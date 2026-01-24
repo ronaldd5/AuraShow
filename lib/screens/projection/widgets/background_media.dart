@@ -3,9 +3,10 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart' as vp;
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 /// Widget for rendering background media (image or video) with filters.
-/// 
+///
 /// Supports various image filters like hue rotation, saturation,
 /// contrast, brightness, blur, and invert.
 class BackgroundMedia extends StatelessWidget {
@@ -46,35 +47,84 @@ class BackgroundMedia extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasPath = path != null && path!.isNotEmpty;
-
     Widget content = Container(color: baseColor);
-    if (hasPath && _isImage) {
-      // Use color blend instead of Opacity widget for better GPU performance
-      content = Image.file(
-        File(path!),
-        fit: BoxFit.cover,
-        color: Colors.white.withOpacity(opacity),
-        colorBlendMode: BlendMode.modulate,
-        errorBuilder: (_, __, ___) => Container(color: baseColor),
-      );
-    } else if (hasPath && _isVideo && videoController != null && videoReady) {
-      // For video, use ColorFiltered instead of Opacity for better performance
-      content = ColorFiltered(
-        colorFilter: ColorFilter.mode(
-          Colors.black.withOpacity(1 - opacity),
-          BlendMode.srcOver,
-        ),
-        child: SizedBox.expand(
-          child: FittedBox(
-            fit: BoxFit.cover,
-            child: SizedBox(
-              width: videoController!.value.size.width,
-              height: videoController!.value.size.height,
-              child: vp.VideoPlayer(videoController!),
+
+    if (hasPath) {
+      // YouTube / YouTube Music
+      if (path!.startsWith('yt:') || path!.startsWith('ytm:')) {
+        final videoId = path!.split(':').last;
+        content = YoutubePlayer(
+          key: ValueKey('yt-bg-$videoId'),
+          aspectRatio: 16 / 9,
+          controller: YoutubePlayerController.fromVideoId(
+            videoId: videoId,
+            autoPlay: true, // Auto-play background videos
+            params: const YoutubePlayerParams(
+              mute: true, // Mute background videos
+              showFullscreenButton: false,
+              showControls: false,
+              playsInline: true,
             ),
           ),
-        ),
-      );
+        );
+      }
+      // Vimeo Placeholder
+      else if (path!.startsWith('vimeo:')) {
+        content = Container(
+          color: Colors.black,
+          alignment: Alignment.center,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.video_library, color: Colors.blue, size: 48),
+              const SizedBox(height: 8),
+              Text(
+                'Vimeo Video: ${path!.split(':').last}',
+                style: const TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+        );
+      }
+      // Image (Network or File)
+      else if (_isImage) {
+        if (path!.startsWith('http')) {
+          content = Image.network(
+            path!,
+            fit: BoxFit.cover,
+            color: Colors.white.withOpacity(opacity),
+            colorBlendMode: BlendMode.modulate,
+            errorBuilder: (_, __, ___) => Container(color: baseColor),
+          );
+        } else {
+          content = Image.file(
+            File(path!),
+            fit: BoxFit.cover,
+            color: Colors.white.withOpacity(opacity),
+            colorBlendMode: BlendMode.modulate,
+            errorBuilder: (_, __, ___) => Container(color: baseColor),
+          );
+        }
+      }
+      // Local Video File
+      else if (_isVideo && videoController != null && videoReady) {
+        content = ColorFiltered(
+          colorFilter: ColorFilter.mode(
+            Colors.black.withOpacity(1 - opacity),
+            BlendMode.srcOver,
+          ),
+          child: SizedBox.expand(
+            child: FittedBox(
+              fit: BoxFit.cover,
+              child: SizedBox(
+                width: videoController!.value.size.width,
+                height: videoController!.value.size.height,
+                child: vp.VideoPlayer(videoController!),
+              ),
+            ),
+          ),
+        );
+      }
     }
 
     final filtered = _applyFilters(content);
@@ -87,7 +137,6 @@ class BackgroundMedia extends StatelessWidget {
       ],
     );
   }
-
   Widget _applyFilters(Widget child) {
     final matrix = _colorMatrix();
     Widget filtered = ColorFiltered(colorFilter: ColorFilter.matrix(matrix), child: child);

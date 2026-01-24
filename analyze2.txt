@@ -1,0 +1,402 @@
+Analyzing dashboard...                                          
+
+   info - Library names are not necessary - lib\screens\dashboard\dashboard_screen.dart:3:9 - unnecessary_library_name
+   info - The import of 'dart:typed_data' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/services.dart' - lib\screens\dashboard\dashboard_screen.dart:14:8 - unnecessary_import
+   info - The imported package 'webview_flutter_platform_interface' isn't a dependency of the importing package - lib\screens\dashboard\dashboard_screen.dart:25:8 - depend_on_referenced_packages
+warning - Unused import: 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart' - lib\screens\dashboard\dashboard_screen.dart:25:8 - unused_import
+warning - Unused import: '../../models/slide_model.dart' - lib\screens\dashboard\dashboard_screen.dart:34:8 - unused_import
+warning - A value for optional parameter 'label' isn't ever given - lib\screens\dashboard\dashboard_screen.dart:186:67 - unused_element_parameter
+warning - The value of the field '_selectedBookId' isn't used - lib\screens\dashboard\dashboard_screen.dart:277:8 - unused_field
+   info - The private field _availableTranslations could be 'final' - lib\screens\dashboard\dashboard_screen.dart:296:30 - prefer_final_fields
+warning - The value of the field '_availableTranslations' isn't used - lib\screens\dashboard\dashboard_screen.dart:296:30 - unused_field
+   info - The private field _loadingTranslations could be 'final' - lib\screens\dashboard\dashboard_screen.dart:297:8 - prefer_final_fields
+warning - The value of the field '_loadingTranslations' isn't used - lib\screens\dashboard\dashboard_screen.dart:297:8 - unused_field
+   info - The private field _customBibleApiSources could be 'final' - lib\screens\dashboard\dashboard_screen.dart:298:30 - prefer_final_fields
+   info - The private field _customApiTranslations could be 'final' - lib\screens\dashboard\dashboard_screen.dart:300:42 - prefer_final_fields
+   info - The private field _audioPlaylists could be 'final' - lib\screens\dashboard\dashboard_screen.dart:338:30 - prefer_final_fields
+   info - The private field _audioShuffle could be 'final' - lib\screens\dashboard\dashboard_screen.dart:347:8 - prefer_final_fields
+warning - The value of the field '_audioShuffle' isn't used - lib\screens\dashboard\dashboard_screen.dart:347:8 - unused_field
+   info - The private field _audioFiles could be 'final' - lib\screens\dashboard\dashboard_screen.dart:361:26 - prefer_final_fields
+warning - The value of the field '_isPresenting' isn't used - lib\screens\dashboard\dashboard_screen.dart:394:8 - unused_field
+warning - The value of the field '_awaitingPresentStopConfirm' isn't used - lib\screens\dashboard\dashboard_screen.dart:395:8 - unused_field
+warning - The value of the field '_presentStopRequestedAt' isn't used - lib\screens\dashboard\dashboard_screen.dart:396:13 - unused_field
+warning - The value of the field '_presentStopConfirmWindow' isn't used - lib\screens\dashboard\dashboard_screen.dart:397:18 - unused_field
+   info - The private field _styles could be 'final' - lib\screens\dashboard\dashboard_screen.dart:427:22 - prefer_final_fields
+warning - The value of the field '_hoverFontPreview' isn't used - lib\screens\dashboard\dashboard_screen.dart:464:11 - unused_field
+warning - The value of the field '_dragCurrent' isn't used - lib\screens\dashboard\dashboard_screen.dart:594:11 - unused_field
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:664:7 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:695:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:696:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:719:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:720:34 - deprecated_member_use
+   info - The local variable '_denseLabel' starts with an underscore - lib\screens\dashboard\dashboard_screen.dart:730:21 - no_leading_underscores_for_local_identifiers
+   info - The local variable '_cycleAlign' starts with an underscore - lib\screens\dashboard\dashboard_screen.dart:738:15 - no_leading_underscores_for_local_identifiers
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:757:35 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\screens\dashboard\dashboard_screen.dart:877:25 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1274:42 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:1279:64 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:1279:75 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1337:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1338:41 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:1343:63 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:1343:74 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1519:39 - deprecated_member_use
+   info - 'opacity' is deprecated and shouldn't be used. Use .a - lib\screens\dashboard\dashboard_screen.dart:1572:46 - deprecated_member_use
+   info - 'opacity' is deprecated and shouldn't be used. Use .a - lib\screens\dashboard\dashboard_screen.dart:1572:70 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1579:28 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1581:43 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:1587:84 - deprecated_member_use
+   info - The local variable '_parseHex' starts with an underscore - lib\screens\dashboard\dashboard_screen.dart:1590:15 - no_leading_underscores_for_local_identifiers
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1615:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1616:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1658:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1700:54 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:1712:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1713:53 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:1713:74 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1734:55 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:1747:70 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1749:56 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:1750:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1773:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1788:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1814:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1817:61 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1908:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1909:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1975:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:2129:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:2178:45 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:2337:38 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:2338:35 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:2390:69 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:2391:35 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:2512:70 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:2513:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:2581:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:2582:50 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:2588:38 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:2589:35 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:2855:70 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:2856:25 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:3054:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:3096:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:3102:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:3110:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:3116:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:3149:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:3169:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:3170:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:3264:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:3277:33 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:3302:23 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:3302:41 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:3304:23 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:3304:41 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:3328:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:3368:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:3403:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:3443:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:3478:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:3729:7 - curly_braces_in_flow_control_structures
+warning - Dead code - lib\screens\dashboard\dashboard_screen.dart:4371:54 - dead_code
+warning - The left operand can't be null, so the right operand is never executed - lib\screens\dashboard\dashboard_screen.dart:4371:57 - dead_null_aware_expression
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:4410:11 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:4460:13 - curly_braces_in_flow_control_structures
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:4524:49 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\dashboard_screen.dart:4525:34 - deprecated_member_use
+warning - This default clause is covered by the previous cases - lib\screens\dashboard\dashboard_screen.dart:4663:9 - unreachable_switch_default
+warning - Dead code - lib\screens\dashboard\dashboard_screen.dart:4920:52 - dead_code
+warning - The left operand can't be null, so the right operand is never executed - lib\screens\dashboard\dashboard_screen.dart:4920:55 - dead_null_aware_expression
+warning - The declaration '_emptyTab' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:5194:10 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:5734:56 - deprecated_member_use
+warning - The value of the local variable 'highlightTerm' isn't used - lib\screens\dashboard\dashboard_screen.dart:5892:47 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:5909:66 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:5934:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:5963:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:5988:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:6050:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:6152:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:6271:42 - deprecated_member_use
+warning - The declaration '_getVerseCount' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:6696:7 - unused_element
+warning - The declaration '_autoNavigateToReference' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:7038:16 - unused_element
+warning - The declaration '_findBookByName' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:7063:24 - unused_element
+warning - The declaration '_searchBibleTextApi' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:7069:16 - unused_element
+warning - The declaration '_searchBibleTextInBookApi' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:7079:16 - unused_element
+warning - This default clause is covered by the previous cases - lib\screens\dashboard\dashboard_screen.dart:7752:7 - unreachable_switch_default
+warning - This default clause is covered by the previous cases - lib\screens\dashboard\dashboard_screen.dart:7874:7 - unreachable_switch_default
+warning - This default clause is covered by the previous cases - lib\screens\dashboard\dashboard_screen.dart:7895:7 - unreachable_switch_default
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:7932:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8093:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8127:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8131:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8266:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8267:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8277:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8286:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8380:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8381:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8391:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8396:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8430:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8430:61 - deprecated_member_use
+warning - The declaration '_pillToggle' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:8472:10 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8478:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8504:31 - deprecated_member_use
+warning - The value of the local variable 'selectedShow' isn't used - lib\screens\dashboard\dashboard_screen.dart:8555:21 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:9121:42 - deprecated_member_use
+warning - The declaration '_projectEmptyState' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:9158:10 - unused_element
+warning - The declaration '_promptRenameFolder' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:9610:16 - unused_element
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:9641:7 - curly_braces_in_flow_control_structures
+warning - The declaration '_promptRenameProject' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:9657:16 - unused_element
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:9688:7 - curly_braces_in_flow_control_structures
+warning - The declaration '_confirmDeleteProject' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:9720:16 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:9925:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:9926:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:10226:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:10227:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:10255:58 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:10427:29 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:10475:61 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:10567:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:10572:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:10573:56 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:10652:33 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:10701:53 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:10919:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:10934:7 - curly_braces_in_flow_control_structures
+warning - Dead code - lib\screens\dashboard\dashboard_screen.dart:11134:43 - dead_code
+warning - The value of the local variable 'slideTabIndex' isn't used - lib\screens\dashboard\dashboard_screen.dart:11155:21 - unused_local_variable
+warning - The value of the local variable 'filtersTabIndex' isn't used - lib\screens\dashboard\dashboard_screen.dart:11158:21 - unused_local_variable
+warning - The value of the local variable 'textboxTabIndex' isn't used - lib\screens\dashboard\dashboard_screen.dart:11161:21 - unused_local_variable
+warning - The operand can't be 'null', so the condition is always 'true' - lib\screens\dashboard\dashboard_screen.dart:11188:32 - unnecessary_null_comparison
+warning - The receiver can't be null, so the null-aware operator '?.' is unnecessary - lib\screens\dashboard\dashboard_screen.dart:11192:51 - invalid_null_aware_operator
+warning - Dead code - lib\screens\dashboard\dashboard_screen.dart:11256:45 - dead_code
+warning - Dead code - lib\screens\dashboard\dashboard_screen.dart:11257:51 - dead_code
+warning - Dead code - lib\screens\dashboard\dashboard_screen.dart:11259:29 - dead_code
+warning - The declaration '_importLyrics' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:11299:8 - unused_element
+warning - The declaration '_drawerList' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:11538:10 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:12220:46 - deprecated_member_use
+warning - The declaration '_toggleOutputsLocked' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:12358:8 - unused_element
+warning - The declaration '_buildClearAllButton' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:12377:10 - unused_element
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:12534:7 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:12646:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:12656:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:12681:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:12794:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:12799:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:12810:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:12811:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:14225:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:14235:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:14245:43 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:14615:23 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:14644:25 - curly_braces_in_flow_control_structures
+warning - The declaration '_promptNewProjectMenu' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:14795:16 - unused_element
+   info - 'VideoPlayerController.network' is deprecated and shouldn't be used. Use VideoPlayerController.networkUrl instead - lib\screens\dashboard\dashboard_screen.dart:14952:22 - deprecated_member_use
+warning - The declaration '_videoAspectRatio' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:14976:11 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:15029:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:15125:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:15126:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:15269:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:15563:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:15690:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:15690:61 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:15702:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:15718:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:15770:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:15770:61 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:15782:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:15806:35 - deprecated_member_use
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\dashboard_screen.dart:15900:19 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\dashboard_screen.dart:15901:19 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\dashboard_screen.dart:15913:9 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\dashboard_screen.dart:15914:9 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\dashboard_screen.dart:15939:5 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\dashboard_screen.dart:15940:5 - library_private_types_in_public_api
+warning - A value for optional parameter 'headless' isn't ever given - lib\screens\dashboard\dashboard_screen.dart:16060:10 - unused_element_parameter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:16209:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:16225:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:16281:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:16286:35 - deprecated_member_use
+warning - A value for optional parameter 'isDesktop' isn't ever given - lib\screens\dashboard\dashboard_screen.dart:16578:10 - unused_element_parameter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:16620:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:16639:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:16704:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:16710:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:16755:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:16764:40 - deprecated_member_use
+   info - The private field _targetFrameTimeMs could be 'final' - lib\screens\dashboard\dashboard_screen.dart:16846:7 - prefer_final_fields
+warning - The value of the field '_targetFrameTimeMs' isn't used - lib\screens\dashboard\dashboard_screen.dart:16846:7 - unused_field
+warning - A value for optional parameter 'onReady' isn't ever given - lib\screens\dashboard\dashboard_screen.dart:17155:10 - unused_element_parameter
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\audio_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\audio_extensions.dart:4:30 - library_private_types_in_public_api
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:53:22 - invalid_use_of_protected_member
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:58:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:96:27 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:98:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:153:52 - deprecated_member_use
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:205:19 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:234:9 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:242:9 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:250:9 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:289:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:303:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:360:30 - invalid_use_of_protected_member
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:371:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:441:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:478:47 - deprecated_member_use
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:511:7 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:518:20 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:537:7 - invalid_use_of_protected_member
+   info - Don't use 'BuildContext's across async gaps - lib\screens\dashboard\extensions\audio_extensions.dart:547:28 - use_build_context_synchronously
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:616:30 - invalid_use_of_protected_member
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:627:38 - deprecated_member_use
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:685:5 - invalid_use_of_protected_member
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:738:41 - deprecated_member_use
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:802:35 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:824:30 - invalid_use_of_protected_member
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:833:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:834:40 - deprecated_member_use
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:872:19 - invalid_use_of_protected_member
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:890:38 - deprecated_member_use
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:919:7 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:924:7 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\audio_extensions.dart:930:9 - invalid_use_of_protected_member
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\clipboard_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\clipboard_extensions.dart:4:34 - library_private_types_in_public_api
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\clipboard_extensions.dart:29:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\clipboard_extensions.dart:65:5 - invalid_use_of_protected_member
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\layer_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\layer_extensions.dart:4:30 - library_private_types_in_public_api
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\layer_extensions.dart:7:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\layer_extensions.dart:154:7 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\layer_extensions.dart:177:5 - invalid_use_of_protected_member
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\layer_extensions.dart:195:7 - curly_braces_in_flow_control_structures
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\layer_extensions.dart:196:5 - invalid_use_of_protected_member
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\layer_extensions.dart:209:7 - curly_braces_in_flow_control_structures
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\layer_extensions.dart:216:5 - invalid_use_of_protected_member
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\layer_extensions.dart:238:7 - curly_braces_in_flow_control_structures
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\layer_extensions.dart:239:5 - invalid_use_of_protected_member
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\layer_extensions.dart:296:7 - curly_braces_in_flow_control_structures
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\layer_extensions.dart:297:5 - invalid_use_of_protected_member
+warning - The value of the local variable 'currentType' isn't used - lib\screens\dashboard\extensions\layer_extensions.dart:370:11 - unused_local_variable
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\layer_extensions.dart:409:5 - invalid_use_of_protected_member
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\layer_extensions.dart:444:7 - curly_braces_in_flow_control_structures
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\layer_extensions.dart:448:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\layer_extensions.dart:478:7 - invalid_use_of_protected_member
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:530:32 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\layer_extensions.dart:546:7 - curly_braces_in_flow_control_structures
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\layer_extensions.dart:553:5 - invalid_use_of_protected_member
+  error - The named parameter 'rect' isn't defined - lib\screens\dashboard\extensions\layer_extensions.dart:564:9 - undefined_named_parameter
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\layer_extensions.dart:586:7 - curly_braces_in_flow_control_structures
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\layer_extensions.dart:587:5 - invalid_use_of_protected_member
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\media_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\media_extensions.dart:4:36 - library_private_types_in_public_api
+warning - The declaration '_submitOnlineSearch' isn't referenced - lib\screens\dashboard\extensions\media_extensions.dart:5:16 - unused_element
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\media_extensions.dart:9:7 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\media_extensions.dart:13:5 - invalid_use_of_protected_member
+warning - This default clause is covered by the previous cases - lib\screens\dashboard\extensions\media_extensions.dart:39:9 - unreachable_switch_default
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\media_extensions.dart:44:7 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\media_extensions.dart:144:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\media_extensions.dart:165:7 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\media_extensions.dart:170:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\media_extensions.dart:191:7 - invalid_use_of_protected_member
+warning - The declaration '_clearOnlineSearch' isn't referenced - lib\screens\dashboard\extensions\media_extensions.dart:244:8 - unused_element
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\media_extensions.dart:245:5 - invalid_use_of_protected_member
+warning - The declaration '_refreshScreensFromPlatform' isn't referenced - lib\screens\dashboard\extensions\media_extensions.dart:279:16 - unused_element
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\media_extensions.dart:288:7 - invalid_use_of_protected_member
+warning - Dead code - lib\screens\dashboard\extensions\media_extensions.dart:294:52 - dead_code
+warning - The left operand can't be null, so the right operand is never executed - lib\screens\dashboard\extensions\media_extensions.dart:294:55 - dead_null_aware_expression
+warning - The declaration '_addYouTubeLink' isn't referenced - lib\screens\dashboard\extensions\media_extensions.dart:310:8 - unused_element
+warning - The declaration '_searchYouTube' isn't referenced - lib\screens\dashboard\extensions\media_extensions.dart:342:16 - unused_element
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\media_extensions.dart:350:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\media_extensions.dart:363:9 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\media_extensions.dart:383:20 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\media_extensions.dart:396:5 - invalid_use_of_protected_member
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\media_extensions.dart:405:7 - curly_braces_in_flow_control_structures
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\media_extensions.dart:450:5 - invalid_use_of_protected_member
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\project_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\project_extensions.dart:4:32 - library_private_types_in_public_api
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:177:7 - invalid_use_of_protected_member
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\settings_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\settings_extensions.dart:4:33 - library_private_types_in_public_api
+warning - The declaration '_showNoticeDialog' isn't referenced - lib\screens\dashboard\extensions\settings_extensions.dart:12:16 - unused_element
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\settings_extensions.dart:58:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\settings_extensions.dart:66:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\settings_extensions.dart:75:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\settings_extensions.dart:85:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\settings_extensions.dart:95:5 - invalid_use_of_protected_member
+warning - The declaration '_loadSettings' isn't referenced - lib\screens\dashboard\extensions\settings_extensions.dart:119:16 - unused_element
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\settings_extensions.dart:129:5 - invalid_use_of_protected_member
+  error - The element type 'String?' can't be assigned to the list type 'String' - lib\screens\dashboard\extensions\settings_extensions.dart:137:9 - list_element_type_not_assignable
+  error - The element type 'String?' can't be assigned to the list type 'String' - lib\screens\dashboard\extensions\settings_extensions.dart:142:9 - list_element_type_not_assignable
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:4:40 - library_private_types_in_public_api
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:44:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:60:5 - invalid_use_of_protected_member
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:92:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:111:7 - curly_braces_in_flow_control_structures
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:113:5 - invalid_use_of_protected_member
+warning - The declaration '_hasSelection' isn't referenced - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:156:8 - unused_element
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:166:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:252:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:270:7 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:313:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:327:5 - invalid_use_of_protected_member
+   info - 'RawKeyEvent' is deprecated and shouldn't be used. Use KeyEvent instead. This feature was deprecated after v3.18.0-2.0.pre - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:334:51 - deprecated_member_use
+   info - 'RawKeyDownEvent' is deprecated and shouldn't be used. Use KeyDownEvent instead. This feature was deprecated after v3.18.0-2.0.pre - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:335:18 - deprecated_member_use
+   info - 'isControlPressed' is deprecated and shouldn't be used. Use HardwareKeyboard.instance.isControlPressed instead. This feature was deprecated after v3.18.0-2.0.pre - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:336:15 - deprecated_member_use
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:338:7 - invalid_use_of_protected_member
+   info - 'onKey' is deprecated and shouldn't be used. Use onKeyEvent instead. This feature was deprecated after v3.18.0-2.0.pre - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:365:7 - deprecated_member_use
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:419:35 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:421:35 - invalid_use_of_protected_member
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:474:67 - deprecated_member_use
+  error - Invalid constant value - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:526:56 - invalid_constant
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:571:66 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:575:63 - invalid_use_of_protected_member
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:606:62 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:660:40 - deprecated_member_use
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:670:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:691:7 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:780:5 - invalid_use_of_protected_member
+   info - The part-of directive uses a library name - lib\screens\dashboard\helpers\render_helpers.dart:1:1 - use_string_in_part_of_directives
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\helpers\render_helpers.dart:215:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\helpers\render_helpers.dart:235:46 - deprecated_member_use
+   info - The part-of directive uses a library name - lib\screens\dashboard\models\layer_models.dart:1:1 - use_string_in_part_of_directives
+   info - The part-of directive uses a library name - lib\screens\dashboard\models\slide_models.dart:3:1 - use_string_in_part_of_directives
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:33:32 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:34:34 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:35:40 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:44:58 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:45:70 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:46:75 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:161:68 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:162:49 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:171:37 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:175:39 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:178:51 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:185:45 - deprecated_member_use
+   info - The part-of directive uses a library name - lib\screens\dashboard\services\output_window_service.dart:1:1 - use_string_in_part_of_directives
+   info - The part-of directive uses a library name - lib\screens\dashboard\widgets\slide_editor_widgets.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\widgets\slide_editor_widgets.dart:4:33 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\widgets\slide_editor_widgets.dart:9:28 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\widgets\slide_editor_widgets.dart:10:28 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\widgets\slide_editor_widgets.dart:114:37 - library_private_types_in_public_api
+   info - The part-of directive uses a library name - lib\screens\dashboard\widgets\view_widgets.dart:1:1 - use_string_in_part_of_directives
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\widgets\view_widgets.dart:23:42 - invalid_use_of_protected_member
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:26:54 - deprecated_member_use
+warning - The declaration '_buildMediaExplorerPanel' isn't referenced - lib\screens\dashboard\widgets\view_widgets.dart:52:10 - unused_element
+warning - The value of the local variable 'stageHeight' isn't used - lib\screens\dashboard\widgets\view_widgets.dart:275:24 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:414:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:415:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:429:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:430:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:502:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:596:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:599:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:617:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:636:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:708:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:776:34 - deprecated_member_use
+

@@ -1,0 +1,301 @@
+Widget _settingsGpuPanel() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Frame Rate Section
+      Container(
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.timeline, size: 20, color: accentPink),
+                const SizedBox(width: 8),
+                const Text(
+                  'Frame Rate Control',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Limit maximum FPS for better performance on lower-end systems',
+              style: TextStyle(fontSize: 12, color: Colors.white70),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Target Frame Rate: ${targetFrameRate} FPS',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Slider(
+                        value: targetFrameRate.toDouble(),
+                        min: 30,
+                        max: 144,
+                        divisions: 19,
+                        label: '$targetFrameRate FPS',
+                        activeColor: accentPink,
+                        onChanged: (v) => _setIntPref(
+                          'target_frame_rate',
+                          v.round(),
+                          (val) => targetFrameRate = val,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+
+      // Rendering Backend Section
+      Container(
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.architecture, size: 20, color: accentPink),
+                const SizedBox(width: 8),
+                const Text(
+                  'Rendering Backend',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Choose between Skia (legacy, stable) and Impeller (new, faster)',
+              style: TextStyle(fontSize: 12, color: Colors.white70),
+            ),
+            const SizedBox(height: 16),
+            SwitchListTile(
+              value: useSkia,
+              onChanged: (v) =>
+                  _setBoolPref('use_skia_renderer', v, (val) => useSkia = val),
+              title: const Text('Use Skia Renderer'),
+              subtitle: Text(
+                useSkia
+                    ? 'Using Skia (legacy, more compatible)'
+                    : 'Using Impeller (new, better performance)',
+                style: const TextStyle(fontSize: 11, color: Colors.white60),
+              ),
+              activeThumbColor: accentPink,
+              contentPadding: EdgeInsets.zero,
+            ),
+          ],
+        ),
+      ),
+
+      // Cache Settings Section
+      Container(
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.memory, size: 20, color: accentPink),
+                const SizedBox(width: 8),
+                const Text(
+                  'Cache Settings',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Control caching behavior for improved performance',
+              style: TextStyle(fontSize: 12, color: Colors.white70),
+            ),
+            const SizedBox(height: 16),
+            SwitchListTile(
+              value: enableRasterCache,
+              onChanged: (v) => _setBoolPref(
+                'enable_raster_cache',
+                v,
+                (val) => enableRasterCache = val,
+              ),
+              title: const Text('Enable Raster Cache'),
+              subtitle: const Text(
+                'Cache rendered content to reduce CPU usage',
+                style: TextStyle(fontSize: 11, color: Colors.white60),
+              ),
+              activeThumbColor: accentPink,
+              contentPadding: EdgeInsets.zero,
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Raster Cache Size: ${rasterCacheSize} MB',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: enableRasterCache
+                              ? Colors.white
+                              : Colors.white38,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Slider(
+                        value: rasterCacheSize.toDouble(),
+                        min: 10,
+                        max: 200,
+                        divisions: 19,
+                        label: '$rasterCacheSize MB',
+                        activeColor: accentPink,
+                        onChanged: enableRasterCache
+                            ? (v) => _setIntPref(
+                                'raster_cache_size',
+                                v.round(),
+                                (val) => rasterCacheSize = val,
+                              )
+                            : null,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            SwitchListTile(
+              value: textureCompressionEnabled,
+              onChanged: (v) => _setBoolPref(
+                'texture_compression',
+                v,
+                (val) => textureCompressionEnabled = val,
+              ),
+              title: const Text('Enable Texture Compression'),
+              subtitle: const Text(
+                'Reduce GPU memory usage with compressed textures',
+                style: TextStyle(fontSize: 11, color: Colors.white60),
+              ),
+              activeThumbColor: accentPink,
+              contentPadding: EdgeInsets.zero,
+            ),
+          ],
+        ),
+      ),
+
+      // Advanced Settings Section
+      Container(
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.settings_suggest, size: 20, color: accentPink),
+                const SizedBox(width: 8),
+                const Text(
+                  'Advanced',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Advanced performance tuning options',
+              style: TextStyle(fontSize: 12, color: Colors.white70),
+            ),
+            const SizedBox(height: 16),
+            SwitchListTile(
+              value: enableShaderWarmup,
+              onChanged: (v) => _setBoolPref(
+                'enable_shader_warmup',
+                v,
+                (val) => enableShaderWarmup = val,
+              ),
+              title: const Text('Enable Shader Warmup'),
+              subtitle: const Text(
+                'Pre-compile shaders to reduce stuttering during presentations',
+                style: TextStyle(fontSize: 11, color: Colors.white60),
+              ),
+              activeThumbColor: accentPink,
+              contentPadding: EdgeInsets.zero,
+            ),
+            const SizedBox(height: 16),
+            SwitchListTile(
+              value: disableHardwareAcceleration,
+              onChanged: (v) => _setBoolPref(
+                'disable_hw_accel',
+                v,
+                (val) => disableHardwareAcceleration = val,
+              ),
+              title: const Text('Disable Hardware Acceleration'),
+              subtitle: const Text(
+                'Force CPU rendering (use only if experiencing GPU issues)',
+                style: TextStyle(fontSize: 11, color: Colors.white60),
+              ),
+              activeThumbColor: accentPink,
+              contentPadding: EdgeInsets.zero,
+            ),
+          ],
+        ),
+      ),
+
+      // Info Card
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: accentPink.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: accentPink.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.info_outline, color: accentPink, size: 20),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'Note: Some GPU settings require restarting the application to take full effect.',
+                style: TextStyle(fontSize: 12, color: Colors.white70),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}

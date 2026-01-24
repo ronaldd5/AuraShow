@@ -1,0 +1,792 @@
+Analyzing AuraShow...                                           
+
+   info - Don't invoke 'print' in production code - delete_filter_code.dart:21:5 - avoid_print
+   info - Don't invoke 'print' in production code - delete_filter_code.dart:23:5 - avoid_print
+   info - Don't invoke 'print' in production code - delete_layer_code.dart:12:3 - avoid_print
+   info - Don't invoke 'print' in production code - delete_media_stage_code.dart:19:5 - avoid_print
+   info - Don't invoke 'print' in production code - delete_media_stage_code.dart:24:5 - avoid_print
+   info - Don't invoke 'print' in production code - delete_media_stage_code.dart:30:5 - avoid_print
+   info - Don't invoke 'print' in production code - delete_media_stage_code.dart:34:5 - avoid_print
+   info - Don't invoke 'print' in production code - delete_media_stage_code.dart:40:5 - avoid_print
+   info - Don't invoke 'print' in production code - delete_media_stage_code.dart:44:5 - avoid_print
+   info - Don't invoke 'print' in production code - delete_media_stage_code.dart:50:5 - avoid_print
+   info - Don't invoke 'print' in production code - delete_media_stage_code.dart:55:5 - avoid_print
+   info - Don't invoke 'print' in production code - delete_media_stage_code.dart:77:3 - avoid_print
+   info - 'background' is deprecated and shouldn't be used. Use surface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\app.dart:24:11 - deprecated_member_use
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\app.dart:28:11 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app.dart:32:44 - deprecated_member_use
+warning - The value of the field '_stack' isn't used - lib\core\widgets\error_boundary.dart:23:15 - unused_field
+warning - The declaration 'of' isn't referenced - lib\core\widgets\error_boundary.dart:69:31 - unused_element
+   info - Dangling library doc comment - lib\main.dart:1:1 - dangling_library_doc_comments
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\models\slide_model.dart:174:32 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\models\slide_model.dart:175:34 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\models\slide_model.dart:176:40 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\models\slide_model.dart:185:58 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\models\slide_model.dart:186:70 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\models\slide_model.dart:187:75 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\models\slide_model.dart:302:68 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\models\slide_model.dart:303:49 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\models\slide_model.dart:312:37 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\models\slide_model.dart:316:39 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\models\slide_model.dart:319:51 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\models\slide_model.dart:326:45 - deprecated_member_use
+   info - Library names are not necessary - lib\screens\dashboard\dashboard_screen.dart:3:9 - unnecessary_library_name
+   info - The imported package 'webview_flutter_platform_interface' isn't a dependency of the importing package - lib\screens\dashboard\dashboard_screen.dart:25:8 - depend_on_referenced_packages
+warning - A value for optional parameter 'label' isn't ever given - lib\screens\dashboard\dashboard_screen.dart:190:67 - unused_element_parameter
+warning - The declaration '<unnamed>' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:226:7 - unused_element
+warning - The value of the field '_selectedBookId' isn't used - lib\screens\dashboard\dashboard_screen.dart:281:8 - unused_field
+   info - The private field _availableTranslations could be 'final' - lib\screens\dashboard\dashboard_screen.dart:300:30 - prefer_final_fields
+warning - The value of the field '_availableTranslations' isn't used - lib\screens\dashboard\dashboard_screen.dart:300:30 - unused_field
+   info - The private field _loadingTranslations could be 'final' - lib\screens\dashboard\dashboard_screen.dart:301:8 - prefer_final_fields
+warning - The value of the field '_loadingTranslations' isn't used - lib\screens\dashboard\dashboard_screen.dart:301:8 - unused_field
+   info - The private field _customBibleApiSources could be 'final' - lib\screens\dashboard\dashboard_screen.dart:302:30 - prefer_final_fields
+   info - The private field _customApiTranslations could be 'final' - lib\screens\dashboard\dashboard_screen.dart:304:42 - prefer_final_fields
+   info - The private field _audioPlaylists could be 'final' - lib\screens\dashboard\dashboard_screen.dart:342:30 - prefer_final_fields
+   info - The private field _audioShuffle could be 'final' - lib\screens\dashboard\dashboard_screen.dart:351:8 - prefer_final_fields
+warning - The value of the field '_audioShuffle' isn't used - lib\screens\dashboard\dashboard_screen.dart:351:8 - unused_field
+   info - The private field _audioFiles could be 'final' - lib\screens\dashboard\dashboard_screen.dart:365:26 - prefer_final_fields
+warning - The value of the field '_isPresenting' isn't used - lib\screens\dashboard\dashboard_screen.dart:398:8 - unused_field
+warning - The value of the field '_awaitingPresentStopConfirm' isn't used - lib\screens\dashboard\dashboard_screen.dart:399:8 - unused_field
+warning - The value of the field '_presentStopRequestedAt' isn't used - lib\screens\dashboard\dashboard_screen.dart:400:13 - unused_field
+warning - The value of the field '_presentStopConfirmWindow' isn't used - lib\screens\dashboard\dashboard_screen.dart:401:18 - unused_field
+   info - The private field _settingsTab could be 'final' - lib\screens\dashboard\dashboard_screen.dart:408:16 - prefer_final_fields
+   info - The private field _styles could be 'final' - lib\screens\dashboard\dashboard_screen.dart:431:22 - prefer_final_fields
+warning - The value of the field '_hoverFontPreview' isn't used - lib\screens\dashboard\dashboard_screen.dart:468:11 - unused_field
+warning - The value of the field '_dragCurrent' isn't used - lib\screens\dashboard\dashboard_screen.dart:598:11 - unused_field
+warning - The declaration '_ensureSelectedLayerValid' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:641:8 - unused_element
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:668:7 - curly_braces_in_flow_control_structures
+  error - The method '_applyLayerUpdate' isn't defined for the type '_DashboardScreenState' - lib\screens\dashboard\dashboard_screen.dart:675:7 - undefined_method
+  error - A member named '_firstNonEmpty' is defined in 'extension SettingsExtensions on _DashboardScreenState' and 'extension TextExtensions on _DashboardScreenState', and neither is more specific - lib\screens\dashboard\dashboard_screen.dart:857:23 - ambiguous_extension_member_access
+  error - A member named '_firstNonEmpty' is defined in 'extension SettingsExtensions on _DashboardScreenState' and 'extension TextExtensions on _DashboardScreenState', and neither is more specific - lib\screens\dashboard\dashboard_screen.dart:862:26 - ambiguous_extension_member_access
+  error - A member named '_ensureOutputPreviewVisibilityDefaults' is defined in 'extension SettingsExtensions on _DashboardScreenState' and 'extension OutputExtensions on _DashboardScreenState', and neither is more specific - lib\screens\dashboard\dashboard_screen.dart:931:7 - ambiguous_extension_member_access
+warning - The declaration '_pickLibraryFolder' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:978:16 - unused_element
+warning - Dead code - lib\screens\dashboard\dashboard_screen.dart:1121:52 - dead_code
+warning - The left operand can't be null, so the right operand is never executed - lib\screens\dashboard\dashboard_screen.dart:1121:55 - dead_null_aware_expression
+warning - The declaration '_emptyTab' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:1319:10 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:1859:56 - deprecated_member_use
+warning - The value of the local variable 'highlightTerm' isn't used - lib\screens\dashboard\dashboard_screen.dart:2017:47 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:2034:66 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:2059:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:2088:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:2113:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:2175:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:2277:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:2396:42 - deprecated_member_use
+warning - The declaration '_getVerseCount' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:2821:7 - unused_element
+warning - The declaration '_autoNavigateToReference' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:3163:16 - unused_element
+warning - The declaration '_findBookByName' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:3188:24 - unused_element
+warning - The declaration '_searchBibleTextApi' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:3194:16 - unused_element
+warning - The declaration '_searchBibleTextInBookApi' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:3204:16 - unused_element
+warning - This default clause is covered by the previous cases - lib\screens\dashboard\dashboard_screen.dart:3877:7 - unreachable_switch_default
+warning - This default clause is covered by the previous cases - lib\screens\dashboard\dashboard_screen.dart:3999:7 - unreachable_switch_default
+warning - This default clause is covered by the previous cases - lib\screens\dashboard\dashboard_screen.dart:4020:7 - unreachable_switch_default
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4057:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4218:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4252:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4256:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4391:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4392:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4402:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4411:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4505:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4506:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4516:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4521:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4555:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4555:61 - deprecated_member_use
+warning - The declaration '_pillToggle' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:4597:10 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4603:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:4629:31 - deprecated_member_use
+warning - The value of the local variable 'selectedShow' isn't used - lib\screens\dashboard\dashboard_screen.dart:4680:21 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:5246:42 - deprecated_member_use
+warning - The declaration '_projectEmptyState' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:5283:10 - unused_element
+warning - The declaration '_promptRenameFolder' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:5735:16 - unused_element
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:5766:7 - curly_braces_in_flow_control_structures
+warning - The declaration '_promptRenameProject' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:5782:16 - unused_element
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:5813:7 - curly_braces_in_flow_control_structures
+warning - The declaration '_confirmDeleteProject' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:5845:16 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:6126:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:6127:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:6155:58 - deprecated_member_use
+  error - The method '_foregroundLayers' isn't defined for the type '_DashboardScreenState' - lib\screens\dashboard\dashboard_screen.dart:6245:26 - undefined_method
+  error - The method '_showLayerContextMenu' isn't defined for the type '_DashboardScreenState' - lib\screens\dashboard\dashboard_screen.dart:6302:58 - undefined_method
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:6327:29 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:6375:61 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:6467:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:6472:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:6473:56 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:6552:33 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:6601:53 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:6819:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:6834:7 - curly_braces_in_flow_control_structures
+  error - The method '_applyLayerUpdate' isn't defined for the type '_DashboardScreenState' - lib\screens\dashboard\dashboard_screen.dart:6845:5 - undefined_method
+  error - Too many positional arguments: 0 expected, but 2 found - lib\screens\dashboard\dashboard_screen.dart:7026:41 - extra_positional_arguments
+warning - Dead code - lib\screens\dashboard\dashboard_screen.dart:7034:43 - dead_code
+warning - The value of the local variable 'slideTabIndex' isn't used - lib\screens\dashboard\dashboard_screen.dart:7055:21 - unused_local_variable
+warning - The value of the local variable 'filtersTabIndex' isn't used - lib\screens\dashboard\dashboard_screen.dart:7058:21 - unused_local_variable
+warning - The value of the local variable 'textboxTabIndex' isn't used - lib\screens\dashboard\dashboard_screen.dart:7061:21 - unused_local_variable
+warning - The operand can't be 'null', so the condition is always 'true' - lib\screens\dashboard\dashboard_screen.dart:7088:32 - unnecessary_null_comparison
+warning - The receiver can't be null, so the null-aware operator '?.' is unnecessary - lib\screens\dashboard\dashboard_screen.dart:7092:51 - invalid_null_aware_operator
+warning - Dead code - lib\screens\dashboard\dashboard_screen.dart:7156:45 - dead_code
+warning - Dead code - lib\screens\dashboard\dashboard_screen.dart:7157:51 - dead_code
+warning - Dead code - lib\screens\dashboard\dashboard_screen.dart:7159:29 - dead_code
+warning - The declaration '_importLyrics' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:7199:8 - unused_element
+warning - The declaration '_drawerList' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:7438:10 - unused_element
+  error - Undefined name '_nextSlide' - lib\screens\dashboard\dashboard_screen.dart:7994:30 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:8120:46 - deprecated_member_use
+  error - Expected a class member - lib\screens\dashboard\dashboard_screen.dart:8167:5 - expected_class_member
+  error - '_pauseCurrentSlideVideo' must have a method body because '_DashboardScreenState' isn't abstract - lib\screens\dashboard\dashboard_screen.dart:8167:8 - concrete_class_with_abstract_member
+  error - isPlaying isn't a type - lib\screens\dashboard\dashboard_screen.dart:8167:9 - not_a_type
+  error - A record type with exactly one positional field requires a trailing comma - lib\screens\dashboard\dashboard_screen.dart:8167:18 - record_type_one_positional_no_trailing_comma
+warning - The declaration '_pauseCurrentSlideVideo' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:8167:20 - unused_element
+   info - The member 'setState' overrides an inherited member but isn't annotated with '@override' - lib\screens\dashboard\dashboard_screen.dart:8169:5 - annotate_overrides
+   info - Use the generic function type syntax to declare the parameter '' - lib\screens\dashboard\dashboard_screen.dart:8169:14 - use_function_type_syntax_for_parameters
+  error - Expected an identifier - lib\screens\dashboard\dashboard_screen.dart:8169:14 - missing_identifier
+  error - Expected to find ')' - lib\screens\dashboard\dashboard_screen.dart:8169:17 - expected_token
+warning - The declaration '_precacheUpcomingSlideImages' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:8179:5 - unused_element
+  error - '_precacheUpcomingSlideImages' must have a method body because '_DashboardScreenState' isn't abstract - lib\screens\dashboard\dashboard_screen.dart:8179:5 - concrete_class_with_abstract_member
+  error - Expected a class member - lib\screens\dashboard\dashboard_screen.dart:8182:5 - expected_class_member
+  error - Expected an identifier - lib\screens\dashboard\dashboard_screen.dart:8182:8 - missing_identifier
+  error - '_sendCurrentSlideToOutputs' must have a method body because '_DashboardScreenState' isn't abstract - lib\screens\dashboard\dashboard_screen.dart:8185:5 - concrete_class_with_abstract_member
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8189:9 - undefined_identifier
+  error - Undefined name 'isPlaying' - lib\screens\dashboard\dashboard_screen.dart:8191:9 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8193:5 - undefined_function
+  error - Undefined name 'selectedSlideIndex' - lib\screens\dashboard\dashboard_screen.dart:8194:7 - undefined_identifier
+  error - Undefined name 'selectedSlideIndex' - lib\screens\dashboard\dashboard_screen.dart:8195:12 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8195:37 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8195:55 - undefined_identifier
+  error - Undefined name 'selectedSlides' - lib\screens\dashboard\dashboard_screen.dart:8196:7 - undefined_identifier
+  error - Undefined name 'selectedSlideIndex' - lib\screens\dashboard\dashboard_screen.dart:8196:25 - undefined_identifier
+  error - The function '_ensureSelectedLayerValid' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8197:7 - undefined_function
+  error - Undefined name '_isInlineTextEditing' - lib\screens\dashboard\dashboard_screen.dart:8198:7 - undefined_identifier
+  error - Undefined name '_editingLayerId' - lib\screens\dashboard\dashboard_screen.dart:8199:7 - undefined_identifier
+  error - Undefined name '_layerTextController' - lib\screens\dashboard\dashboard_screen.dart:8200:7 - undefined_identifier
+  error - Undefined name 'isPlaying' - lib\screens\dashboard\dashboard_screen.dart:8207:9 - undefined_identifier
+  error - The function '_sendCurrentSlideToOutputs' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8210:5 - undefined_function
+  error - Undefined name 'mounted' - lib\screens\dashboard\dashboard_screen.dart:8215:10 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8215:21 - undefined_identifier
+  error - Undefined name 'selectedSlideIndex' - lib\screens\dashboard\dashboard_screen.dart:8219:26 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8219:57 - undefined_identifier
+  error - Undefined name 'selectedSlideIndex' - lib\screens\dashboard\dashboard_screen.dart:8220:24 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8222:21 - undefined_identifier
+  error - The function '_backgroundLayerFor' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8225:23 - undefined_function
+  error - The function '_foregroundLayers' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8232:27 - undefined_function
+  error - Undefined name 'mounted' - lib\screens\dashboard\dashboard_screen.dart:8243:10 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\dashboard\dashboard_screen.dart:8247:40 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8257:5 - undefined_function
+  error - Undefined name 'isPlaying' - lib\screens\dashboard\dashboard_screen.dart:8258:7 - undefined_identifier
+  error - Undefined name 'isPlaying' - lib\screens\dashboard\dashboard_screen.dart:8258:20 - undefined_identifier
+  error - Undefined name 'isPlaying' - lib\screens\dashboard\dashboard_screen.dart:8260:9 - undefined_identifier
+  error - The function '_sendCurrentSlideToOutputs' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8268:5 - undefined_function
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8273:9 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8275:9 - undefined_identifier
+  error - Undefined name 'selectedSlideIndex' - lib\screens\dashboard\dashboard_screen.dart:8275:31 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8275:54 - undefined_identifier
+  error - The function '_backgroundLayerFor' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8278:21 - undefined_function
+  error - The function '_foregroundLayers' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8284:25 - undefined_function
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8295:9 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8297:9 - undefined_identifier
+  error - Undefined name 'selectedSlideIndex' - lib\screens\dashboard\dashboard_screen.dart:8297:31 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8297:54 - undefined_identifier
+  error - Undefined name '_videoControllers' - lib\screens\dashboard\dashboard_screen.dart:8341:19 - undefined_identifier
+  error - Undefined name 'isPlaying' - lib\screens\dashboard\dashboard_screen.dart:8356:10 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8356:23 - undefined_identifier
+  error - Undefined name 'autoAdvanceEnabled' - lib\screens\dashboard\dashboard_screen.dart:8367:16 - undefined_identifier
+  error - Undefined name 'mounted' - lib\screens\dashboard\dashboard_screen.dart:8382:10 - undefined_identifier
+  error - Undefined name 'isPlaying' - lib\screens\dashboard\dashboard_screen.dart:8382:22 - undefined_identifier
+  error - Undefined name 'mounted' - lib\screens\dashboard\dashboard_screen.dart:8389:12 - undefined_identifier
+  error - Undefined name 'isPlaying' - lib\screens\dashboard\dashboard_screen.dart:8389:24 - undefined_identifier
+  error - Undefined name 'autoAdvanceEnabled' - lib\screens\dashboard\dashboard_screen.dart:8397:13 - undefined_identifier
+  error - The function '_nextSlide' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8398:11 - undefined_function
+  error - Undefined name '_videoControllers' - lib\screens\dashboard\dashboard_screen.dart:8417:21 - undefined_identifier
+  error - Undefined name 'isPlaying' - lib\screens\dashboard\dashboard_screen.dart:8426:10 - undefined_identifier
+  error - Undefined name 'autoAdvanceEnabled' - lib\screens\dashboard\dashboard_screen.dart:8426:24 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8426:46 - undefined_identifier
+  error - Undefined name '_autoAdvanceTimer' - lib\screens\dashboard\dashboard_screen.dart:8435:5 - undefined_identifier
+  error - Undefined name 'autoAdvanceInterval' - lib\screens\dashboard\dashboard_screen.dart:8435:31 - undefined_identifier
+  error - Undefined name 'mounted' - lib\screens\dashboard\dashboard_screen.dart:8436:12 - undefined_identifier
+  error - The function '_nextSlide' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8437:7 - undefined_function
+  error - Undefined name '_autoAdvanceTimer' - lib\screens\dashboard\dashboard_screen.dart:8442:5 - undefined_identifier
+  error - Undefined name '_autoAdvanceTimer' - lib\screens\dashboard\dashboard_screen.dart:8443:5 - undefined_identifier
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8447:9 - undefined_identifier
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8448:7 - undefined_identifier
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8457:31 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8458:5 - undefined_function
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8459:44 - undefined_identifier
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8461:7 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8462:11 - undefined_identifier
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8463:13 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8464:11 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8465:20 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8466:11 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8467:20 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8468:11 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8468:35 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\dashboard\dashboard_screen.dart:8479:32 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\dashboard\dashboard_screen.dart:8484:16 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8506:9 - undefined_identifier
+  error - Undefined name 'shows' - lib\screens\dashboard\dashboard_screen.dart:8506:47 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8507:9 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8508:9 - undefined_identifier
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8508:34 - undefined_identifier
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8509:19 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8509:34 - undefined_identifier
+  error - Undefined name 'shows' - lib\screens\dashboard\dashboard_screen.dart:8510:14 - undefined_identifier
+  error - Undefined name 'shows' - lib\screens\dashboard\dashboard_screen.dart:8512:12 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8516:9 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8517:9 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8518:9 - undefined_identifier
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8518:34 - undefined_identifier
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8519:14 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8519:29 - undefined_identifier
+  error - Undefined name 'selectedShowIndex' - lib\screens\dashboard\dashboard_screen.dart:8527:7 - undefined_identifier
+  error - Undefined name 'selectedShowIndex' - lib\screens\dashboard\dashboard_screen.dart:8530:9 - undefined_identifier
+  error - Undefined name 'selectedShowIndex' - lib\screens\dashboard\dashboard_screen.dart:8530:38 - undefined_identifier
+  error - Undefined name 'shows' - lib\screens\dashboard\dashboard_screen.dart:8530:60 - undefined_identifier
+  error - Undefined name 'selectedShowIndex' - lib\screens\dashboard\dashboard_screen.dart:8531:7 - undefined_identifier
+  error - Undefined name 'shows' - lib\screens\dashboard\dashboard_screen.dart:8531:27 - undefined_identifier
+  error - Undefined name 'selectedShowIndex' - lib\screens\dashboard\dashboard_screen.dart:8533:23 - undefined_identifier
+  error - Undefined name 'shows' - lib\screens\dashboard\dashboard_screen.dart:8534:29 - undefined_identifier
+  error - Undefined name 'selectedShowIndex' - lib\screens\dashboard\dashboard_screen.dart:8535:9 - undefined_identifier
+  error - Undefined name 'shows' - lib\screens\dashboard\dashboard_screen.dart:8535:29 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\dashboard\dashboard_screen.dart:8545:16 - undefined_identifier
+  error - Undefined name 'bgMedium' - lib\screens\dashboard\dashboard_screen.dart:8548:28 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8589:5 - undefined_function
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8590:27 - undefined_identifier
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8591:9 - undefined_identifier
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8591:30 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8592:9 - undefined_identifier
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8592:35 - undefined_identifier
+  error - Undefined name 'shows' - lib\screens\dashboard\dashboard_screen.dart:8595:7 - undefined_identifier
+  error - Undefined name 'shows' - lib\screens\dashboard\dashboard_screen.dart:8595:19 - undefined_identifier
+  error - Undefined name 'selectedShowIndex' - lib\screens\dashboard\dashboard_screen.dart:8596:7 - undefined_identifier
+  error - Undefined name 'shows' - lib\screens\dashboard\dashboard_screen.dart:8596:27 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\dashboard\dashboard_screen.dart:8604:16 - undefined_identifier
+  error - Undefined name 'bgMedium' - lib\screens\dashboard\dashboard_screen.dart:8607:28 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8632:5 - undefined_function
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8633:12 - undefined_identifier
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8634:9 - undefined_identifier
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8634:30 - undefined_identifier
+  error - Undefined name 'selectedCategoryIndex' - lib\screens\dashboard\dashboard_screen.dart:8635:9 - undefined_identifier
+  error - Undefined name 'showCategories' - lib\screens\dashboard\dashboard_screen.dart:8635:33 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\dashboard\dashboard_screen.dart:8643:16 - undefined_identifier
+  error - Undefined name 'bgMedium' - lib\screens\dashboard\dashboard_screen.dart:8646:28 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8671:5 - undefined_function
+  error - Undefined name 'playlists' - lib\screens\dashboard\dashboard_screen.dart:8672:7 - undefined_identifier
+  error - Undefined name 'playlists' - lib\screens\dashboard\dashboard_screen.dart:8672:23 - undefined_identifier
+  error - Undefined name 'selectedPlaylist' - lib\screens\dashboard\dashboard_screen.dart:8673:7 - undefined_identifier
+  error - Undefined name 'playlists' - lib\screens\dashboard\dashboard_screen.dart:8673:26 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\dashboard\dashboard_screen.dart:8680:16 - undefined_identifier
+  error - Undefined name 'bgMedium' - lib\screens\dashboard\dashboard_screen.dart:8683:28 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8708:5 - undefined_function
+  error - Undefined name 'folders' - lib\screens\dashboard\dashboard_screen.dart:8709:7 - undefined_identifier
+  error - Undefined name 'folders' - lib\screens\dashboard\dashboard_screen.dart:8709:21 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\dashboard\dashboard_screen.dart:8716:16 - undefined_identifier
+  error - Undefined name 'bgMedium' - lib\screens\dashboard\dashboard_screen.dart:8719:28 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8744:5 - undefined_function
+  error - Undefined name 'projects' - lib\screens\dashboard\dashboard_screen.dart:8745:7 - undefined_identifier
+  error - Undefined name 'projects' - lib\screens\dashboard\dashboard_screen.dart:8745:22 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\dashboard\dashboard_screen.dart:8752:16 - undefined_identifier
+  error - Undefined name 'bgMedium' - lib\screens\dashboard\dashboard_screen.dart:8755:28 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8780:5 - undefined_function
+  error - Undefined name 'playlists' - lib\screens\dashboard\dashboard_screen.dart:8781:7 - undefined_identifier
+  error - Undefined name 'playlists' - lib\screens\dashboard\dashboard_screen.dart:8781:23 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\dashboard\dashboard_screen.dart:8788:16 - undefined_identifier
+  error - Undefined name 'bgMedium' - lib\screens\dashboard\dashboard_screen.dart:8790:26 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8813:5 - undefined_function
+  error - Undefined name 'profiles' - lib\screens\dashboard\dashboard_screen.dart:8813:20 - undefined_identifier
+  error - Undefined name 'profiles' - lib\screens\dashboard\dashboard_screen.dart:8813:35 - undefined_identifier
+  error - The function '_saveProfiles' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8814:5 - undefined_function
+  error - Undefined name 'context' - lib\screens\dashboard\dashboard_screen.dart:8821:16 - undefined_identifier
+  error - Undefined name 'bgMedium' - lib\screens\dashboard\dashboard_screen.dart:8823:26 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8871:5 - undefined_function
+  error - Undefined name '_ndiSources' - lib\screens\dashboard\dashboard_screen.dart:8872:7 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8884:55 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8888:5 - undefined_function
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8889:47 - undefined_identifier
+  error - Undefined name '_slideThumbnails' - lib\screens\dashboard\dashboard_screen.dart:8890:41 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8897:7 - undefined_identifier
+  error - Undefined name '_slideThumbnails' - lib\screens\dashboard\dashboard_screen.dart:8898:7 - undefined_identifier
+  error - Undefined name 'selectedSlides' - lib\screens\dashboard\dashboard_screen.dart:8900:7 - undefined_identifier
+  error - Undefined name 'selectedSlides' - lib\screens\dashboard\dashboard_screen.dart:8900:24 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8900:56 - undefined_identifier
+  error - Undefined name 'selectedSlides' - lib\screens\dashboard\dashboard_screen.dart:8901:11 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8901:37 - undefined_identifier
+  error - Undefined name 'selectedSlides' - lib\screens\dashboard\dashboard_screen.dart:8902:9 - undefined_identifier
+  error - Undefined name 'selectedSlideIndex' - lib\screens\dashboard\dashboard_screen.dart:8903:25 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8903:48 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8906:11 - undefined_identifier
+  error - Undefined name 'selectedSlideIndex' - lib\screens\dashboard\dashboard_screen.dart:8907:9 - undefined_identifier
+  error - Undefined name 'selectedSlides' - lib\screens\dashboard\dashboard_screen.dart:8909:22 - undefined_identifier
+  error - Undefined name 'selectedSlides' - lib\screens\dashboard\dashboard_screen.dart:8910:16 - undefined_identifier
+  error - Undefined name 'selectedSlideIndex' - lib\screens\dashboard\dashboard_screen.dart:8912:9 - undefined_identifier
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:8912:53 - undefined_identifier
+  error - The function '_syncSlideEditors' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8915:5 - undefined_function
+  error - Undefined name '_settingsTab' - lib\screens\dashboard\dashboard_screen.dart:8919:31 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\dashboard\dashboard_screen.dart:8920:18 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8927:17 - undefined_function
+  error - Undefined name '_settingsTab' - lib\screens\dashboard\dashboard_screen.dart:8927:32 - undefined_identifier
+  error - Undefined name 'bgDark' - lib\screens\dashboard\dashboard_screen.dart:8931:34 - undefined_identifier
+  error - Undefined name '_outputWindowIds' - lib\screens\dashboard\dashboard_screen.dart:8937:32 - undefined_identifier
+  error - Undefined name '_outputWindowIds' - lib\screens\dashboard\dashboard_screen.dart:8941:32 - undefined_identifier
+  error - The function '_togglePresent' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8946:33 - undefined_function
+  error - Undefined name '_outputWindowIds' - lib\screens\dashboard\dashboard_screen.dart:8949:38 - undefined_identifier
+  error - The function '_disarmPresentation' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8954:39 - undefined_function
+  error - Undefined name 'mounted' - lib\screens\dashboard\dashboard_screen.dart:8955:37 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:8955:46 - undefined_function
+  error - Undefined name '_outputWindowIds' - lib\screens\dashboard\dashboard_screen.dart:8968:40 - undefined_identifier
+  error - Undefined name '_outputWindowIds' - lib\screens\dashboard\dashboard_screen.dart:8974:33 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\dashboard\dashboard_screen.dart:8998:16 - undefined_identifier
+  error - Undefined name '_settingsTab' - lib\screens\dashboard\dashboard_screen.dart:9012:31 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9013:44 - undefined_function
+  error - Undefined name '_settingsTab' - lib\screens\dashboard\dashboard_screen.dart:9013:59 - undefined_identifier
+  error - Undefined name '_connectedScreens' - lib\screens\dashboard\dashboard_screen.dart:9014:29 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9126:45 - undefined_identifier
+  error - Undefined name 'use24HourClock' - lib\screens\dashboard\dashboard_screen.dart:9178:20 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9180:17 - undefined_function
+  error - Undefined name 'use24HourClock' - lib\screens\dashboard\dashboard_screen.dart:9180:59 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9183:31 - undefined_identifier
+  error - Undefined name 'disableLabels' - lib\screens\dashboard\dashboard_screen.dart:9186:20 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9188:17 - undefined_function
+  error - Undefined name 'disableLabels' - lib\screens\dashboard\dashboard_screen.dart:9188:60 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9191:31 - undefined_identifier
+  error - Undefined name 'showProjectsOnStartup' - lib\screens\dashboard\dashboard_screen.dart:9196:20 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9197:31 - undefined_function
+  error - Undefined name 'showProjectsOnStartup' - lib\screens\dashboard\dashboard_screen.dart:9200:24 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9203:31 - undefined_identifier
+  error - Undefined name 'autoLaunchOutput' - lib\screens\dashboard\dashboard_screen.dart:9208:20 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9209:31 - undefined_function
+  error - Undefined name 'autoLaunchOutput' - lib\screens\dashboard\dashboard_screen.dart:9212:24 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9215:31 - undefined_identifier
+  error - Undefined name 'hideCursorInOutput' - lib\screens\dashboard\dashboard_screen.dart:9218:20 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9219:31 - undefined_function
+  error - Undefined name 'hideCursorInOutput' - lib\screens\dashboard\dashboard_screen.dart:9222:24 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9225:31 - undefined_identifier
+  error - Undefined name 'youtubeApiKey' - lib\screens\dashboard\dashboard_screen.dart:9231:20 - undefined_identifier
+  error - Undefined name '_saveYoutubeApiKey' - lib\screens\dashboard\dashboard_screen.dart:9233:23 - undefined_identifier
+  error - Undefined name 'vimeoAccessToken' - lib\screens\dashboard\dashboard_screen.dart:9237:20 - undefined_identifier
+  error - Undefined name '_saveVimeoAccessToken' - lib\screens\dashboard\dashboard_screen.dart:9239:23 - undefined_identifier
+  error - Undefined name 'autoAdvanceEnabled' - lib\screens\dashboard\dashboard_screen.dart:9244:20 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9245:31 - undefined_function
+  error - Undefined name 'autoAdvanceEnabled' - lib\screens\dashboard\dashboard_screen.dart:9245:46 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9248:31 - undefined_identifier
+  error - Undefined name 'autoAdvanceInterval' - lib\screens\dashboard\dashboard_screen.dart:9254:22 - undefined_identifier
+  error - Undefined name 'autoAdvanceInterval' - lib\screens\dashboard\dashboard_screen.dart:9258:25 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9259:28 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9260:33 - undefined_function
+  error - Undefined name 'autoAdvanceInterval' - lib\screens\dashboard\dashboard_screen.dart:9261:23 - undefined_identifier
+  error - Undefined name 'autoAdvanceInterval' - lib\screens\dashboard\dashboard_screen.dart:9265:18 - undefined_identifier
+  error - Undefined name '_connectedScreens' - lib\screens\dashboard\dashboard_screen.dart:9279:15 - undefined_identifier
+  error - Undefined name 'enableNdiOutput' - lib\screens\dashboard\dashboard_screen.dart:9296:20 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9297:31 - undefined_function
+  error - Undefined name 'enableNdiOutput' - lib\screens\dashboard\dashboard_screen.dart:9300:24 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9304:31 - undefined_identifier
+  error - Undefined name '_outputs' - lib\screens\dashboard\dashboard_screen.dart:9307:11 - undefined_identifier
+  error - Undefined name '_outputs' - lib\screens\dashboard\dashboard_screen.dart:9312:34 - undefined_identifier
+  error - Undefined name '_addOutput' - lib\screens\dashboard\dashboard_screen.dart:9319:28 - undefined_identifier
+  error - The function '_sendCurrentSlideToOutputs' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9325:21 - undefined_function
+  error - The function '_buildStagePreviewCard' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9333:9 - undefined_function
+  error - Undefined name '_styles' - lib\screens\dashboard\dashboard_screen.dart:9343:14 - undefined_identifier
+  error - Undefined name 'lowerThirdGradient' - lib\screens\dashboard\dashboard_screen.dart:9353:22 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9354:33 - undefined_function
+  error - Undefined name 'lowerThirdGradient' - lib\screens\dashboard\dashboard_screen.dart:9357:26 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9363:33 - undefined_identifier
+  error - Undefined name 'lowerThirdHeight' - lib\screens\dashboard\dashboard_screen.dart:9369:24 - undefined_identifier
+  error - Undefined name 'lowerThirdHeight' - lib\screens\dashboard\dashboard_screen.dart:9373:28 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9374:30 - undefined_identifier
+  error - The function '_setDoublePref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9375:35 - undefined_function
+  error - Undefined name 'lowerThirdHeight' - lib\screens\dashboard\dashboard_screen.dart:9378:28 - undefined_identifier
+  error - Undefined name 'lowerThirdHeight' - lib\screens\dashboard\dashboard_screen.dart:9382:21 - undefined_identifier
+  error - Undefined name 'stageNotesScale' - lib\screens\dashboard\dashboard_screen.dart:9390:24 - undefined_identifier
+  error - Undefined name 'stageNotesScale' - lib\screens\dashboard\dashboard_screen.dart:9394:28 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9395:30 - undefined_identifier
+  error - The function '_setDoublePref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9396:35 - undefined_function
+  error - Undefined name 'stageNotesScale' - lib\screens\dashboard\dashboard_screen.dart:9399:28 - undefined_identifier
+  error - Undefined name 'stageNotesScale' - lib\screens\dashboard\dashboard_screen.dart:9403:21 - undefined_identifier
+  error - The function '_saveStyles' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9436:21 - undefined_function
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9437:21 - undefined_function
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9444:19 - undefined_function
+  error - Undefined name '_styles' - lib\screens\dashboard\dashboard_screen.dart:9444:34 - undefined_identifier
+  error - The function '_saveStyles' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9445:19 - undefined_function
+  error - The function '_saveStyles' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9467:23 - undefined_function
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9468:23 - undefined_function
+  error - The function '_saveStyles' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9487:23 - undefined_function
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9488:23 - undefined_function
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9502:32 - undefined_identifier
+  error - The function '_saveStyles' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9505:19 - undefined_function
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9506:19 - undefined_function
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9512:32 - undefined_identifier
+  error - The function '_saveStyles' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9515:19 - undefined_function
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9516:19 - undefined_function
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9522:32 - undefined_identifier
+  error - The function '_saveStyles' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9525:19 - undefined_function
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9526:19 - undefined_function
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9537:5 - undefined_function
+  error - Undefined name '_styles' - lib\screens\dashboard\dashboard_screen.dart:9538:7 - undefined_identifier
+  error - The function '_saveStyles' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9550:5 - undefined_function
+  error - Undefined name 'enableRemoteShow' - lib\screens\dashboard\dashboard_screen.dart:9559:20 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9560:31 - undefined_function
+  error - Undefined name 'enableRemoteShow' - lib\screens\dashboard\dashboard_screen.dart:9563:24 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9567:31 - undefined_identifier
+  error - Undefined name 'enableStageShow' - lib\screens\dashboard\dashboard_screen.dart:9570:20 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9571:31 - undefined_function
+  error - Undefined name 'enableStageShow' - lib\screens\dashboard\dashboard_screen.dart:9574:24 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9578:31 - undefined_identifier
+  error - Undefined name 'enableControlShow' - lib\screens\dashboard\dashboard_screen.dart:9581:20 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9582:31 - undefined_function
+  error - Undefined name 'enableControlShow' - lib\screens\dashboard\dashboard_screen.dart:9585:24 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9589:31 - undefined_identifier
+  error - Undefined name 'enableApiAccess' - lib\screens\dashboard\dashboard_screen.dart:9592:20 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9593:31 - undefined_function
+  error - Undefined name 'enableApiAccess' - lib\screens\dashboard\dashboard_screen.dart:9596:24 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9600:31 - undefined_identifier
+  error - Undefined name 'videoFolder' - lib\screens\dashboard\dashboard_screen.dart:9612:47 - undefined_identifier
+  error - Undefined name 'songFolder' - lib\screens\dashboard\dashboard_screen.dart:9613:46 - undefined_identifier
+  error - Undefined name 'lyricsFolder' - lib\screens\dashboard\dashboard_screen.dart:9614:48 - undefined_identifier
+  error - Undefined name '_scanLibraries' - lib\screens\dashboard\dashboard_screen.dart:9617:24 - undefined_identifier
+  error - Undefined name 'saveFolder' - lib\screens\dashboard\dashboard_screen.dart:9623:46 - undefined_identifier
+  error - The function '_showSnack' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9635:30 - undefined_function
+  error - The function '_showSnack' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9639:31 - undefined_function
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9641:31 - undefined_identifier
+  error - Undefined name 'profiles' - lib\screens\dashboard\dashboard_screen.dart:9650:10 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9656:15 - undefined_function
+  error - Undefined name 'profiles' - lib\screens\dashboard\dashboard_screen.dart:9656:30 - undefined_identifier
+  error - The function '_saveProfiles' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9657:15 - undefined_function
+  error - Undefined name 'selectedThemeName' - lib\screens\dashboard\dashboard_screen.dart:9701:23 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9710:13 - undefined_function
+  error - Undefined name 'selectedThemeName' - lib\screens\dashboard\dashboard_screen.dart:9711:15 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9712:15 - undefined_identifier
+  error - Undefined name 'accentBlue' - lib\screens\dashboard\dashboard_screen.dart:9713:15 - undefined_identifier
+  error - Undefined name 'bgDark' - lib\screens\dashboard\dashboard_screen.dart:9714:15 - undefined_identifier
+  error - Undefined name 'bgMedium' - lib\screens\dashboard\dashboard_screen.dart:9715:15 - undefined_identifier
+  error - The function '_setStringPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9717:13 - undefined_function
+  error - Undefined name 'selectedThemeName' - lib\screens\dashboard\dashboard_screen.dart:9717:54 - undefined_identifier
+  error - Undefined name 'selectedThemeName' - lib\screens\dashboard\dashboard_screen.dart:9723:25 - undefined_identifier
+  error - The function 'setState' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9741:5 - undefined_function
+  error - Undefined name 'selectedThemeName' - lib\screens\dashboard\dashboard_screen.dart:9742:7 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9743:7 - undefined_identifier
+  error - Undefined name 'accentBlue' - lib\screens\dashboard\dashboard_screen.dart:9744:7 - undefined_identifier
+  error - Undefined name 'bgDark' - lib\screens\dashboard\dashboard_screen.dart:9745:7 - undefined_identifier
+  error - Undefined name 'bgMedium' - lib\screens\dashboard\dashboard_screen.dart:9746:7 - undefined_identifier
+  error - The function '_setStringPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9749:7 - undefined_function
+  error - Undefined name 'selectedThemeName' - lib\screens\dashboard\dashboard_screen.dart:9749:51 - undefined_identifier
+  error - Undefined name 'autoUpdates' - lib\screens\dashboard\dashboard_screen.dart:9756:16 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9758:13 - undefined_function
+  error - Undefined name 'autoUpdates' - lib\screens\dashboard\dashboard_screen.dart:9758:54 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9760:27 - undefined_identifier
+  error - Undefined name 'alertOnUpdate' - lib\screens\dashboard\dashboard_screen.dart:9763:16 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9765:13 - undefined_function
+  error - Undefined name 'alertOnUpdate' - lib\screens\dashboard\dashboard_screen.dart:9765:57 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9767:27 - undefined_identifier
+  error - Undefined name 'alertOnBeta' - lib\screens\dashboard\dashboard_screen.dart:9770:16 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9772:13 - undefined_function
+  error - Undefined name 'alertOnBeta' - lib\screens\dashboard\dashboard_screen.dart:9772:55 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9774:27 - undefined_identifier
+  error - Undefined name 'enableCloseConfirm' - lib\screens\dashboard\dashboard_screen.dart:9777:16 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9778:27 - undefined_function
+  error - Undefined name 'enableCloseConfirm' - lib\screens\dashboard\dashboard_screen.dart:9781:20 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9784:27 - undefined_identifier
+  error - Undefined name 'logSongUsage' - lib\screens\dashboard\dashboard_screen.dart:9787:16 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9789:13 - undefined_function
+  error - Undefined name 'logSongUsage' - lib\screens\dashboard\dashboard_screen.dart:9789:56 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9791:27 - undefined_identifier
+  error - Undefined name 'autoErrorReporting' - lib\screens\dashboard\dashboard_screen.dart:9794:16 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9795:27 - undefined_function
+  error - Undefined name 'autoErrorReporting' - lib\screens\dashboard\dashboard_screen.dart:9798:20 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9801:27 - undefined_identifier
+  error - Undefined name 'disableHardwareAcceleration' - lib\screens\dashboard\dashboard_screen.dart:9804:16 - undefined_identifier
+  error - The function '_setBoolPref' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9805:27 - undefined_function
+  error - Undefined name 'disableHardwareAcceleration' - lib\screens\dashboard\dashboard_screen.dart:9808:20 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9811:27 - undefined_identifier
+  error - The function '_pickLibraryFolder' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9851:20 - undefined_function
+  error - Undefined name '_connectedScreens' - lib\screens\dashboard\dashboard_screen.dart:9856:21 - undefined_identifier
+  error - The function '_updateOutput' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9878:39 - undefined_function
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:9892:23 - curly_braces_in_flow_control_structures
+  error - The function '_updateOutput' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9892:23 - undefined_function
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:9921:25 - curly_braces_in_flow_control_structures
+  error - The function '_updateOutput' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9921:25 - undefined_function
+  error - The function '_updateOutput' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9929:23 - undefined_function
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9930:37 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:9953:38 - undefined_identifier
+  error - The function '_updateOutput' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9954:43 - undefined_function
+  error - The function '_updateOutput' isn't defined - lib\screens\dashboard\dashboard_screen.dart:9976:25 - undefined_function
+  error - The function '_updateOutput' isn't defined - lib\screens\dashboard\dashboard_screen.dart:10005:25 - undefined_function
+  error - The function '_updateOutput' isn't defined - lib\screens\dashboard\dashboard_screen.dart:10019:25 - undefined_function
+  error - The function '_updateOutput' isn't defined - lib\screens\dashboard\dashboard_screen.dart:10033:25 - undefined_function
+  error - The function '_updateOutput' isn't defined - lib\screens\dashboard\dashboard_screen.dart:10047:27 - undefined_function
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:10048:41 - undefined_identifier
+  error - Undefined name 'accentBlue' - lib\screens\dashboard\dashboard_screen.dart:10065:16 - undefined_identifier
+warning - The declaration '_promptNewProjectMenu' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:10072:16 - unused_element
+  error - Undefined name '_newProjectButtonKey' - lib\screens\dashboard\dashboard_screen.dart:10073:27 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\dashboard\dashboard_screen.dart:10074:32 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\dashboard\dashboard_screen.dart:10105:16 - undefined_identifier
+  error - Undefined name 'accentBlue' - lib\screens\dashboard\dashboard_screen.dart:10196:41 - undefined_identifier
+  error - Undefined name '_templates' - lib\screens\dashboard\dashboard_screen.dart:10205:12 - undefined_identifier
+  error - Undefined name '_templates' - lib\screens\dashboard\dashboard_screen.dart:10207:21 - undefined_identifier
+  error - Undefined name '_videoControllers' - lib\screens\dashboard\dashboard_screen.dart:10217:12 - undefined_identifier
+   info - 'VideoPlayerController.network' is deprecated and shouldn't be used. Use VideoPlayerController.networkUrl instead - lib\screens\dashboard\dashboard_screen.dart:10229:22 - deprecated_member_use
+warning - The declaration '_videoAspectRatio' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:10253:11 - unused_element
+  error - Undefined name '_videoControllers' - lib\screens\dashboard\dashboard_screen.dart:10255:19 - undefined_identifier
+warning - The declaration '_pruneVideoControllers' isn't referenced - lib\screens\dashboard\dashboard_screen.dart:10262:8 - unused_element
+  error - Undefined name '_slides' - lib\screens\dashboard\dashboard_screen.dart:10264:25 - undefined_identifier
+  error - Undefined name '_videoControllers' - lib\screens\dashboard\dashboard_screen.dart:10276:19 - undefined_identifier
+  error - Undefined name '_videoControllers' - lib\screens\dashboard\dashboard_screen.dart:10280:21 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:10306:31 - deprecated_member_use
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:10365:36 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:10402:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:10403:26 - deprecated_member_use
+  error - The function '_backgroundLayerFor' isn't defined - lib\screens\dashboard\dashboard_screen.dart:10411:21 - undefined_function
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:10546:57 - deprecated_member_use
+  error - The function '_fileName' isn't defined - lib\screens\dashboard\dashboard_screen.dart:10563:25 - undefined_function
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:10840:31 - deprecated_member_use
+  error - Undefined name '_connectedCameras' - lib\screens\dashboard\dashboard_screen.dart:10867:22 - undefined_identifier
+  error - The function '_layerIcon' isn't defined - lib\screens\dashboard\dashboard_screen.dart:10920:18 - undefined_function
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:10967:20 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:10967:50 - undefined_identifier
+  error - Undefined name 'accentPink' - lib\screens\dashboard\dashboard_screen.dart:10979:22 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:10995:35 - deprecated_member_use
+  error - Undefined name 'accentBlue' - lib\screens\dashboard\dashboard_screen.dart:11047:20 - undefined_identifier
+  error - Undefined name 'accentBlue' - lib\screens\dashboard\dashboard_screen.dart:11047:50 - undefined_identifier
+  error - Undefined name 'accentBlue' - lib\screens\dashboard\dashboard_screen.dart:11059:22 - undefined_identifier
+  error - Undefined name 'accentBlue' - lib\screens\dashboard\dashboard_screen.dart:11083:24 - undefined_identifier
+  error - Undefined name 'accentBlue' - lib\screens\dashboard\dashboard_screen.dart:11093:30 - undefined_identifier
+  error - Expected a method, getter, setter or operator declaration - lib\screens\dashboard\dashboard_screen.dart:11148:1 - expected_executable
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\dashboard_screen.dart:11177:19 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\dashboard_screen.dart:11178:19 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\dashboard_screen.dart:11190:9 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\dashboard_screen.dart:11191:9 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\dashboard_screen.dart:11216:5 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\dashboard_screen.dart:11217:5 - library_private_types_in_public_api
+warning - A value for optional parameter 'headless' isn't ever given - lib\screens\dashboard\dashboard_screen.dart:11337:10 - unused_element_parameter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:11486:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:11502:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:11558:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:11563:35 - deprecated_member_use
+warning - A value for optional parameter 'isDesktop' isn't ever given - lib\screens\dashboard\dashboard_screen.dart:11855:10 - unused_element_parameter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:11897:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:11916:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:11981:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:11987:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:12032:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\dashboard_screen.dart:12041:40 - deprecated_member_use
+   info - The private field _targetFrameTimeMs could be 'final' - lib\screens\dashboard\dashboard_screen.dart:12123:7 - prefer_final_fields
+warning - The value of the field '_targetFrameTimeMs' isn't used - lib\screens\dashboard\dashboard_screen.dart:12123:7 - unused_field
+warning - A value for optional parameter 'onReady' isn't ever given - lib\screens\dashboard\dashboard_screen.dart:12432:10 - unused_element_parameter
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\audio_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\audio_extensions.dart:4:30 - library_private_types_in_public_api
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:58:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:96:27 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:98:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:153:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:371:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:441:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:478:47 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps - lib\screens\dashboard\extensions\audio_extensions.dart:547:28 - use_build_context_synchronously
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:627:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:738:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:833:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:834:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:890:38 - deprecated_member_use
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\clipboard_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\clipboard_extensions.dart:4:34 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\filter_extensions.dart:3:31 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\layer_extensions.dart:3:30 - library_private_types_in_public_api
+warning - This default clause is covered by the previous cases - lib\screens\dashboard\extensions\layer_extensions.dart:73:7 - unreachable_switch_default
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\layer_extensions.dart:169:7 - curly_braces_in_flow_control_structures
+warning - The value of the local variable 'template' isn't used - lib\screens\dashboard\extensions\layer_extensions.dart:172:11 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:221:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:222:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:288:45 - deprecated_member_use
+  error - Undefined name '_showMediaPickerSheet' - lib\screens\dashboard\extensions\layer_extensions.dart:480:53 - undefined_identifier
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\extensions\layer_extensions.dart:603:70 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\extensions\layer_extensions.dart:604:25 - deprecated_member_use
+warning - The declaration '_mediaAttachmentCard' isn't referenced - lib\screens\dashboard\extensions\layer_extensions.dart:769:10 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:801:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:843:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:849:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:857:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:863:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:896:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:916:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:917:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:1011:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:1024:33 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\layer_extensions.dart:1049:23 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:1049:41 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\layer_extensions.dart:1051:23 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\layer_extensions.dart:1051:41 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\layer_extensions.dart:1075:7 - curly_braces_in_flow_control_structures
+  error - Static members from the extended type or one of its superclasses must be qualified by the name of the defining type - lib\screens\dashboard\extensions\layer_extensions.dart:1085:10 - unqualified_reference_to_static_member_of_extended_type
+  error - Static members from the extended type or one of its superclasses must be qualified by the name of the defining type - lib\screens\dashboard\extensions\layer_extensions.dart:1086:25 - unqualified_reference_to_static_member_of_extended_type
+  error - Static members from the extended type or one of its superclasses must be qualified by the name of the defining type - lib\screens\dashboard\extensions\layer_extensions.dart:1089:10 - unqualified_reference_to_static_member_of_extended_type
+  error - Static members from the extended type or one of its superclasses must be qualified by the name of the defining type - lib\screens\dashboard\extensions\layer_extensions.dart:1090:26 - unqualified_reference_to_static_member_of_extended_type
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\layer_extensions.dart:1113:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\layer_extensions.dart:1145:7 - curly_braces_in_flow_control_structures
+  error - Static members from the extended type or one of its superclasses must be qualified by the name of the defining type - lib\screens\dashboard\extensions\layer_extensions.dart:1156:10 - unqualified_reference_to_static_member_of_extended_type
+  error - Static members from the extended type or one of its superclasses must be qualified by the name of the defining type - lib\screens\dashboard\extensions\layer_extensions.dart:1157:25 - unqualified_reference_to_static_member_of_extended_type
+  error - Static members from the extended type or one of its superclasses must be qualified by the name of the defining type - lib\screens\dashboard\extensions\layer_extensions.dart:1160:10 - unqualified_reference_to_static_member_of_extended_type
+  error - Static members from the extended type or one of its superclasses must be qualified by the name of the defining type - lib\screens\dashboard\extensions\layer_extensions.dart:1161:26 - unqualified_reference_to_static_member_of_extended_type
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\layer_extensions.dart:1184:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\layer_extensions.dart:1216:7 - curly_braces_in_flow_control_structures
+  error - Static members from the extended type or one of its superclasses must be qualified by the name of the defining type - lib\screens\dashboard\extensions\layer_extensions.dart:1227:10 - unqualified_reference_to_static_member_of_extended_type
+  error - Static members from the extended type or one of its superclasses must be qualified by the name of the defining type - lib\screens\dashboard\extensions\layer_extensions.dart:1228:25 - unqualified_reference_to_static_member_of_extended_type
+  error - Static members from the extended type or one of its superclasses must be qualified by the name of the defining type - lib\screens\dashboard\extensions\layer_extensions.dart:1231:10 - unqualified_reference_to_static_member_of_extended_type
+  error - Static members from the extended type or one of its superclasses must be qualified by the name of the defining type - lib\screens\dashboard\extensions\layer_extensions.dart:1232:26 - unqualified_reference_to_static_member_of_extended_type
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\media_extensions.dart:4:36 - library_private_types_in_public_api
+warning - This default clause is covered by the previous cases - lib\screens\dashboard\extensions\media_extensions.dart:39:9 - unreachable_switch_default
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\media_extensions.dart:261:7 - curly_braces_in_flow_control_structures
+warning - The declaration '_saveOnlineSearchResults' isn't referenced - lib\screens\dashboard\extensions\media_extensions.dart:313:16 - unused_element
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\output_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\output_extensions.dart:3:31 - library_private_types_in_public_api
+warning - Dead code - lib\screens\dashboard\extensions\output_extensions.dart:218:54 - dead_code
+warning - The left operand can't be null, so the right operand is never executed - lib\screens\dashboard\extensions\output_extensions.dart:218:57 - dead_null_aware_expression
+  error - The method '_effectiveMediaLayer' isn't defined for the type '_DashboardScreenState' - lib\screens\dashboard\extensions\output_extensions.dart:360:24 - undefined_method
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\extensions\output_extensions.dart:367:49 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\extensions\output_extensions.dart:368:34 - deprecated_member_use
+warning - The declaration '_addOutput' isn't referenced - lib\screens\dashboard\extensions\output_extensions.dart:380:8 - unused_element
+warning - The declaration '_updateOutput' isn't referenced - lib\screens\dashboard\extensions\output_extensions.dart:394:8 - unused_element
+warning - The declaration '_toggleOutputsLocked' isn't referenced - lib\screens\dashboard\extensions\output_extensions.dart:499:8 - unused_element
+warning - The declaration '_buildClearAllButton' isn't referenced - lib\screens\dashboard\extensions\output_extensions.dart:518:10 - unused_element
+  error - The method '_foregroundLayers' isn't defined for the type '_DashboardScreenState' - lib\screens\dashboard\extensions\output_extensions.dart:684:22 - undefined_method
+  error - The method '_foregroundLayers' isn't defined for the type '_DashboardScreenState' - lib\screens\dashboard\extensions\output_extensions.dart:692:22 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\output_extensions.dart:781:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\output_extensions.dart:791:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\output_extensions.dart:815:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\output_extensions.dart:928:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\output_extensions.dart:933:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\output_extensions.dart:944:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\output_extensions.dart:945:52 - deprecated_member_use
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\project_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\project_extensions.dart:4:32 - library_private_types_in_public_api
+  error - A member named '_ensureOutputPreviewVisibilityDefaults' is defined in 'extension SettingsExtensions on _DashboardScreenState' and 'extension OutputExtensions on _DashboardScreenState', and neither is more specific - lib\screens\dashboard\extensions\project_extensions.dart:236:7 - ambiguous_extension_member_access
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\settings_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\settings_extensions.dart:4:33 - library_private_types_in_public_api
+warning - The declaration '_showNoticeDialog' isn't referenced - lib\screens\dashboard\extensions\settings_extensions.dart:12:16 - unused_element
+warning - The declaration '_saveYoutubeApiKey' isn't referenced - lib\screens\dashboard\extensions\settings_extensions.dart:54:16 - unused_element
+warning - The declaration '_saveVimeoAccessToken' isn't referenced - lib\screens\dashboard\extensions\settings_extensions.dart:62:16 - unused_element
+warning - The declaration '_setBoolPref' isn't referenced - lib\screens\dashboard\extensions\settings_extensions.dart:70:16 - unused_element
+warning - The declaration '_setStringPref' isn't referenced - lib\screens\dashboard\extensions\settings_extensions.dart:80:16 - unused_element
+warning - The declaration '_setDoublePref' isn't referenced - lib\screens\dashboard\extensions\settings_extensions.dart:90:16 - unused_element
+warning - The declaration '_saveOutputs' isn't referenced - lib\screens\dashboard\extensions\settings_extensions.dart:100:16 - unused_element
+warning - The declaration '_saveStyles' isn't referenced - lib\screens\dashboard\extensions\settings_extensions.dart:106:16 - unused_element
+warning - The declaration '_saveProfiles' isn't referenced - lib\screens\dashboard\extensions\settings_extensions.dart:114:16 - unused_element
+warning - The declaration '_loadSettings' isn't referenced - lib\screens\dashboard\extensions\settings_extensions.dart:119:16 - unused_element
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:4:40 - library_private_types_in_public_api
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:92:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:111:7 - curly_braces_in_flow_control_structures
+warning - The declaration '_hasSelection' isn't referenced - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:156:8 - unused_element
+  error - The method '_foregroundLayers' isn't defined for the type '_DashboardScreenState' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:209:25 - undefined_method
+   info - 'RawKeyEvent' is deprecated and shouldn't be used. Use KeyEvent instead. This feature was deprecated after v3.18.0-2.0.pre - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:334:51 - deprecated_member_use
+   info - 'RawKeyDownEvent' is deprecated and shouldn't be used. Use KeyDownEvent instead. This feature was deprecated after v3.18.0-2.0.pre - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:335:18 - deprecated_member_use
+   info - 'isControlPressed' is deprecated and shouldn't be used. Use HardwareKeyboard.instance.isControlPressed instead. This feature was deprecated after v3.18.0-2.0.pre - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:336:15 - deprecated_member_use
+   info - 'onKey' is deprecated and shouldn't be used. Use onKeyEvent instead. This feature was deprecated after v3.18.0-2.0.pre - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:365:7 - deprecated_member_use
+  error - The method '_addMediaAsNewSlide' isn't defined for the type '_DashboardScreenState' - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:375:19 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:474:67 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:606:62 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\slide_navigation_extensions.dart:660:40 - deprecated_member_use
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\stage_extensions.dart:3:30 - library_private_types_in_public_api
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\stage_extensions.dart:101:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\stage_extensions.dart:102:52 - deprecated_member_use
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\text_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\text_extensions.dart:3:29 - library_private_types_in_public_api
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:24:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:25:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:48:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:49:34 - deprecated_member_use
+   info - The local variable '_denseLabel' starts with an underscore - lib\screens\dashboard\extensions\text_extensions.dart:59:21 - no_leading_underscores_for_local_identifiers
+   info - The local variable '_cycleAlign' starts with an underscore - lib\screens\dashboard\extensions\text_extensions.dart:67:15 - no_leading_underscores_for_local_identifiers
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:86:35 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\screens\dashboard\extensions\text_extensions.dart:206:25 - deprecated_member_use
+  error - The method 'BlockPicker' isn't defined for the type '_DashboardScreenState' - lib\screens\dashboard\extensions\text_extensions.dart:609:36 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:682:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:703:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:714:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:725:57 - deprecated_member_use
+   info - 'opacity' is deprecated and shouldn't be used. Use .a - lib\screens\dashboard\extensions\text_extensions.dart:776:46 - deprecated_member_use
+   info - 'opacity' is deprecated and shouldn't be used. Use .a - lib\screens\dashboard\extensions\text_extensions.dart:776:70 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:783:28 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:785:43 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\extensions\text_extensions.dart:791:84 - deprecated_member_use
+   info - The local variable '_parseHex' starts with an underscore - lib\screens\dashboard\extensions\text_extensions.dart:794:15 - no_leading_underscores_for_local_identifiers
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:819:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:820:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:874:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:877:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:901:50 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\extensions\text_extensions.dart:904:44 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\extensions\text_extensions.dart:904:66 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\extensions\text_extensions.dart:911:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:938:45 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\extensions\text_extensions.dart:943:54 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\extensions\text_extensions.dart:944:59 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\extensions\text_extensions.dart:950:54 - deprecated_member_use
+  error - The method '_denseLabel' isn't defined for the type '_DashboardScreenState' - lib\screens\dashboard\extensions\text_extensions.dart:979:37 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\text_extensions.dart:984:46 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\text_extensions.dart:1054:7 - curly_braces_in_flow_control_structures
+warning - The declaration '_firstNonEmpty' isn't referenced - lib\screens\dashboard\extensions\text_extensions.dart:1122:11 - unused_element
+   info - The part-of directive uses a library name - lib\screens\dashboard\helpers\render_helpers.dart:1:1 - use_string_in_part_of_directives
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\helpers\render_helpers.dart:215:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\helpers\render_helpers.dart:235:46 - deprecated_member_use
+   info - The part-of directive uses a library name - lib\screens\dashboard\models\layer_models.dart:1:1 - use_string_in_part_of_directives
+   info - The part-of directive uses a library name - lib\screens\dashboard\models\slide_models.dart:3:1 - use_string_in_part_of_directives
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:33:32 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:34:34 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:35:40 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:44:58 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:45:70 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:46:75 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:161:68 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:162:49 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:171:37 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:175:39 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:178:51 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\screens\dashboard\models\slide_models.dart:185:45 - deprecated_member_use
+   info - The part-of directive uses a library name - lib\screens\dashboard\services\output_window_service.dart:1:1 - use_string_in_part_of_directives
+   info - The part-of directive uses a library name - lib\screens\dashboard\widgets\slide_editor_widgets.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\widgets\slide_editor_widgets.dart:4:33 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\widgets\slide_editor_widgets.dart:9:28 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\widgets\slide_editor_widgets.dart:10:28 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\widgets\slide_editor_widgets.dart:114:37 - library_private_types_in_public_api
+   info - The part-of directive uses a library name - lib\screens\dashboard\widgets\view_widgets.dart:1:1 - use_string_in_part_of_directives
+warning - The declaration '_buildStagePreviewCard' isn't referenced - lib\screens\dashboard\widgets\view_widgets.dart:4:10 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:26:54 - deprecated_member_use
+warning - The declaration '_buildMediaExplorerPanel' isn't referenced - lib\screens\dashboard\widgets\view_widgets.dart:52:10 - unused_element
+warning - The value of the local variable 'stageHeight' isn't used - lib\screens\dashboard\widgets\view_widgets.dart:275:24 - unused_local_variable
+  error - The method '_foregroundLayers' isn't defined for the type '_DashboardScreenState' - lib\screens\dashboard\widgets\view_widgets.dart:370:28 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:414:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:415:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:429:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:430:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:502:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:596:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:599:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:617:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:636:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:708:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:776:34 - deprecated_member_use
+warning - Unused import: 'dart:async' - lib\screens\projection\projection_window.dart:1:8 - unused_import
+warning - Unused import: 'dart:io' - lib\screens\projection\projection_window.dart:3:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\projection\widgets\background_media.dart:95:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\projection\widgets\background_media.dart:103:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\projection\widgets\background_media.dart:113:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\projection\widgets\background_media.dart:135:75 - deprecated_member_use
+warning - The value of the local variable 'isStageNotes' isn't used - lib\screens\projection\widgets\legacy_slide_surface.dart:32:16 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\projection\widgets\legacy_slide_surface.dart:49:59 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\projection\widgets\projected_layer.dart:633:7 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\projection\widgets\projected_layer.dart:651:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\projection\widgets\projected_layer.dart:658:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\projection\widgets\styled_slide.dart:341:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\projection\widgets\styled_slide.dart:342:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\projection\widgets\styled_slide.dart:362:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\projection\widgets\styled_slide.dart:390:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\projection\widgets\styled_slide.dart:455:10 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\projection\widgets\styled_slide.dart:475:35 - deprecated_member_use
+   info - The import of 'dart:typed_data' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/foundation.dart' - lib\services\device_service.dart:6:8 - unnecessary_import
+warning - Dead code - lib\services\device_service.dart:214:60 - dead_code
+warning - The left operand can't be null, so the right operand is never executed - lib\services\device_service.dart:214:63 - dead_null_aware_expression
+warning - The declaration '_captureCameraThumbnail' isn't referenced - lib\services\device_service.dart:408:16 - unused_element
+   info - Library names are not necessary - lib\services\scripture_service.dart:3:9 - unnecessary_library_name
+   info - The import of 'dart:typed_data' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/foundation.dart' - lib\services\win32_capture_service.dart:7:8 - unnecessary_import
+   info - 'EnumWindowsProc' is deprecated and shouldn't be used. Use WNDENUMPROC instead - lib\services\win32_capture_service.dart:97:45 - deprecated_member_use
+

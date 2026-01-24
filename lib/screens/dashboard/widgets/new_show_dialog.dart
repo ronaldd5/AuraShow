@@ -1,0 +1,414 @@
+import 'package:flutter/material.dart';
+import '../../../core/theme/palette.dart';
+import '../../../services/lyrics_service.dart';
+import '../../../models/song_model.dart';
+import 'quick_lyrics_dialog.dart';
+
+class NewShowDialog extends StatefulWidget {
+  final List<String> availableCategories;
+  final String? defaultCategory;
+
+  const NewShowDialog({
+    Key? key,
+    required this.availableCategories,
+    this.defaultCategory,
+  }) : super(key: key);
+
+  @override
+  State<NewShowDialog> createState() => _NewShowDialogState();
+}
+
+class _NewShowDialogState extends State<NewShowDialog> {
+  final TextEditingController _nameController = TextEditingController();
+  String? _selectedCategory;
+  bool _isSearching = false;
+  List<Song>? _searchResults;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.defaultCategory != null &&
+        widget.availableCategories.contains(widget.defaultCategory)) {
+      _selectedCategory = widget.defaultCategory;
+    } else {
+      _selectedCategory = null;
+    }
+    // Listener removed: Search only triggers on button press
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  void _finish(String mode, [dynamic data]) {
+    final name = _nameController.text.trim();
+    if (name.isEmpty && mode != 'quick_lyrics' && mode != 'web_import') {
+      return; // Name optional for smart modes? No, name is title.
+    }
+
+    Navigator.of(context).pop({
+      'mode': mode,
+      'name': name.isEmpty && data is Song ? data.title : name,
+      'category': _selectedCategory,
+      'data': data,
+    });
+  }
+
+  Future<void> _performWebSearch() async {
+    final query = _nameController.text.trim();
+    if (query.isEmpty) return;
+
+    setState(() {
+      _isSearching = true;
+      // If we don't have results yet, show loading.
+      // If we do, keeps showing old results until new ones arrive?
+      // Or maybe clear them? Let's keep them to reduce flicker.
+    });
+
+    try {
+      final results = await LyricsService.instance.searchSongs(query);
+
+      if (mounted) {
+        setState(() {
+          _isSearching = false;
+          _searchResults = results;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSearching = false);
+        // Don't snackbar on every type error, just log
+        debugPrint('Search failed: $e');
+      }
+    }
+  }
+
+  /// When user selects a song from search results, fetch full lyrics and open QuickLyricsDialog
+  Future<void> _selectSongAndOpenQuickLyrics(Song song) async {
+    // Show loading state
+    setState(() => _isSearching = true);
+
+    String lyrics = song.content;
+
+    // If content is empty, fetch from source URL (stored in copyright field)
+    if (lyrics.isEmpty && song.copyright.startsWith('http')) {
+      try {
+        lyrics = await LyricsService.instance.fetchLyricsFromUrl(
+          song.copyright,
+        );
+      } catch (e) {
+        debugPrint('Failed to fetch lyrics: $e');
+      }
+    }
+
+    setState(() => _isSearching = false);
+
+    // Format lyrics with section tags if not already present
+    final formattedLyrics = _formatLyricsWithTags(
+      lyrics,
+      song.title,
+      song.author,
+    );
+
+    // Close this dialog and return data for quick_lyrics mode
+    // The parent will open QuickLyricsDialog with this pre-populated text
+    Navigator.of(context).pop({
+      'mode': 'quick_lyrics_prefilled',
+      'name': song.title,
+      'category': _selectedCategory,
+      'author': song.author,
+      'lyrics': formattedLyrics,
+    });
+  }
+
+  /// Format raw lyrics with section tags like [Verse 1], [Chorus], etc.
+  String _formatLyricsWithTags(String rawLyrics, String title, String author) {
+    final buffer = StringBuffer();
+
+    // Add metadata header
+    if (title.isNotEmpty) buffer.writeln('Title: $title');
+    if (author.isNotEmpty) buffer.writeln('Author: $author');
+    if (buffer.isNotEmpty) buffer.writeln();
+
+    // Split into stanzas by blank lines
+    final stanzas = rawLyrics.split(RegExp(r'\n\s*\n'));
+
+    int verseCount = 1;
+    bool hasChorus = false;
+    String? chorusText;
+
+    for (int i = 0; i < stanzas.length; i++) {
+      final stanza = stanzas[i].trim();
+      if (stanza.isEmpty) continue;
+
+      // Detect if this stanza looks like a chorus (repeats)
+      if (!hasChorus && i < stanzas.length - 1) {
+        // Simple heuristic: shorter stanzas that repeat might be choruses
+        final nextStanzas = stanzas.sublist(i + 1);
+        if (nextStanzas.any((s) => s.trim() == stanza)) {
+          hasChorus = true;
+          chorusText = stanza;
+          buffer.writeln('[Chorus]');
+          buffer.writeln(stanza);
+          buffer.writeln();
+          continue;
+        }
+      }
+
+      // Check if this is a repeat of the chorus
+      if (hasChorus && stanza == chorusText) {
+        buffer.writeln('[Chorus]');
+        buffer.writeln(stanza);
+        buffer.writeln();
+        continue;
+      }
+
+      // Otherwise it's a verse
+      buffer.writeln('[Verse $verseCount]');
+      buffer.writeln(stanza);
+      buffer.writeln();
+      verseCount++;
+    }
+
+    return buffer.toString().trim();
+  }
+
+  Widget _buildOptionCard({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    String? subtitle,
+  }) {
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          hoverColor: Colors.white10,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.white12),
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.black26,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 48, color: Colors.white70),
+                const SizedBox(height: 16),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(color: Colors.white54, fontSize: 12),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Determine content to show below text field
+    Widget content;
+
+    if (_isSearching) {
+      content = const SizedBox(
+        height: 200,
+        child: Center(
+          child: CircularProgressIndicator(color: AppPalette.accent),
+        ),
+      );
+    } else if (_searchResults != null) {
+      if (_searchResults!.isEmpty) {
+        content = SizedBox(
+          height: 200,
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.search_off, size: 48, color: Colors.white38),
+                const SizedBox(height: 16),
+                const Text(
+                  'No results found',
+                  style: TextStyle(color: Colors.white70, fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Try "Artist - Song Title"',
+                  style: TextStyle(color: Colors.white54, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        );
+      } else {
+        content = SizedBox(
+          height: 300,
+          child: ListView.separated(
+            itemCount: _searchResults!.length,
+            separatorBuilder: (_, __) =>
+                const Divider(height: 1, color: Colors.white12),
+            itemBuilder: (context, index) {
+              final song = _searchResults![index];
+              return ListTile(
+                title: Text(
+                  song.title,
+                  style: const TextStyle(color: Colors.white),
+                ),
+                subtitle: Text(
+                  song.author,
+                  style: const TextStyle(color: Colors.white70),
+                ),
+                leading: const Icon(Icons.music_note, color: AppPalette.accent),
+                onTap: () => _selectSongAndOpenQuickLyrics(song),
+              );
+            },
+          ),
+        );
+      }
+    } else {
+      // Default state: Show buttons
+      content = SizedBox(
+        height: 160,
+        child: Row(
+          children: [
+            _buildOptionCard(
+              icon: Icons.text_fields,
+              label: 'Quick lyrics',
+              onTap: () => _finish('quick_lyrics'),
+            ),
+            const SizedBox(width: 12),
+            _buildOptionCard(
+              icon: Icons.search,
+              label: 'Web search',
+              onTap: _performWebSearch,
+            ),
+            const SizedBox(width: 12),
+            _buildOptionCard(
+              icon: Icons.add,
+              label: 'Empty show',
+              onTap: () => _finish('empty'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Dialog(
+      backgroundColor: AppPalette.carbonBlack,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        width: 600,
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'New show',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white54),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            TextField(
+              controller: _nameController,
+              autofocus: true,
+              onChanged: (_) => setState(() {}),
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                labelText: 'Name',
+                filled: true,
+                fillColor: Colors.black26,
+                border: InputBorder.none,
+                suffixIcon: _nameController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, color: Colors.white54),
+                        onPressed: () {
+                          _nameController.clear();
+                          setState(() {
+                            _isSearching = false;
+                            _searchResults = null;
+                          });
+                        },
+                      )
+                    : null,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              color: Colors.black26,
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: _selectedCategory,
+                  isExpanded: true,
+                  hint: const Text(
+                    'Category',
+                    style: TextStyle(color: Colors.white54),
+                  ),
+                  dropdownColor: AppPalette.carbonBlack,
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Colors.white,
+                  ),
+                  items: [
+                    const DropdownMenuItem(
+                      value: null,
+                      child: Text(
+                        'No Category',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    ...widget.availableCategories.map(
+                      (c) => DropdownMenuItem(
+                        value: c,
+                        child: Text(
+                          c,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                  onChanged: (v) => setState(() => _selectedCategory = v),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            content,
+          ],
+        ),
+      ),
+    );
+  }
+}

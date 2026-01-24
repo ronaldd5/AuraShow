@@ -1,0 +1,20 @@
+Analyzing 2 items...                                            
+
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\audio_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:58:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:96:27 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:98:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:154:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:440:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:513:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:550:49 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\audio_extensions.dart:637:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\audio_extensions.dart:639:9 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:834:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:945:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:1040:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:1041:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\audio_extensions.dart:1097:38 - deprecated_member_use
+   info - The imported package 'path' isn't a dependency of the importing package - lib\services\vocal_remover_service.dart:3:8 - depend_on_referenced_packages
+warning - Unused import: 'package:path_provider/path_provider.dart' - lib\services\vocal_remover_service.dart:4:8 - unused_import
+

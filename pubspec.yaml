@@ -32,20 +32,31 @@ dependencies:
     sdk: flutter
   shared_preferences: ^2.2.2
   file_picker: ^8.0.0
+  file_selector: ^1.0.3
   # Downgrade to 0.2.x to keep DesktopMultiWindow/MultiWindow API used across the app.
   desktop_multi_window: ^0.2.0
+  # Machine Learning for Spleeter
+  tflite_flutter: ^0.12.1
+  # Pure Dart Audio Decoding
+  wav: ^1.5.0
+
   screen_retriever: ^0.2.0
   youtube_player_iframe: ^5.2.0
   video_player: ^2.8.1
   video_player_win: ^2.3.8
   # Direct import is used in main.dart to gate registration; add the interface as an explicit dep.
   video_player_platform_interface: ^6.2.0
+  # Path provider for temporary/cache storage
+  path_provider: ^2.1.2
   media_kit: ^1.1.10
   media_kit_video: ^1.2.5
   media_kit_libs_windows_video: ^1.0.11
+  media_kit_libs_macos_video: ^1.1.4
   just_audio: ^0.9.40
   just_audio_windows: ^0.2.2
   http: ^1.2.1
+  html: ^0.15.4
+  intl: ^0.19.0
   flutter_dotenv: ^5.1.0
   # Screen capture for live thumbnails
   screen_capturer: ^0.2.3
@@ -55,10 +66,22 @@ dependencies:
   # Win32 APIs for native screen/window capture
   win32: ^5.5.0
   ffi: ^2.1.0
+  webview_flutter: ^4.7.0
+  webview_win_floating: ^3.0.2
+  #webview_flutter_web: ^0.2.3
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  tutorial_coach_mark: ^1.2.9
+  webview_windows: ^0.4.0
+  flutter_colorpicker: ^1.1.0
+  uuid: ^4.5.2
+  google_fonts: ^7.0.2
+  qr_flutter: ^4.1.0
+  desktop_drop: ^0.7.0
+  string_similarity: ^2.1.1
 
 dev_dependencies:
   flutter_test:
@@ -84,6 +107,9 @@ flutter:
 
   assets:
     - .env
+
+  shaders:
+    - shaders/bg_shader.frag
 
   # To add assets to your application, add an assets section, like this:
   # assets:

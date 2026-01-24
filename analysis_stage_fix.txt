@@ -1,0 +1,26 @@
+Analyzing 2 items...                                            
+
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\stage_extensions.dart:3:30 - library_private_types_in_public_api
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\stage_extensions.dart:58:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\stage_extensions.dart:66:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\stage_extensions.dart:77:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\stage_extensions.dart:92:5 - invalid_use_of_protected_member
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\stage_extensions.dart:190:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\stage_extensions.dart:191:52 - deprecated_member_use
+   info - The part-of directive uses a library name - lib\screens\dashboard\widgets\view_widgets.dart:1:1 - use_string_in_part_of_directives
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\widgets\view_widgets.dart:23:42 - invalid_use_of_protected_member
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:26:54 - deprecated_member_use
+warning - The declaration '_buildMediaExplorerPanel' isn't referenced - lib\screens\dashboard\widgets\view_widgets.dart:52:10 - unused_element
+warning - The value of the local variable 'stageHeight' isn't used - lib\screens\dashboard\widgets\view_widgets.dart:275:24 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:414:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:415:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:429:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:430:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:505:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:599:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:602:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:620:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:639:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:711:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\widgets\view_widgets.dart:779:34 - deprecated_member_use
+

@@ -4,7 +4,10 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   camera_windows
+  desktop_drop
   desktop_multi_window
+  file_selector_windows
+  fullscreen_window
   just_audio_windows
   media_kit_libs_windows_video
   media_kit_video
@@ -13,9 +16,12 @@ list(APPEND FLUTTER_PLUGIN_LIST
   url_launcher_windows
   video_player_win
   volume_controller
+  webview_win_floating
+  webview_windows
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
+  tflite_flutter
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)

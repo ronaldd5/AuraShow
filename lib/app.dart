@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'core/theme/palette.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 
 /// The main AuraShow application widget.
-/// 
+///
 /// This configures the app theme and provides the root MaterialApp
 /// with dark theme styling and the DashboardScreen as the home.
 class AuraShowApp extends StatelessWidget {
@@ -27,9 +28,9 @@ class AuraShowApp extends StatelessWidget {
           onSurface: Colors.white,
           onBackground: Colors.white,
         ).copyWith(tertiary: AppPalette.willowGreen),
-        textTheme: ThemeData(brightness: Brightness.dark)
-            .textTheme
-            .apply(bodyColor: Colors.white.withOpacity(0.9), displayColor: Colors.white),
+        textTheme: GoogleFonts.outfitTextTheme(
+          ThemeData(brightness: Brightness.dark).textTheme,
+        ).apply(bodyColor: Colors.white, displayColor: Colors.white),
         useMaterial3: true,
       ),
       home: const DashboardScreen(),

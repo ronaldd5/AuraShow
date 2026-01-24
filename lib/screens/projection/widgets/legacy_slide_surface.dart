@@ -38,7 +38,9 @@ class LegacySlideSurface extends StatelessWidget {
         color: backgroundActive ? AppPalette.carbonBlack : AppPalette.carbonBlack,
         image: backgroundActive && imagePath != null
             ? DecorationImage(
-                image: FileImage(File(imagePath!)),
+                image: imagePath!.startsWith('http')
+                    ? NetworkImage(imagePath!)
+                    : FileImage(File(imagePath!)) as ImageProvider,
                 fit: BoxFit.cover,
               )
             : null,

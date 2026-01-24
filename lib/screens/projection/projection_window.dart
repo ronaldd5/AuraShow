@@ -1,6 +1,4 @@
-import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import '../../core/theme/palette.dart';
@@ -8,6 +6,9 @@ import 'models/projection_slide.dart';
 import 'projection_constants.dart';
 import 'widgets/styled_slide.dart';
 import 'widgets/legacy_slide_surface.dart';
+import 'widgets/stage_display_slide.dart';
+import 'widgets/slide_transition_engine.dart';
+import '../dashboard/models/stage_models.dart';
 
 /// Secondary projection window for displaying slides on external displays.
 ///
@@ -28,6 +29,8 @@ class ProjectionWindow extends StatefulWidget {
 
 class _ProjectionWindowState extends State<ProjectionWindow> {
   ProjectionSlide? slide;
+  ProjectionSlide? nextSlide;
+  StageLayout? stageLayout;
   String content = '';
   String? imagePath;
   TextAlign alignment = TextAlign.center;
@@ -41,7 +44,16 @@ class _ProjectionWindowState extends State<ProjectionWindow> {
   bool outputLocked = false;
   bool isPlaying = false;
   String transitionName = 'fade';
+  Duration transitionDuration = const Duration(milliseconds: 600);
   int viewVersion = 0;
+
+  // Video sync state - for synchronized playback across windows
+  int videoPositionMs = 0;
+  String? syncedVideoPath;
+
+  // Stage Timer
+  DateTime? stageTimerTarget;
+  Duration stageTimerDuration = Duration.zero;
 
   @override
   void initState() {
@@ -95,7 +107,10 @@ class _ProjectionWindowState extends State<ProjectionWindow> {
     // Prefer rich slide payload; fallback to legacy text-only payload.
     if (data['clear'] == true) {
       debugPrint('proj: received clear payload');
+      debugPrint('proj: received clear payload');
       slide = null;
+      nextSlide = null;
+      stageLayout = null;
       outputConfig = null;
       content = '';
       imagePath = null;
@@ -125,6 +140,29 @@ class _ProjectionWindowState extends State<ProjectionWindow> {
       outputLocked = state['locked'] ?? false;
       isPlaying = state['isPlaying'] ?? false;
       transitionName = state['transition'] ?? transitionName;
+      if (state['transitionDuration'] is int) {
+        transitionDuration = Duration(
+          milliseconds: state['transitionDuration'],
+        );
+      }
+
+      // Video sync data for timestamp synchronization
+      videoPositionMs = state['videoPositionMs'] ?? 0;
+      syncedVideoPath = state['videoPath'] as String?;
+      if (videoPositionMs > 0) {
+        debugPrint(
+          'proj: received video sync positionMs=$videoPositionMs path=$syncedVideoPath',
+        );
+      }
+    }
+
+    if (data['stageTimerTarget'] != null) {
+      stageTimerTarget = DateTime.tryParse(data['stageTimerTarget']);
+    } else {
+      stageTimerTarget = null;
+    }
+    if (data['stageTimerDuration'] != null) {
+      stageTimerDuration = Duration(seconds: data['stageTimerDuration']);
     }
 
     if (data['slide'] is Map) {
@@ -137,6 +175,27 @@ class _ProjectionWindowState extends State<ProjectionWindow> {
       );
     } else {
       slide = null;
+    }
+
+    if (data['nextSlide'] is Map) {
+      nextSlide = ProjectionSlide.fromJson(
+        Map<String, dynamic>.from(data['nextSlide'] as Map),
+      );
+      // Preload video for the next slide to ensure smooth transitions
+      if (nextSlide!.mediaType == 'video' &&
+          (nextSlide!.mediaPath?.isNotEmpty ?? false)) {
+        StyledSlide.preload(nextSlide!.mediaPath!);
+      }
+    } else {
+      nextSlide = null;
+    }
+
+    if (data['stageLayout'] is Map) {
+      stageLayout = StageLayout.fromJson(
+        Map<String, dynamic>.from(data['stageLayout'] as Map),
+      );
+    } else {
+      stageLayout = null;
     }
 
     if (data['output'] is Map) {
@@ -164,32 +223,12 @@ class _ProjectionWindowState extends State<ProjectionWindow> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: AppPalette.carbonBlack,
-        body: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 600),
-          transitionBuilder: (child, animation) {
-            switch (transitionName) {
-              case 'slide':
-                final offsetTween = Tween<Offset>(
-                  begin: const Offset(0.08, 0),
-                  end: Offset.zero,
-                );
-                return SlideTransition(
-                  position: offsetTween.animate(
-                    CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeOutCubic,
-                    ),
-                  ),
-                  child: child,
-                );
-              case 'none':
-                return child;
-              case 'fade':
-              default:
-                return FadeTransition(opacity: animation, child: child);
-            }
-          },
+        backgroundColor: (outputConfig?['transparent'] == true)
+            ? Colors.transparent
+            : AppPalette.carbonBlack,
+        body: SlideTransitionEngine(
+          duration: transitionDuration,
+          transitionType: transitionName,
           child: KeyedSubtree(
             key: ValueKey<int>(viewVersion),
             child: LayoutBuilder(
@@ -206,6 +245,12 @@ class _ProjectionWindowState extends State<ProjectionWindow> {
                         slideActive: layerSlideActive,
                         overlayActive: layerOverlayActive,
                         isPlaying: isPlaying,
+                        videoPositionMs: videoPositionMs,
+                        volume:
+                            (layerAudioActive &&
+                                (outputConfig?['ndiAudio'] ?? true))
+                            ? 1.0
+                            : 0.0,
                       )
                     : LegacySlideSurface(
                         stageWidth: kStageWidth,
@@ -218,13 +263,29 @@ class _ProjectionWindowState extends State<ProjectionWindow> {
                         slideActive: layerSlideActive,
                       );
 
+                // Use StageDisplaySlide if applicable
+                final isStageMode =
+                    outputConfig?['styleProfile'] == 'stageNotes' &&
+                    stageLayout != null;
+                final displayWidget = isStageMode
+                    ? StageDisplaySlide(
+                        layout: stageLayout!,
+                        currentSlide: slide,
+                        nextSlide: nextSlide,
+                        timerTarget: stageTimerTarget,
+                        timerDuration: stageTimerDuration,
+                        stageWidth: kStageWidth,
+                        stageHeight: kStageHeight,
+                      )
+                    : slideSurface;
+
                 return Center(
                   child: FittedBox(
                     fit: BoxFit.contain,
                     child: SizedBox(
                       width: kStageWidth,
                       height: kStageHeight,
-                      child: slideSurface,
+                      child: displayWidget,
                     ),
                   ),
                 );

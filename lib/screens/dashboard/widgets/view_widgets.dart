@@ -1,54 +1,6 @@
 part of dashboard_screen;
 
-extension _DashboardViewWidgets on _DashboardScreenState {
-  Widget _buildStagePreviewCard() {
-    final visibleOutputs = _outputs
-        .where((o) => _outputPreviewVisible[o.id] ?? true)
-        .toList();
-    return _frostedBox(
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _sectionHeader('Stage Preview'),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: _outputs
-                  .map(
-                    (o) => FilterChip(
-                      label: Text(o.name, style: const TextStyle(fontSize: 11)),
-                      selected: _outputPreviewVisible[o.id] ?? true,
-                      onSelected: (v) => setState(() {
-                        _outputPreviewVisible[o.id] = v;
-                      }),
-                      selectedColor: _outputColor(o).withOpacity(0.25),
-                      checkmarkColor: Colors.white,
-                      backgroundColor: Colors.white10,
-                    ),
-                  )
-                  .toList(),
-            ),
-            const SizedBox(height: 10),
-            if (visibleOutputs.isEmpty)
-              _emptyStageBox('No previews selected')
-            else
-              Column(
-                children: [
-                  for (int i = 0; i < visibleOutputs.length; i++) ...[
-                    _outputPreviewTile(visibleOutputs[i], i),
-                    if (i != visibleOutputs.length - 1)
-                      const SizedBox(height: 10),
-                  ],
-                ],
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
+extension _DashboardViewWidgets on DashboardScreenState {
   Widget _buildMediaExplorerPanel() {
     return _frostedBox(
       child: Column(
@@ -85,7 +37,7 @@ extension _DashboardViewWidgets on _DashboardScreenState {
             decoration: const InputDecoration(
               hintText: 'Search YouTube videos',
               filled: true,
-              fillColor: AppPalette.carbonBlack,
+              fillColor: AppPalette.surface,
               border: OutlineInputBorder(
                 borderSide: BorderSide.none,
                 borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -130,7 +82,7 @@ extension _DashboardViewWidgets on _DashboardScreenState {
                           final item = youtubeResults[i];
                           return Container(
                             decoration: BoxDecoration(
-                              color: AppPalette.carbonBlack,
+                              color: AppPalette.surface,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(color: Colors.white12),
                             ),
@@ -195,7 +147,7 @@ extension _DashboardViewWidgets on _DashboardScreenState {
                           final title = item['title'] ?? '';
                           return Container(
                             decoration: BoxDecoration(
-                              color: AppPalette.carbonBlack,
+                              color: AppPalette.surface,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(color: Colors.white12),
                             ),
@@ -242,13 +194,14 @@ extension _DashboardViewWidgets on _DashboardScreenState {
   }
 
   Widget _renderSlidePreview(
-    _SlideContent slide, {
+    SlideContent slide, {
     bool compact = false,
     OutputConfig? output,
     bool? backgroundActive,
     bool? slideActive,
     bool? overlayActive,
     bool? foregroundMediaActive,
+    bool forceLivePreview = false,
   }) {
     // Use the passed-in visibility states, or default to true for thumbnails/compact previews
     final showBackground = backgroundActive ?? true;
@@ -258,11 +211,11 @@ extension _DashboardViewWidgets on _DashboardScreenState {
 
     final template = _templateFor(slide.templateId);
     final align = slide.alignOverride ?? template.alignment;
-    final verticalAlign = slide.verticalAlign ?? _VerticalAlign.middle;
+    final verticalAlign = slide.verticalAlign ?? template.verticalAlign;
     final profile = output?.styleProfile;
     final isStageNotes =
-        profile == _OutputStyleProfile.stageNotes || output?.stageNotes == true;
-    final applyLowerThird = profile == _OutputStyleProfile.streamLowerThird;
+        profile == OutputStyleProfile.stageNotes || output?.stageNotes == true;
+    final applyLowerThird = profile == OutputStyleProfile.streamLowerThird;
     final textScale = (output?.textScale ?? 1.0).clamp(0.5, 2.0);
     final maxLines = output?.maxLines ?? (compact ? 6 : 12);
     final bool autoPlayVideo = output != null;
@@ -280,7 +233,7 @@ extension _DashboardViewWidgets on _DashboardScreenState {
 
           final resolvedBox = _resolvedBoxRect(slide);
           final hasTextboxLayer = slide.layers.any(
-            (l) => l.kind == _LayerKind.textbox,
+            (l) => l.kind == LayerKind.textbox || l.kind == LayerKind.scripture,
           );
           final hasTextContent =
               hasTextboxLayer || slide.body.trim().isNotEmpty;
@@ -294,10 +247,10 @@ extension _DashboardViewWidgets on _DashboardScreenState {
           final fontSize =
               _autoSizedFont(slide, baseFontSize, resolvedBox) *
               (isStageNotes ? stageNotesScale : 1.0);
-          final fontWeight = (slide.isBold ?? true)
+          final fontWeight = (slide.isBold ?? template.isBold)
               ? FontWeight.w700
               : FontWeight.w400;
-          final fontStyle = (slide.isItalic ?? false)
+          final fontStyle = (slide.isItalic ?? template.isItalic)
               ? FontStyle.italic
               : FontStyle.normal;
           final decoration = (slide.isUnderline ?? false)
@@ -372,7 +325,7 @@ extension _DashboardViewWidgets on _DashboardScreenState {
           // - Media layers: show if showForegroundMedia is true
           // - Textbox layers: show if showSlide is true
           final visibleFgLayers = fgLayers.where((l) {
-            if (l.kind == _LayerKind.textbox) {
+            if (l.kind == LayerKind.textbox || l.kind == LayerKind.scripture) {
               return showSlide;
             }
             // Media layers (image/video)
@@ -444,44 +397,56 @@ extension _DashboardViewWidgets on _DashboardScreenState {
                         top: layerTop,
                         width: layerWidth,
                         height: layerHeight,
-                        child: ClipRect(
-                          child: _buildLayerWidget(
-                            layer,
-                            compact: compact,
-                            fit: BoxFit.cover,
-                            showControls: false,
-                            autoPlayVideo: autoPlayVideo,
-                          ),
+                        child: _buildLayerWidget(
+                          layer,
+                          slide: slide,
+                          compact: compact,
+                          fit: _mapFit(layer.fit),
+                          showControls: false,
+                          autoPlayVideo: autoPlayVideo,
+                          forceLivePreview: forceLivePreview,
+                          scale: scale,
                         ),
                       );
                     }(),
-                  if (showSlide && !hasTextboxLayer)
+                  if (showSlide &&
+                      !hasTextboxLayer &&
+                      (slide.body.trim().isNotEmpty ||
+                          slide.boxBackgroundColor != null))
                     Positioned(
                       left: boxLeft,
                       top: boxTop,
                       width: boxWidth,
                       height: boxHeight,
-                      child: Container(
-                        padding: EdgeInsets.all(
-                          ((slide.boxPadding ?? 8).clamp(0, 48)).toDouble() *
-                              scale,
-                        ),
-                        alignment: _textAlignToAlignment(align, verticalAlign),
-                        decoration: BoxDecoration(
-                          color: slide.boxBackgroundColor ?? Colors.black26,
-                          borderRadius: BorderRadius.zero,
-                        ),
-                        child: Text(
-                          _applyTransform(
-                            slide.body,
-                            slide.textTransform ?? _TextTransform.none,
+                      child: Transform.rotate(
+                        angle: (slide.rotation ?? 0) * (3.1415926535 / 180),
+                        child: Container(
+                          padding: EdgeInsets.all(
+                            ((slide.boxPadding ?? 8).clamp(0, 48)).toDouble() *
+                                scale,
                           ),
-                          textAlign: align,
-                          style: textStyle,
-                          maxLines: maxVisibleLines,
-                          overflow: slide.singleLine == true
-                              ? TextOverflow.fade
-                              : TextOverflow.ellipsis,
+                          alignment: _textAlignToAlignment(
+                            align,
+                            verticalAlign,
+                          ),
+                          decoration: BoxDecoration(
+                            color: slide.boxBackgroundColor ?? Colors.black26,
+                            borderRadius: BorderRadius.circular(
+                              (slide.boxBorderRadius ?? 0).toDouble(),
+                            ),
+                          ),
+                          child: LiturgyTextRenderer.build(
+                            _applyTransform(
+                              slide.body,
+                              slide.textTransform ?? TextTransform.none,
+                            ),
+                            align: align,
+                            style: textStyle,
+                            maxLines: maxVisibleLines,
+                            overflow: slide.singleLine == true
+                                ? TextOverflow.fade
+                                : TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                     ),
@@ -541,7 +506,7 @@ extension _DashboardViewWidgets on _DashboardScreenState {
     final runtime = _outputRuntime[output.id];
     final headless =
         (runtime?.headless ?? false) ||
-        output.destination != _OutputDestination.screen ||
+        output.destination != OutputDestination.screen ||
         output.visible == false;
     final locked = runtime?.locked ?? false;
     final hasHeadlessPayload = _headlessOutputPayloads.containsKey(output.id);
@@ -623,6 +588,17 @@ extension _DashboardViewWidgets on _DashboardScreenState {
                     output.name,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.edit,
+                      size: 14,
+                      color: Colors.white54,
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    tooltip: 'Rename output',
+                    onPressed: () => _showRenameOutputDialog(output),
+                  ),
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -680,13 +656,16 @@ extension _DashboardViewWidgets on _DashboardScreenState {
             ),
             AspectRatio(
               aspectRatio: 16 / 9,
-              child: slide == null
+              child: outputPreviewCleared
+                  ? Container(color: Colors.black) // Show cleared/black screen
+                  : slide == null
                   ? _emptyStageBox('No slide')
                   : Stack(
                       children: [
                         Positioned.fill(
                           child: _renderSlidePreview(
                             slide,
+                            compact: true,
                             output: output,
                             backgroundActive: outputBackgroundActive,
                             slideActive: outputSlideActive,
@@ -694,6 +673,93 @@ extension _DashboardViewWidgets on _DashboardScreenState {
                             foregroundMediaActive: outputForegroundMediaActive,
                           ),
                         ),
+                        // Scripture Context Tools (Verses Around)
+                        if (slide != null &&
+                            slide.layers.any(
+                              (l) =>
+                                  l.kind == LayerKind.scripture &&
+                                  (l.scriptureReference?.isNotEmpty ?? false),
+                            ))
+                          Stack(
+                            children: [
+                              Positioned(
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                height: 24,
+                                child: Center(
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () => _extendScripture(false),
+                                      borderRadius: const BorderRadius.vertical(
+                                        bottom: Radius.circular(12),
+                                      ),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black45,
+                                          borderRadius:
+                                              const BorderRadius.vertical(
+                                                bottom: Radius.circular(12),
+                                              ),
+                                          border: Border.all(
+                                            color: Colors.white24,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.add,
+                                          color: Colors.white,
+                                          size: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                height: 24,
+                                child: Center(
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () => _extendScripture(true),
+                                      borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(12),
+                                      ),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black45,
+                                          borderRadius:
+                                              const BorderRadius.vertical(
+                                                top: Radius.circular(12),
+                                              ),
+                                          border: Border.all(
+                                            color: Colors.white24,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.add,
+                                          color: Colors.white,
+                                          size: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         Positioned(
                           right: 8,
                           bottom: 8,
@@ -852,11 +918,182 @@ extension _DashboardViewWidgets on _DashboardScreenState {
               ],
             );
           }
-
-          return Center(
-            child: Text(label, style: const TextStyle(color: Colors.white54)),
-          );
         }(),
+      ),
+    );
+  }
+
+  BoxFit _mapFit(String? fit) {
+    switch (fit) {
+      case 'contain':
+        return BoxFit.contain;
+      case 'fill':
+        return BoxFit.fill;
+      case 'fitWidth':
+        return BoxFit.fitWidth;
+      case 'fitHeight':
+        return BoxFit.fitHeight;
+      case 'none':
+        return BoxFit.none;
+      case 'cover':
+      default:
+        return BoxFit.cover;
+    }
+  }
+
+  Future<void> _showRenameOutputDialog(OutputConfig output) async {
+    final controller = TextEditingController(text: output.name);
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppPalette.carbonBlack,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: Colors.white24),
+        ),
+        title: const Text('Rename Output'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            hintText: 'Enter new name',
+            hintStyle: TextStyle(color: Colors.white54),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white24),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: AppPalette.accent),
+            ),
+          ),
+          onSubmitted: (_) {
+            if (controller.text.trim().isNotEmpty) {
+              _updateOutput(output.copyWith(name: controller.text.trim()));
+              Navigator.of(context).pop();
+            }
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white70),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppPalette.accent,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () {
+              if (controller.text.trim().isNotEmpty) {
+                _updateOutput(output.copyWith(name: controller.text.trim()));
+                Navigator.of(context).pop();
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TemplatePreviewCard extends StatelessWidget {
+  final SlideTemplate template;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const TemplatePreviewCard({
+    required this.template,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Create a dummy slide for preview
+    final dummySlide = SlideContent(
+      id: 'preview',
+      title: 'Preview',
+      body: 'Title\nText',
+      templateId: template.id,
+      textColorOverride: null,
+      boxBackgroundColor: null,
+    );
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          border: isSelected
+              ? Border.all(color: AppPalette.dustyMauve, width: 2)
+              : Border.all(color: Colors.white12),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: 1920,
+                  height: 1080,
+                  child: Stack(
+                    children: [
+                      // Background
+                      Positioned.fill(
+                        child: template.backgroundImagePath != null
+                            ? Image.file(
+                                File(template.backgroundImagePath!),
+                                fit: BoxFit.cover,
+                              )
+                            : Container(color: template.background),
+                      ),
+
+                      // Text Content (Simulated)
+                      Container(
+                        alignment: template.verticalAlign == VerticalAlign.top
+                            ? Alignment.topCenter
+                            : (template.verticalAlign == VerticalAlign.bottom
+                                  ? Alignment.bottomCenter
+                                  : Alignment.center),
+                        padding: const EdgeInsets.all(40),
+                        child: Text(
+                          dummySlide.body,
+                          textAlign: template.alignment,
+                          style: TextStyle(
+                            color: template.textColor,
+                            fontSize: template.fontSize * 1.5,
+                            fontWeight: template.isBold
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                            fontStyle: template.isItalic
+                                ? FontStyle.italic
+                                : FontStyle.normal,
+                            fontFamily: 'Roboto',
+                          ),
+                        ),
+                      ),
+
+                      // Overlay Accent
+                      if (template.overlayAccent != Colors.transparent)
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          height: 20,
+                          child: Container(color: template.overlayAccent),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }

@@ -4,9 +4,20 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:video_player/video_player.dart' as vp;
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import '../models/projection_slide.dart';
 import '../projection_constants.dart';
-import '../../../services/win32_capture_service.dart';
+import '../../../platforms/desktop_capture.dart';
+import '../../../services/text_token_service.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../dashboard/widgets/shader_background.dart';
+import '../../dashboard/widgets/qr_widget.dart';
+import '../../../widgets/clock_layer_widget.dart';
+import '../../../widgets/weather_layer_widget.dart';
+import '../../../widgets/audio_layer_widget.dart';
+import '../../../widgets/visualizer_layer_widget.dart';
+import '../../../models/slide_model.dart';
+import '../../../core/utils/liturgy_renderer.dart';
 
 /// Widget for rendering a projected layer (media or text).
 class ProjectedLayer extends StatelessWidget {
@@ -36,6 +47,129 @@ class ProjectedLayer extends StatelessWidget {
         layer: layer,
         stageWidth: stageWidth,
         stageHeight: stageHeight,
+      );
+    }
+
+    if (layer.kind == 'shader' || layer.kind == 'shader') {
+      return ShaderWidget(
+        shaderId: layer.shaderId,
+        opacity: layer.opacity ?? 1.0,
+        boxColor: layer.boxColor,
+        color1: layer.boxColor,
+        color2: layer.outlineColor,
+        speed: layer.shaderParams?['speed'] ?? 1.0,
+        intensity: layer.shaderParams?['intensity'] ?? 1.0,
+      );
+    }
+
+    if (layer.kind == 'qr') {
+      return QrWidget(
+        data: layer.qrData ?? 'https://aurashow.app',
+        foregroundColor: layer.qrForegroundColor ?? Colors.black,
+        backgroundColor: layer.qrBackgroundColor ?? Colors.white,
+      );
+    }
+
+    if (layer.kind == 'clock') {
+      final slideLayer = SlideLayer(
+        id: 'proj-clock',
+        label: 'Clock',
+        kind: LayerKind.clock,
+        role: LayerRole.foreground,
+        clockType: layer.clockType,
+        clockShowSeconds: layer.clockShowSeconds,
+        clock24Hour: layer.clock24Hour,
+        textColor: layer.textColor,
+        boxColor: layer.boxColor,
+        fontFamily: layer.fontFamily,
+        fontSize: layer.fontSize,
+        isBold: layer.isBold,
+        isItalic: layer.isItalic,
+        isUnderline: layer.isUnderline,
+        align: layer.align,
+        // Map other potentially relevant fields if needed
+      );
+      final scale = stageWidth / 1920.0;
+      return ClockLayerWidget(layer: slideLayer, scale: scale);
+    }
+
+    if (layer.kind == 'weather') {
+      final slideLayer = SlideLayer(
+        id: 'proj-weather',
+        label: 'Weather',
+        kind: LayerKind.weather,
+        role: LayerRole.foreground,
+        weatherCity: layer.weatherCity,
+        weatherCelsius: layer.weatherCelsius,
+        weatherShowCondition: layer.weatherShowCondition,
+        weatherShowHumidity: layer.weatherShowHumidity,
+        weatherShowWind: layer.weatherShowWind,
+        weatherShowFeelsLike: layer.weatherShowFeelsLike,
+        textColor: layer.textColor,
+        boxColor: layer.boxColor,
+        fontFamily: layer.fontFamily,
+        fontSize: layer.fontSize,
+        isBold: layer.isBold,
+        isItalic: layer.isItalic,
+        isUnderline: layer.isUnderline,
+        align: layer.align,
+        boxPadding: layer.boxPadding,
+      );
+      final scale = stageWidth / 1920.0;
+      return WeatherLayerWidget(layer: slideLayer, scale: scale);
+    }
+
+    if (layer.kind == 'visualizer') {
+      // Visualizer layer - render visualizer widget
+      final slideLayer = SlideLayer(
+        id: 'proj-visualizer',
+        label: 'Visualizer',
+        kind: LayerKind.visualizer,
+        role: LayerRole.foreground,
+        visualizerType: layer.visualizerType,
+        visualizerBarCount: layer.visualizerBarCount,
+        visualizerSensitivity: layer.visualizerSensitivity,
+        visualizerSmoothing: layer.visualizerSmoothing,
+        visualizerColor1: layer.visualizerColor1,
+        visualizerColor2: layer.visualizerColor2,
+        visualizerMirror: layer.visualizerMirror,
+        visualizerGlow: layer.visualizerGlow,
+        visualizerGlowIntensity: layer.visualizerGlowIntensity,
+        visualizerColorMode: layer.visualizerColorMode,
+        visualizerLineWidth: layer.visualizerLineWidth,
+        visualizerGap: layer.visualizerGap,
+        visualizerRadius: layer.visualizerRadius,
+        visualizerRotationSpeed: layer.visualizerRotationSpeed,
+        visualizerShape: layer.visualizerShape,
+        visualizerFilled: layer.visualizerFilled,
+        visualizerMinHeight: layer.visualizerMinHeight,
+        visualizerFrequencyRange: layer.visualizerFrequencyRange,
+        visualizerAudioSource: layer.visualizerAudioSource,
+        visualizerPreviewMode: layer.visualizerPreviewMode,
+      );
+      final scale = stageWidth / 1920.0;
+      return VisualizerLayerWidget(layer: slideLayer, scale: scale);
+    }
+
+    if (layer.kind == 'media' &&
+        layer.mediaType == 'audio' &&
+        layer.path != null) {
+      // Audio layer - render audio widget
+      final slideLayer = SlideLayer(
+        id: 'proj-audio',
+        label: 'Audio',
+        kind: LayerKind.media,
+        mediaType: SlideMediaType.audio,
+        role: LayerRole.foreground,
+        path: layer.path,
+        textColor: layer.textColor,
+        boxColor: layer.boxColor,
+      );
+      final scale = stageWidth / 1920.0;
+      return AudioLayerWidget(
+        layer: slideLayer,
+        scale: scale,
+        showControls: false,
       );
     }
 
@@ -79,7 +213,8 @@ class ScreenCaptureLayer extends StatefulWidget {
   State<ScreenCaptureLayer> createState() => _ScreenCaptureLayerState();
 }
 
-class _ScreenCaptureLayerState extends State<ScreenCaptureLayer> with SingleTickerProviderStateMixin {
+class _ScreenCaptureLayerState extends State<ScreenCaptureLayer>
+    with SingleTickerProviderStateMixin {
   Uint8List? _currentFrame;
   bool _isCapturing = false;
   bool _hasError = false;
@@ -117,14 +252,14 @@ class _ScreenCaptureLayerState extends State<ScreenCaptureLayer> with SingleTick
 
   void _onTick(Duration elapsed) {
     if (_isCapturing || !mounted) return;
-    
+
     // Check if it's time for next frame
     final now = DateTime.now();
     final timeSinceCapture = now.difference(_lastCaptureTime);
     if (timeSinceCapture.inMilliseconds < _frameTimeMs) {
       return; // Not time yet
     }
-    
+
     _captureOnce();
   }
 
@@ -133,15 +268,15 @@ class _ScreenCaptureLayerState extends State<ScreenCaptureLayer> with SingleTick
     _isCapturing = true;
 
     final startTime = DateTime.now();
-    
+
     try {
       final pathValue = widget.layer.path ?? '';
       final captureType = widget.layer.text ?? 'display';
-      
+
       // Parse hwnd or displayIndex from path
       int? hwnd;
       int? displayIndex;
-      
+
       if (pathValue.startsWith('hwnd:')) {
         hwnd = int.tryParse(pathValue.substring(5));
       } else if (pathValue.startsWith('display:')) {
@@ -149,15 +284,15 @@ class _ScreenCaptureLayerState extends State<ScreenCaptureLayer> with SingleTick
       }
 
       Uint8List? bytes;
-      
+
       // Use 320x180 for projection (better quality than dashboard)
       const thumbWidth = 320;
       const thumbHeight = 180;
-      
+
       switch (captureType) {
         case 'window':
           if (hwnd != null && hwnd > 0) {
-            bytes = Win32CaptureService.instance.captureWindow(
+            bytes = DesktopCapture.instance.captureWindow(
               hwnd,
               thumbnailWidth: thumbWidth,
               thumbnailHeight: thumbHeight,
@@ -166,7 +301,7 @@ class _ScreenCaptureLayerState extends State<ScreenCaptureLayer> with SingleTick
           break;
         case 'display':
           final idx = displayIndex ?? 0;
-          bytes = Win32CaptureService.instance.captureDisplay(
+          bytes = DesktopCapture.instance.captureDisplay(
             idx,
             thumbnailWidth: thumbWidth,
             thumbnailHeight: thumbHeight,
@@ -174,7 +309,7 @@ class _ScreenCaptureLayerState extends State<ScreenCaptureLayer> with SingleTick
           break;
         case 'desktop':
         default:
-          bytes = Win32CaptureService.instance.captureScreen(
+          bytes = DesktopCapture.instance.captureScreen(
             thumbnailWidth: thumbWidth,
             thumbnailHeight: thumbHeight,
           );
@@ -182,7 +317,7 @@ class _ScreenCaptureLayerState extends State<ScreenCaptureLayer> with SingleTick
       }
 
       if (!mounted) return;
-      
+
       if (bytes != null && bytes.isNotEmpty) {
         setState(() {
           _currentFrame = bytes;
@@ -193,7 +328,7 @@ class _ScreenCaptureLayerState extends State<ScreenCaptureLayer> with SingleTick
           _hasError = true;
         });
       }
-      
+
       // Adaptive frame rate based on capture time
       final captureTime = DateTime.now().difference(startTime).inMilliseconds;
       if (captureTime > 25) {
@@ -204,10 +339,10 @@ class _ScreenCaptureLayerState extends State<ScreenCaptureLayer> with SingleTick
         // Fast enough for 60fps
         _frameTimeMs = 16;
       }
-      
+
       // Reset missed frames counter
       if (_missedFrames > 10) _missedFrames = 0;
-      
+
       _lastCaptureTime = DateTime.now();
     } catch (e) {
       debugPrint('ScreenCaptureLayer error: $e');
@@ -285,10 +420,7 @@ class _ScreenCaptureLayerState extends State<ScreenCaptureLayer> with SingleTick
       height: height,
       child: Opacity(
         opacity: opacity,
-        child: Container(
-          color: Colors.black,
-          child: content,
-        ),
+        child: Container(color: Colors.black, child: content),
       ),
     );
   }
@@ -390,7 +522,15 @@ class _ForegroundMediaLayerState extends State<ForegroundMediaLayer> {
     final layer = widget.layer;
     final path = layer.path;
     final type = layer.mediaType;
-    if (path == null || path.isEmpty || type != 'video') {
+
+    // Only attempt to hydrate VideoPlayerController for local video files
+    if (path == null ||
+        path.isEmpty ||
+        type != 'video' ||
+        path.startsWith('yt:') ||
+        path.startsWith('ytm:') ||
+        path.startsWith('vimeo:') ||
+        path.startsWith('http')) {
       _hydrating = false;
       return;
     }
@@ -471,7 +611,8 @@ class _ForegroundMediaLayerState extends State<ForegroundMediaLayer> {
   @override
   Widget build(BuildContext context) {
     final layer = widget.layer;
-    if (layer.path == null || layer.path!.isEmpty) {
+    final path = layer.path;
+    if (path == null || path.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -482,17 +623,100 @@ class _ForegroundMediaLayerState extends State<ForegroundMediaLayer> {
     final height = rect.height * widget.stageHeight;
     final opacity = (layer.opacity ?? 1.0).clamp(0.0, 1.0);
 
-    final isImage = layer.mediaType == 'image' || layer.mediaType == null;
-    Widget content;
-    if (isImage) {
-      content = Image.file(
-        File(layer.path!),
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black26),
+    // YouTube / YouTube Music
+    if (path.startsWith('yt:') || path.startsWith('ytm:')) {
+      final videoId = path.split(':').last;
+      return Positioned(
+        left: left,
+        top: top,
+        width: width,
+        height: height,
+        child: Transform.rotate(
+          angle: (layer.rotation ?? 0) * (3.1415926535 / 180),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Opacity(
+              opacity: opacity,
+              child: YoutubePlayer(
+                key: ValueKey('yt-proj-$videoId'),
+                aspectRatio: 16 / 9,
+                controller: YoutubePlayerController.fromVideoId(
+                  videoId: videoId,
+                  autoPlay: widget.isPlaying,
+                  params: const YoutubePlayerParams(
+                    mute: false, // Play sound in projection
+                    showFullscreenButton: false,
+                    showControls: true,
+                    playsInline: true,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
       );
+    }
+
+    // Vimeo Placeholder
+    if (path.startsWith('vimeo:')) {
+      return Positioned(
+        left: left,
+        top: top,
+        width: width,
+        height: height,
+        child: Transform.rotate(
+          angle: (layer.rotation ?? 0) * (3.1415926535 / 180),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Opacity(
+              opacity: opacity,
+              child: Container(
+                color: Colors.black,
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.video_library,
+                      color: Colors.blue,
+                      size: 48,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Vimeo Video: ${path.split(':').last}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    final isImage = layer.mediaType == 'image' || layer.mediaType == null;
+    final isNetwork = path.startsWith('http');
+    final boxFit = _mapFit(layer.fit);
+    Widget content;
+
+    if (isImage) {
+      if (isNetwork) {
+        content = Image.network(
+          path,
+          fit: boxFit,
+          errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black26),
+        );
+      } else {
+        content = Image.file(
+          File(path),
+          fit: boxFit,
+          errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black26),
+        );
+      }
     } else if (_vpController != null && _ready) {
       content = FittedBox(
-        fit: BoxFit.cover,
+        fit: boxFit,
         child: SizedBox(
           width: _vpController!.value.size.width,
           height: _vpController!.value.size.height,
@@ -508,11 +732,32 @@ class _ForegroundMediaLayerState extends State<ForegroundMediaLayer> {
       top: top,
       width: width,
       height: height,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Opacity(opacity: opacity, child: content),
+      child: Transform.rotate(
+        angle: (layer.rotation ?? 0) * (3.1415926535 / 180),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Opacity(opacity: opacity, child: content),
+        ),
       ),
     );
+  }
+
+  BoxFit _mapFit(String? fit) {
+    switch (fit) {
+      case 'contain':
+        return BoxFit.contain;
+      case 'fill':
+        return BoxFit.fill;
+      case 'fitWidth':
+        return BoxFit.fitWidth;
+      case 'fitHeight':
+        return BoxFit.fitHeight;
+      case 'none':
+        return BoxFit.none;
+      case 'cover':
+      default:
+        return BoxFit.cover;
+    }
   }
 
   Rect _rectForLayer(ProjectionLayer layer) {
@@ -531,7 +776,7 @@ class _ForegroundMediaLayerState extends State<ForegroundMediaLayer> {
 }
 
 /// Widget for rendering a projected text layer.
-class ProjectedTextLayer extends StatelessWidget {
+class ProjectedTextLayer extends StatefulWidget {
   const ProjectedTextLayer({
     super.key,
     required this.layer,
@@ -546,44 +791,131 @@ class ProjectedTextLayer extends StatelessWidget {
   final TextStyle textStyle;
 
   @override
+  State<ProjectedTextLayer> createState() => _ProjectedTextLayerState();
+}
+
+class _ProjectedTextLayerState extends State<ProjectedTextLayer> {
+  String _resolvedText = '';
+  bool _isDynamic = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateText();
+    if (_isDynamic) {
+      TextTokenService().ticker.addListener(_onTick);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant ProjectedTextLayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.layer.text != widget.layer.text) {
+      bool wasDynamic = _isDynamic;
+      _updateText();
+      if (_isDynamic != wasDynamic) {
+        if (_isDynamic) {
+          TextTokenService().ticker.addListener(_onTick);
+        } else {
+          TextTokenService().ticker.removeListener(_onTick);
+        }
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_isDynamic) {
+      TextTokenService().ticker.removeListener(_onTick);
+    }
+    super.dispose();
+  }
+
+  void _onTick() {
+    if (mounted) {
+      setState(() {
+        _resolvedText = TextTokenService().resolve(widget.layer.text ?? '');
+      });
+    }
+  }
+
+  void _updateText() {
+    final raw = widget.layer.text ?? '';
+    _isDynamic = TextTokenService().hasTokens(raw);
+    _resolvedText = _isDynamic ? TextTokenService().resolve(raw) : raw;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (layer.text == null || layer.text!.isEmpty)
+    if (widget.layer.text == null || widget.layer.text!.isEmpty) {
       return const SizedBox.shrink();
-    final rect = _rectForLayer(layer);
-    final left = rect.left * stageWidth;
-    final top = rect.top * stageHeight;
-    final width = rect.width * stageWidth;
-    final height = rect.height * stageHeight;
-    final opacity = (layer.opacity ?? 1.0).clamp(0.0, 1.0);
+    }
+
+    final rect = _rectForLayer(widget.layer);
+    final left = rect.left * widget.stageWidth;
+    final top = rect.top * widget.stageHeight;
+    final width = rect.width * widget.stageWidth;
+    final height = rect.height * widget.stageHeight;
+    final opacity = (widget.layer.opacity ?? 1.0).clamp(0.0, 1.0);
+
     return Positioned(
       left: left,
       top: top,
       width: width,
       height: height,
-      child: Opacity(
-        opacity: opacity,
-        child: Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.04),
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: Text(
-            layer.text!,
-            textAlign: TextAlign.center,
-            style: textStyle.copyWith(
-              color: textStyle.color?.withOpacity(opacity),
-              shadows: const [
-                Shadow(
-                  color: Colors.black54,
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
-                ),
-              ],
+      child: Transform.rotate(
+        angle: (widget.layer.rotation ?? 0) * (3.1415926535 / 180),
+        child: Opacity(
+          opacity: opacity,
+          child: Container(
+            padding: EdgeInsets.all(widget.layer.boxPadding ?? 0),
+            decoration: BoxDecoration(
+              color: widget.layer.boxColor,
+              borderRadius: BorderRadius.circular(
+                (widget.layer.boxBorderRadius ?? 0).toDouble(),
+              ),
+              border: (widget.layer.outlineWidth ?? 0) > 0
+                  ? Border.all(
+                      color: widget.layer.outlineColor ?? Colors.black,
+                      width: widget.layer.outlineWidth ?? 0,
+                    )
+                  : null,
             ),
-            maxLines: 12,
-            overflow: TextOverflow.ellipsis,
+            alignment: _textAlignToAlignment(
+              widget.layer.align ?? TextAlign.center,
+              VerticalAlign.middle,
+            ),
+            child: LiturgyTextRenderer.build(
+              _resolvedText,
+              align: widget.layer.align ?? TextAlign.center,
+              style: widget.textStyle.copyWith(
+                fontSize: widget.layer.fontSize,
+                fontFamily: widget.layer.fontFamily,
+                color:
+                    (widget.layer.textColor ??
+                            widget.textStyle.color ??
+                            Colors.white)
+                        .withOpacity(opacity),
+                fontWeight: (widget.layer.isBold ?? false)
+                    ? FontWeight.bold
+                    : FontWeight.normal,
+                fontStyle: (widget.layer.isItalic ?? false)
+                    ? FontStyle.italic
+                    : FontStyle.normal,
+                decoration: (widget.layer.isUnderline ?? false)
+                    ? TextDecoration.underline
+                    : TextDecoration.none,
+                shadows: const [
+                  Shadow(
+                    color: Colors.black54,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              maxLines: 12,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ),
       ),
@@ -600,5 +932,38 @@ class ProjectedTextLayer extends StatelessWidget {
     final width = (layer.width ?? defaultRect.width).clamp(0.05, 2.0);
     final height = (layer.height ?? defaultRect.height).clamp(0.05, 2.0);
     return Rect.fromLTWH(left, top, width, height);
+  }
+
+  Alignment _textAlignToAlignment(TextAlign align, VerticalAlign vertical) {
+    double x;
+    switch (align) {
+      case TextAlign.left:
+        x = -1;
+        break;
+      case TextAlign.right:
+        x = 1;
+        break;
+      case TextAlign.center:
+      case TextAlign.justify:
+      case TextAlign.start:
+      case TextAlign.end:
+        x = 0;
+        break;
+    }
+
+    double y;
+    switch (vertical) {
+      case VerticalAlign.top:
+        y = -1;
+        break;
+      case VerticalAlign.bottom:
+        y = 1;
+        break;
+      case VerticalAlign.middle:
+        y = 0;
+        break;
+    }
+
+    return Alignment(x, y);
   }
 }

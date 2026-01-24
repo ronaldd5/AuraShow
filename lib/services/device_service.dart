@@ -3,6 +3,7 @@
 library;
 
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' show Offset, Size;
 
@@ -10,7 +11,8 @@ import 'package:flutter/foundation.dart';
 import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:screen_retriever/screen_retriever.dart';
 
-import 'win32_capture_service.dart';
+import '../platforms/desktop_capture.dart';
+import '../platforms/interface/capture_platform_interface.dart';
 
 /// Device type enumeration
 enum DeviceType { camera, screen, ndi }
@@ -163,47 +165,53 @@ class DeviceService {
 
   /// Refresh all devices
   Future<void> refreshDevices() async {
-    await Future.wait([
-      _scanScreens(),
-      _scanCameras(),
-      _scanNdiSources(),
-    ]);
+    await Future.wait([_scanScreens(), _scanCameras(), _scanNdiSources()]);
     _notifyListeners();
   }
 
   /// Scan for connected screens/displays using Win32 APIs
   Future<void> _scanScreens() async {
     try {
-      // Use Win32 capture service for reliable display detection
-      final displays = Win32CaptureService.instance.getDisplays();
-      final newScreens = <LiveDevice>[];
+      // Use Win32 capture service for reliable display detection (Windows only)
+      if (Platform.isWindows) {
+        final displays = DesktopCapture.instance.getDisplays();
+        final newScreens = <LiveDevice>[];
 
-      for (int i = 0; i < displays.length; i++) {
-        final display = displays[i];
-        final resolution = '${display.width}x${display.height}';
+        for (int i = 0; i < displays.length; i++) {
+          final display = displays[i];
+          final resolution = '${display.width}x${display.height}';
 
-        // Check if we already have this screen to preserve thumbnail
-        final existing = _screens.firstWhereOrNull(
-          (s) => s.id == 'screen-$i',
-        );
+          // Check if we already have this screen to preserve thumbnail
+          final existing = _screens.firstWhereOrNull(
+            (s) => s.id == 'screen-$i',
+          );
 
-        newScreens.add(LiveDevice(
-          id: 'screen-$i',
-          name: display.name,
-          detail: '$resolution @(${display.left},${display.top})',
-          type: DeviceType.screen,
-          thumbnail: existing?.thumbnail,
-          resolution: resolution,
-          isActive: true,
-        ));
+          newScreens.add(
+            LiveDevice(
+              id: 'screen-$i',
+              name: display.name,
+              detail: '$resolution @(${display.left},${display.top})',
+              type: DeviceType.screen,
+              thumbnail: existing?.thumbnail,
+              resolution: resolution,
+              isActive: true,
+            ),
+          );
+        }
+
+        _screens
+          ..clear()
+          ..addAll(newScreens);
+        return;
       }
 
-      _screens
-        ..clear()
-        ..addAll(newScreens);
+      // Non-Windows Fallback below
+      throw UnsupportedError('Not running on Windows');
     } catch (e) {
-      debugPrint('DeviceService: Error scanning screens: $e');
-      // Fallback to screen_retriever if Win32 fails
+      if (Platform.isWindows) {
+        debugPrint('DeviceService: Error scanning screens (Win32): $e');
+      }
+      // Fallback to screen_retriever on Mac or if Win32 fails
       try {
         final displays = await ScreenRetriever.instance.getAllDisplays();
         final newScreens = <LiveDevice>[];
@@ -219,15 +227,17 @@ class DeviceService {
             (s) => s.id == 'screen-$i',
           );
 
-          newScreens.add(LiveDevice(
-            id: 'screen-$i',
-            name: name,
-            detail: '$resolution @(${pos.dx.toInt()},${pos.dy.toInt()})',
-            type: DeviceType.screen,
-            thumbnail: existing?.thumbnail,
-            resolution: resolution,
-            isActive: true,
-          ));
+          newScreens.add(
+            LiveDevice(
+              id: 'screen-$i',
+              name: name,
+              detail: '$resolution @(${pos.dx.toInt()},${pos.dy.toInt()})',
+              type: DeviceType.screen,
+              thumbnail: existing?.thumbnail,
+              resolution: resolution,
+              isActive: true,
+            ),
+          );
         }
 
         _screens
@@ -263,14 +273,16 @@ class DeviceService {
         final cam = cameras[i];
         final existing = _cameras.firstWhereOrNull((c) => c.id == cam.id);
 
-        newCameras.add(LiveDevice(
-          id: cam.id,
-          name: cam.name,
-          detail: cam.detail,
-          type: DeviceType.camera,
-          thumbnail: existing?.thumbnail,
-          isActive: true,
-        ));
+        newCameras.add(
+          LiveDevice(
+            id: cam.id,
+            name: cam.name,
+            detail: cam.detail,
+            type: DeviceType.camera,
+            thumbnail: existing?.thumbnail,
+            isActive: true,
+          ),
+        );
       }
 
       _cameras
@@ -298,16 +310,19 @@ class DeviceService {
 
     try {
       // Use the camera platform interface to get available cameras
-      final List<CameraDescription> availableCameras = 
-          await CameraPlatform.instance.availableCameras();
-      
+      final List<CameraDescription> availableCameras = await CameraPlatform
+          .instance
+          .availableCameras();
+
       for (int i = 0; i < availableCameras.length; i++) {
         final camera = availableCameras[i];
-        cameras.add(_CameraInfo(
-          id: 'camera-$i',
-          name: camera.name.isNotEmpty ? camera.name : 'Camera ${i + 1}',
-          detail: _getLensFacingLabel(camera.lensDirection),
-        ));
+        cameras.add(
+          _CameraInfo(
+            id: 'camera-$i',
+            name: camera.name.isNotEmpty ? camera.name : 'Camera ${i + 1}',
+            detail: _getLensFacingLabel(camera.lensDirection),
+          ),
+        );
       }
     } catch (e) {
       debugPrint('DeviceService: Camera enumeration error: $e');
@@ -357,14 +372,16 @@ class DeviceService {
     int? port,
   }) {
     final id = 'ndi-${DateTime.now().millisecondsSinceEpoch}';
-    _ndiSources.add(LiveDevice(
-      id: id,
-      name: name,
-      detail: url,
-      type: DeviceType.ndi,
-      ndiUrl: url,
-      isActive: true,
-    ));
+    _ndiSources.add(
+      LiveDevice(
+        id: id,
+        name: name,
+        detail: url,
+        type: DeviceType.ndi,
+        ndiUrl: url,
+        isActive: true,
+      ),
+    );
     _notifyListeners();
   }
 
@@ -379,7 +396,7 @@ class DeviceService {
     // Prevent concurrent updates
     if (_isUpdatingThumbnails) return;
     _isUpdatingThumbnails = true;
-    
+
     try {
       bool hasUpdates = false;
 
@@ -408,11 +425,13 @@ class DeviceService {
   Future<bool> _captureCameraThumbnail(LiveDevice camera) async {
     // Prevent concurrent camera capture - the camera plugin doesn't handle it well
     if (_isCapturingCamera) {
-      debugPrint('DeviceService: Skipping camera capture - already in progress');
+      debugPrint(
+        'DeviceService: Skipping camera capture - already in progress',
+      );
       return false;
     }
     _isCapturingCamera = true;
-    
+
     try {
       // Extract camera index from id
       final cameraIdStr = camera.id.replaceFirst('camera-', '');
@@ -438,12 +457,14 @@ class DeviceService {
       try {
         // Initialize camera
         await CameraPlatform.instance.initializeCamera(cameraId);
-        
+
         // Wait briefly for camera to warm up
         await Future.delayed(const Duration(milliseconds: 200));
 
         // Capture image
-        final XFile imageFile = await CameraPlatform.instance.takePicture(cameraId);
+        final XFile imageFile = await CameraPlatform.instance.takePicture(
+          cameraId,
+        );
         final imageBytes = await imageFile.readAsBytes();
 
         if (imageBytes.isNotEmpty) {
@@ -463,7 +484,9 @@ class DeviceService {
       }
     } catch (e) {
       // Only log first occurrence to avoid spam
-      debugPrint('DeviceService: Camera thumbnail capture skipped: ${e.runtimeType}');
+      debugPrint(
+        'DeviceService: Camera thumbnail capture skipped: ${e.runtimeType}',
+      );
     } finally {
       _isCapturingCamera = false;
     }
@@ -472,6 +495,8 @@ class DeviceService {
 
   /// Capture a thumbnail for a screen using native Win32 APIs
   Future<bool> _captureScreenThumbnail(LiveDevice screen) async {
+    if (!Platform.isWindows) return false;
+
     try {
       // Extract display ID from screen.id
       final displayIdStr = screen.id.replaceFirst('screen-', '');
@@ -480,11 +505,12 @@ class DeviceService {
       if (displayIndex == null) return false;
 
       // Get displays from Win32 capture service
-      final displays = Win32CaptureService.instance.getDisplays();
+      // Get displays from Win32 capture service
+      final displays = DesktopCapture.instance.getDisplays();
       if (displayIndex >= displays.length) return false;
 
       // Capture the display using Win32 BitBlt (silent, no Snipping Tool!)
-      final imageBytes = Win32CaptureService.instance.captureDisplay(
+      final imageBytes = DesktopCapture.instance.captureDisplay(
         displayIndex,
         thumbnailWidth: 320,
         thumbnailHeight: 180,
@@ -530,17 +556,20 @@ class DeviceService {
 
   /// Get list of available windows for capture
   List<WindowInfo> getWindows() {
-    return Win32CaptureService.instance.getWindows();
+    if (!Platform.isWindows) return [];
+    return DesktopCapture.instance.getWindows();
   }
 
   /// Get list of available displays for capture
   List<DisplayInfo> getDisplays() {
-    return Win32CaptureService.instance.getDisplays();
+    if (!Platform.isWindows) return [];
+    return DesktopCapture.instance.getDisplays();
   }
 
   /// Capture a window thumbnail
   Uint8List? captureWindowThumbnail(int hwnd, {int? width, int? height}) {
-    return Win32CaptureService.instance.captureWindow(
+    if (!Platform.isWindows) return null;
+    return DesktopCapture.instance.captureWindow(
       hwnd,
       thumbnailWidth: width ?? 320,
       thumbnailHeight: height ?? 180,
@@ -548,8 +577,13 @@ class DeviceService {
   }
 
   /// Capture a display thumbnail
-  Uint8List? captureDisplayThumbnail(int displayIndex, {int? width, int? height}) {
-    return Win32CaptureService.instance.captureDisplay(
+  Uint8List? captureDisplayThumbnail(
+    int displayIndex, {
+    int? width,
+    int? height,
+  }) {
+    if (!Platform.isWindows) return null;
+    return DesktopCapture.instance.captureDisplay(
       displayIndex,
       thumbnailWidth: width ?? 320,
       thumbnailHeight: height ?? 180,
@@ -558,7 +592,8 @@ class DeviceService {
 
   /// Capture entire screen (primary monitor)
   Uint8List? captureScreenThumbnail({int? width, int? height}) {
-    return Win32CaptureService.instance.captureScreen(
+    if (!Platform.isWindows) return null;
+    return DesktopCapture.instance.captureScreen(
       thumbnailWidth: width ?? 320,
       thumbnailHeight: height ?? 180,
     );
@@ -583,11 +618,7 @@ extension _ListExtension<T> on List<T> {
 
 /// Internal camera info class
 class _CameraInfo {
-  _CameraInfo({
-    required this.id,
-    required this.name,
-    required this.detail,
-  });
+  _CameraInfo({required this.id, required this.name, required this.detail});
 
   final String id;
   final String name;

@@ -1,0 +1,28 @@
+Analyzing project_extensions.dart...                            
+
+   info - The part-of directive uses a library name - lib\screens\dashboard\extensions\project_extensions.dart:1:1 - use_string_in_part_of_directives
+   info - Invalid use of a private type in a public API - lib\screens\dashboard\extensions\project_extensions.dart:4:32 - library_private_types_in_public_api
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:177:7 - invalid_use_of_protected_member
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard\extensions\project_extensions.dart:484:42 - deprecated_member_use
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:514:20 - invalid_use_of_protected_member
+warning - The declaration '_projectEmptyState' isn't referenced - lib\screens\dashboard\extensions\project_extensions.dart:521:10 - unused_element
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:836:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:856:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:901:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:915:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:921:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:925:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:935:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:961:5 - invalid_use_of_protected_member
+warning - The declaration '_promptRenameFolder' isn't referenced - lib\screens\dashboard\extensions\project_extensions.dart:973:16 - unused_element
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\project_extensions.dart:1004:7 - curly_braces_in_flow_control_structures
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:1007:5 - invalid_use_of_protected_member
+warning - The declaration '_promptRenameProject' isn't referenced - lib\screens\dashboard\extensions\project_extensions.dart:1020:16 - unused_element
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\extensions\project_extensions.dart:1051:7 - curly_braces_in_flow_control_structures
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:1054:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:1072:5 - invalid_use_of_protected_member
+warning - The declaration '_confirmDeleteProject' isn't referenced - lib\screens\dashboard\extensions\project_extensions.dart:1083:16 - unused_element
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:1111:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:1130:5 - invalid_use_of_protected_member
+warning - The member 'setState' can only be used within instance members of subclasses of 'State' - lib\screens\dashboard\extensions\project_extensions.dart:1146:5 - invalid_use_of_protected_member
+

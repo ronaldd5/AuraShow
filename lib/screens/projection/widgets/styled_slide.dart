@@ -7,6 +7,8 @@ import '../models/projection_slide.dart';
 import '../projection_constants.dart';
 import 'background_media.dart';
 import 'projected_layer.dart';
+import '../../projection/widgets/scripture_display.dart';
+import '../../../core/utils/liturgy_renderer.dart';
 
 /// Widget for rendering a fully-styled slide with all layers.
 ///
@@ -24,6 +26,8 @@ class StyledSlide extends StatefulWidget {
     this.slideActive = true,
     this.overlayActive = true,
     this.isPlaying = false,
+    this.videoPositionMs = 0,
+    this.volume = 1.0,
   });
 
   final double stageWidth;
@@ -35,14 +39,53 @@ class StyledSlide extends StatefulWidget {
   final bool slideActive;
   final bool overlayActive;
   final bool isPlaying;
+  final double volume;
+
+  /// Video position in milliseconds for synchronized playback
+  final int videoPositionMs;
 
   @override
   State<StyledSlide> createState() => _StyledSlideState();
+
+  // Cache for preloaded video controllers
+  static final Map<String, vp.VideoPlayerController> _preloaded = {};
+
+  /// Preloads a video controller for the given path.
+  static Future<void> preload(String path) async {
+    if (path.isEmpty) return;
+    if (_preloaded.containsKey(path)) return; // Already preloaded
+
+    // Enforce cache limit (max 2 preloaded videos) to prevent memory bloat
+    if (_preloaded.length >= 2) {
+      final oldestPath = _preloaded.keys.first;
+      final oldController = _preloaded.remove(oldestPath);
+      await oldController?.dispose();
+      debugPrint('proj: preload cache full, disposed oldest=$oldestPath');
+    }
+
+    final file = File(path);
+    if (!await file.exists()) return;
+
+    debugPrint('proj: preloading video path=$path');
+    try {
+      final controller = vp.VideoPlayerController.file(file);
+      // We don't initialize here to save memory/resources until needed?
+      // No, we must initialize to be "ready".
+      // But we shouldn't play.
+      await controller.initialize();
+      await controller.setLooping(true);
+      _preloaded[path] = controller;
+      debugPrint('proj: preload complete path=$path');
+    } catch (e) {
+      debugPrint('proj: preload failed for $path: $e');
+    }
+  }
 }
 
 class _StyledSlideState extends State<StyledSlide> {
   vp.VideoPlayerController? _vpController;
   bool _videoReady = false;
+  int _currentHydrationId = 0;
 
   @override
   void initState() {
@@ -62,9 +105,11 @@ class _StyledSlideState extends State<StyledSlide> {
     final newType = widget.slide.mediaType;
     final oldPlaying = oldWidget.isPlaying;
     final newPlaying = widget.isPlaying;
-    debugPrint(
-      'proj: _StyledSlideState didUpdateWidget oldPath=$oldPath newPath=$newPath oldType=$oldType newType=$newType oldPlaying=$oldPlaying newPlaying=$newPlaying',
-    );
+    final oldPositionMs = oldWidget.videoPositionMs;
+    final newPositionMs = widget.videoPositionMs;
+    final oldVolume = oldWidget.volume;
+    final newVolume = widget.volume;
+
     if (oldPath != newPath || oldType != newType) {
       debugPrint('proj: media changed, re-hydrating video');
       _disposeVideo();
@@ -72,6 +117,11 @@ class _StyledSlideState extends State<StyledSlide> {
     } else if (oldPlaying != newPlaying) {
       // Playing state changed - play or pause video
       _updatePlayState();
+    } else if (newPlaying && (newPositionMs - oldPositionMs).abs() > 500) {
+      // Position changed significantly while playing - re-sync
+      _updatePlayState();
+    } else if (oldVolume != newVolume) {
+      _vpController?.setVolume(newVolume);
     }
   }
 
@@ -82,16 +132,30 @@ class _StyledSlideState extends State<StyledSlide> {
   }
 
   void _disposeVideo() {
+    _currentHydrationId++; // Invalidate pending hydrations
     _videoReady = false;
     _vpController?.dispose();
     _vpController = null;
   }
 
-  void _updatePlayState() {
+  void _updatePlayState() async {
     final controller = _vpController;
     if (controller == null || !controller.value.isInitialized) return;
 
     if (widget.isPlaying) {
+      // Seek to synced position before playing for frame-accurate sync
+      if (widget.videoPositionMs > 0) {
+        final syncPosition = Duration(milliseconds: widget.videoPositionMs);
+        final currentPos = controller.value.position;
+        final drift = (syncPosition - currentPos).abs();
+        // Only seek if drift is > 500ms to avoid constant seeking
+        if (drift > const Duration(milliseconds: 500)) {
+          debugPrint(
+            'proj: syncing video position to ${widget.videoPositionMs}ms (drift=${drift.inMilliseconds}ms)',
+          );
+          await controller.seekTo(syncPosition);
+        }
+      }
       if (!controller.value.isPlaying) {
         controller.play();
         debugPrint('proj: background video started playing');
@@ -105,8 +169,9 @@ class _StyledSlideState extends State<StyledSlide> {
   }
 
   Future<void> _hydrateVideo() async {
+    final hydrationId = ++_currentHydrationId;
     debugPrint(
-      'proj: _hydrateVideo called, kEnableProjectionVideo=$kEnableProjectionVideo',
+      'proj: _hydrateVideo called id=$hydrationId, kEnableProjectionVideo=$kEnableProjectionVideo',
     );
     if (!kEnableProjectionVideo) {
       debugPrint(
@@ -124,6 +189,22 @@ class _StyledSlideState extends State<StyledSlide> {
       return;
     }
 
+    // Check if the same video exists as a foreground layer
+    // This prevents double-initialization of video players for the same file, which can crash the app
+    final hasDuplicateForeground = widget.slide.layers.any(
+      (l) =>
+          l.role == 'foreground' &&
+          l.path == path &&
+          (l.mediaType == 'video' || type == 'video'),
+    );
+
+    if (hasDuplicateForeground) {
+      debugPrint(
+        'proj: skipping background video hydration - duplicate found in foreground layers',
+      );
+      return;
+    }
+
     // Verify file exists before attempting to create controller
     final file = File(path);
     if (!await file.exists()) {
@@ -131,28 +212,59 @@ class _StyledSlideState extends State<StyledSlide> {
       return;
     }
 
-    debugPrint('proj: hydrate background video path=$path');
+    if (hydrationId != _currentHydrationId) return;
+
+    debugPrint('proj: hydrate background video path=$path id=$hydrationId');
 
     // Use the queue to serialize video initialization
     await VideoInitQueue.instance.enqueue(() async {
-      if (!mounted) return;
+      if (!mounted || hydrationId != _currentHydrationId) return;
 
       try {
-        // Delay to allow the secondary engine/window to finish its first frame
-        await Future.delayed(const Duration(milliseconds: 300));
-        if (!mounted) return;
+        vp.VideoPlayerController? controller;
 
-        final controller = vp.VideoPlayerController.file(file);
+        // Check preloaded cache first
+        if (StyledSlide._preloaded.containsKey(path)) {
+          debugPrint('proj: using preloaded controller for path=$path');
+          controller = StyledSlide._preloaded.remove(path);
+          // Skip the 300ms delay for preloaded content
+        } else {
+          // Delay to allow the secondary engine/window to finish its first frame (only for fresh loads)
+          await Future.delayed(const Duration(milliseconds: 300));
+          if (!mounted || hydrationId != _currentHydrationId) return;
+
+          controller = vp.VideoPlayerController.file(file);
+          await controller.initialize().timeout(const Duration(seconds: 8));
+        }
+
+        if (controller == null) return; // Should not happen
+
         _vpController = controller;
-        await controller.initialize().timeout(const Duration(seconds: 8));
-        if (!mounted) {
+
+        if (!mounted || hydrationId != _currentHydrationId) {
+          try {
+            // Only dispose if we created it or took ownership
+            controller.dispose();
+          } catch (_) {}
+          return;
+        }
+
+        if (!controller.value.isInitialized) {
+          // Fallback if preloaded but not init (unlikely) or just created
+          // If we came from preload, it should be init.
+        }
+
+        await controller.setLooping(true);
+        await controller.setVolume(widget.volume);
+
+        // Check again before playing
+        if (hydrationId != _currentHydrationId) {
           try {
             controller.dispose();
           } catch (_) {}
           return;
         }
-        await controller.setLooping(true);
-        await controller.setVolume(0);
+
         // Only start playing if isPlaying is true
         if (widget.isPlaying) {
           await controller.play();
@@ -162,7 +274,8 @@ class _StyledSlideState extends State<StyledSlide> {
             'proj: background video ready but paused (isPlaying=false)',
           );
         }
-        if (!mounted) {
+
+        if (!mounted || hydrationId != _currentHydrationId) {
           try {
             controller.dispose();
           } catch (_) {}
@@ -173,11 +286,11 @@ class _StyledSlideState extends State<StyledSlide> {
         debugPrint(
           'proj: hydrate background video timed out; skipping playback',
         );
-        _disposeVideo();
+        if (hydrationId == _currentHydrationId) _disposeVideo();
       } catch (e, st) {
         debugPrint('proj: hydrate background video failed error=$e');
         debugPrint('$st');
-        _disposeVideo();
+        if (hydrationId == _currentHydrationId) _disposeVideo();
       }
     });
   }
@@ -280,14 +393,27 @@ class _StyledSlideState extends State<StyledSlide> {
     );
 
     final bgPath = slide.mediaPath;
+
+    // Check for redundancy in build method as well
+    final hasDuplicateForeground = slide.layers.any(
+      (l) =>
+          l.role == 'foreground' &&
+          l.path == bgPath &&
+          (l.mediaType == 'video' || slide.mediaType == 'video'),
+    );
+
+    final effectiveBackgroundActive =
+        backgroundActive && !hasDuplicateForeground;
     final baseBgColor = slide.backgroundColor ?? slide.templateBackground;
 
     return Stack(
       children: [
         BackgroundMedia(
-          path: backgroundActive ? bgPath : null,
+          path: effectiveBackgroundActive ? bgPath : null,
           mediaType: slide.mediaType,
-          baseColor: backgroundActive ? baseBgColor : AppPalette.carbonBlack,
+          baseColor: effectiveBackgroundActive
+              ? baseBgColor
+              : AppPalette.carbonBlack,
           overlayOpacity: 0.25,
           videoController: _vpController,
           videoReady: _videoReady,
@@ -325,32 +451,6 @@ class _StyledSlideState extends State<StyledSlide> {
               ),
             ),
           ),
-        if (showDefaultTextbox)
-          Positioned(
-            left: boxLeft,
-            top: boxTop,
-            width: boxWidth,
-            height: boxHeight,
-            child: Container(
-              padding: EdgeInsets.all(
-                ((slide.boxPadding ?? 8).clamp(0, 48)).toDouble(),
-              ),
-              alignment: _textAlignToAlignment(align),
-              decoration: BoxDecoration(
-                color:
-                    slide.boxBackgroundColor ??
-                    AppPalette.carbonBlack.withOpacity(0.26),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                _applyTransform(slide.body, slide.textTransform),
-                textAlign: align,
-                style: textStyle,
-                maxLines: maxLines.clamp(1, 24).toInt(),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ),
         // Render foreground media layers
         for (final layer in foregroundLayers)
           ProjectedLayer(
@@ -359,6 +459,56 @@ class _StyledSlideState extends State<StyledSlide> {
             stageHeight: stageHeight,
             textStyle: textStyle,
             isPlaying: widget.isPlaying,
+          ),
+        if (foregroundLayers.any((l) => l.kind == 'scripture'))
+          for (final layer in foregroundLayers.where(
+            (l) => l.kind == 'scripture',
+          ))
+            Positioned(
+              left: (layer.left ?? 0) * stageWidth,
+              top: (layer.top ?? 0) * stageHeight,
+              width: (layer.width ?? 1) * stageWidth,
+              height: (layer.height ?? 1) * stageHeight,
+              child: ScriptureDisplay(
+                text: layer.text ?? '',
+                reference: layer.scriptureReference ?? '',
+                highlightedIndices: layer.highlightedIndices ?? [],
+                fontSize: layer.fontSize ?? 50,
+                textColor: layer.textColor ?? Colors.white,
+                fontFamily: layer.fontFamily ?? 'Roboto',
+                textAlign: layer.align ?? TextAlign.center,
+              ),
+            ),
+        if (showDefaultTextbox)
+          Positioned(
+            left: boxLeft,
+            top: boxTop,
+            width: boxWidth,
+            height: boxHeight,
+            child: Transform.rotate(
+              angle: (slide.rotation ?? 0) * (3.1415926535 / 180),
+              child: Container(
+                padding: EdgeInsets.all(
+                  ((slide.boxPadding ?? 8).clamp(0, 48)).toDouble(),
+                ),
+                alignment: _textAlignToAlignment(align),
+                decoration: BoxDecoration(
+                  color:
+                      slide.boxBackgroundColor ??
+                      AppPalette.carbonBlack.withOpacity(0.26),
+                  borderRadius: BorderRadius.circular(
+                    (slide.boxBorderRadius ?? 0).toDouble(),
+                  ),
+                ),
+                child: LiturgyTextRenderer.build(
+                  _applyTransform(slide.body, slide.textTransform),
+                  align: align,
+                  style: textStyle,
+                  maxLines: maxLines.clamp(1, 24).toInt(),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
           ),
         if (overlayActive)
           Positioned(

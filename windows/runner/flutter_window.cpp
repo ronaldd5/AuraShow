@@ -2,8 +2,10 @@
 
 #include <optional>
 
-#include "flutter/generated_plugin_registrant.h"
 #include "desktop_multi_window/desktop_multi_window_plugin.h"
+#include "flutter/generated_plugin_registrant.h"
+#include <just_audio_windows/just_audio_windows_plugin.h>
+
 #include <media_kit_libs_windows_video/media_kit_libs_windows_video_plugin_c_api.h>
 #include <media_kit_video/media_kit_video_plugin_c_api.h>
 #include <screen_retriever_windows/screen_retriever_windows_plugin_c_api.h>
@@ -11,45 +13,49 @@
 #include <video_player_win/video_player_win_plugin_c_api.h>
 #include <volume_controller/volume_controller_plugin_c_api.h>
 
-FlutterWindow::FlutterWindow(const flutter::DartProject& project)
+FlutterWindow::FlutterWindow(const flutter::DartProject &project)
     : project_(project) {}
 
 FlutterWindow::~FlutterWindow() {}
 
 // Track the primary engine.
 namespace {
-flutter::FlutterEngine* g_primary_engine = nullptr;
+flutter::FlutterEngine *g_primary_engine = nullptr;
 
 // Register plugins needed by secondary windows, excluding DesktopMultiWindow
 // to avoid "main window already exists" errors.
-void RegisterSecondaryPlugins(flutter::FlutterEngine* engine) {
+void RegisterSecondaryPlugins(flutter::FlutterEngine *engine) {
   MediaKitLibsWindowsVideoPluginCApiRegisterWithRegistrar(
-    engine->GetRegistrarForPlugin("MediaKitLibsWindowsVideoPluginCApi"));
+      engine->GetRegistrarForPlugin("MediaKitLibsWindowsVideoPluginCApi"));
   MediaKitVideoPluginCApiRegisterWithRegistrar(
-    engine->GetRegistrarForPlugin("MediaKitVideoPluginCApi"));
+      engine->GetRegistrarForPlugin("MediaKitVideoPluginCApi"));
   ScreenRetrieverWindowsPluginCApiRegisterWithRegistrar(
-    engine->GetRegistrarForPlugin("ScreenRetrieverWindowsPluginCApi"));
+      engine->GetRegistrarForPlugin("ScreenRetrieverWindowsPluginCApi"));
   UrlLauncherWindowsRegisterWithRegistrar(
-    engine->GetRegistrarForPlugin("UrlLauncherWindows"));
+      engine->GetRegistrarForPlugin("UrlLauncherWindows"));
   VideoPlayerWinPluginCApiRegisterWithRegistrar(
-    engine->GetRegistrarForPlugin("VideoPlayerWinPluginCApi"));
+      engine->GetRegistrarForPlugin("VideoPlayerWinPluginCApi"));
   VolumeControllerPluginCApiRegisterWithRegistrar(
-    engine->GetRegistrarForPlugin("VolumeControllerPluginCApi"));
+      engine->GetRegistrarForPlugin("VolumeControllerPluginCApi"));
 }
-}
+} // namespace
 
 bool FlutterWindow::OnCreate() {
   if (!Win32Window::OnCreate()) {
     return false;
   }
 
-  DesktopMultiWindowSetWindowCreatedCallback([](void* controller) {
-    // Register only video_player_win for secondary engines.
-    // media_kit crashes when shared across engines, but video_player_win is safe.
-    auto* flutter_view_controller = reinterpret_cast<flutter::FlutterViewController*>(controller);
-    auto* engine = flutter_view_controller->engine();
+  DesktopMultiWindowSetWindowCreatedCallback([](void *controller) {
+    // Register plugins for secondary engines.
+    auto *flutter_view_controller =
+        reinterpret_cast<flutter::FlutterViewController *>(controller);
+    auto *engine = flutter_view_controller->engine();
     VideoPlayerWinPluginCApiRegisterWithRegistrar(
         engine->GetRegistrarForPlugin("VideoPlayerWinPluginCApi"));
+    // Register just_audio for secondary windows (background audio, projection
+    // sound)
+    JustAudioWindowsPluginRegisterWithRegistrar(
+        engine->GetRegistrarForPlugin("JustAudioWindowsPlugin"));
   });
 
   RECT frame = GetClientArea();
@@ -66,9 +72,7 @@ bool FlutterWindow::OnCreate() {
   RegisterPlugins(flutter_controller_->engine());
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
-  flutter_controller_->engine()->SetNextFrameCallback([&]() {
-    this->Show();
-  });
+  flutter_controller_->engine()->SetNextFrameCallback([&]() { this->Show(); });
 
   // Flutter can complete the first frame before the "show window" callback is
   // registered. The following call ensures a frame is pending to ensure the
@@ -101,9 +105,9 @@ FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
   }
 
   switch (message) {
-    case WM_FONTCHANGE:
-      flutter_controller_->engine()->ReloadSystemFonts();
-      break;
+  case WM_FONTCHANGE:
+    flutter_controller_->engine()->ReloadSystemFonts();
+    break;
   }
 
   return Win32Window::MessageHandler(hwnd, message, wparam, lparam);
