@@ -1,0 +1,17 @@
+name: Mac Build Check
+on: [push]
+
+jobs:
+  build_macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      
+      # 1. Install Dependencies
+      - run: flutter pub get
+      
+      # 2. Try to Build (This will fail if you have Windows-only code unguarded)
+      - run: flutter build macos --debug --no-codesign
