@@ -1,65 +1,29 @@
-import 'dart:typed_data';
+import 'dart:async';
 
-/// Common Window Info
-class WindowInfo {
-  WindowInfo({
-    required this.hwnd,
-    required this.title,
-    required this.processName,
-    required this.className,
-    this.isVisible = true,
-  });
-
-  final int hwnd;
-  final String title;
-  final String processName;
-  final String className;
-  final bool isVisible;
-
-  @override
-  String toString() => 'WindowInfo(hwnd: $hwnd, title: $title)';
+/// Defines the mode of audio capture.
+enum AudioCaptureMode {
+  loopback,   // System audio (what you hear)
+  microphone, // Input audio (what you say)
 }
 
-/// Common Display Info
-class DisplayInfo {
-  DisplayInfo({
-    required this.handle,
-    required this.name,
-    required this.left,
-    required this.top,
-    required this.width,
-    required this.height,
-    required this.isPrimary,
-  });
-
-  final int handle;
-  final String name;
-  final int left;
-  final int top;
-  final int width;
-  final int height;
-  final bool isPrimary;
+/// Data packet containing frequency info.
+class AudioCaptureData {
+  final List<double> frequencies;
+  AudioCaptureData(this.frequencies);
 }
 
-/// Abstract Interface for Desktop Capture
+/// The contract that both Mac and Windows implementations must follow.
 abstract class CapturePlatform {
-  List<WindowInfo> getWindows({bool refresh = false});
-  List<DisplayInfo> getDisplays({bool refresh = false});
+  /// The stream of audio frequency data.
+  Stream<AudioCaptureData> get audioDataStream;
 
-  Uint8List? captureWindow(
-    int hwnd, {
-    int thumbnailWidth = 320,
-    int thumbnailHeight = 180,
+  /// Starts capturing audio in the specified mode.
+  /// Returns true if started successfully.
+  Future<bool> startCapture({
+    required AudioCaptureMode mode,
+    String? deviceId,
   });
 
-  Uint8List? captureDisplay(
-    int displayIndex, {
-    int thumbnailWidth = 320,
-    int thumbnailHeight = 180,
-  });
-
-  Uint8List? captureScreen({
-    int thumbnailWidth = 320,
-    int thumbnailHeight = 180,
-  });
+  /// Stops the current capture session.
+  Future<void> stopCapture();
 }
