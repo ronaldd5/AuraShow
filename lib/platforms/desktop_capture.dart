@@ -3,8 +3,9 @@ import 'dart:io';
 import 'interface/capture_platform_interface.dart';
 
 import 'windows/windows_capture_service.dart'
-    if (dart.library.html) 'macos/macos_capture_service.dart';
-import 'macos/macos_capture_service.dart';
+    if (dart.library.io) 'windows/windows_capture_service.dart';
+import 'macos/macos_capture_service.dart'
+    if (dart.library.io) 'macos/macos_capture_service.dart';
 
 /// Facade for Desktop Capture
 /// Returns the platform-specific implementation
@@ -17,7 +18,7 @@ class DesktopCapture {
     } else if (Platform.isMacOS) {
       return MacosCaptureService();
     }
-    // Fallback or throw
-    return MacosCaptureService(); // Safe stub
+    // Fallback stub for other platforms
+    return MacosCaptureService();
   }
 }

@@ -66,14 +66,14 @@ extension TopBarModule on DashboardScreenState {
         label: 'Copy',
         icon: Icons.copy,
         shortcut: 'Ctrl+C',
-        onSelected: _copyAction,
+        onSelected: copySelection,
         enabled: _hasSelection(),
       ),
       _MiniNavAction(
         label: 'Paste',
         icon: Icons.paste,
         shortcut: 'Ctrl+V',
-        onSelected: _pasteAction,
+        onSelected: pasteSelection,
       ),
       _MiniNavAction(
         label: 'Delete',
@@ -503,7 +503,6 @@ extension TopBarModule on DashboardScreenState {
       ),
     );
   }
-
 }
 
 class _AnimatedGradientText extends StatefulWidget {

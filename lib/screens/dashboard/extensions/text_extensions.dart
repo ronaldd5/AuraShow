@@ -261,6 +261,7 @@ extension TextExtensions on DashboardScreenState {
                                   )
                                   .toList(),
                               onChanged: (value) {
+                                recordHistory();
                                 if (activeLayer != null) {
                                   _updateLayerField(
                                     activeLayer.id,
@@ -397,6 +398,8 @@ extension TextExtensions on DashboardScreenState {
                             max: 400,
                             activeColor: accentPink,
                             inactiveColor: Colors.white24,
+                            onChangeStart: (_) =>
+                                recordHistory(immediate: true),
                             onChanged: (value) {
                               if (activeLayer != null) {
                                 _updateLayerField(
@@ -457,6 +460,7 @@ extension TextExtensions on DashboardScreenState {
                           ),
                         ],
                         onChanged: (v) {
+                          recordHistory();
                           if (v == null) return;
                           safeSetState(() {
                             _slides[selectedSlideIndex] =
@@ -484,6 +488,7 @@ extension TextExtensions on DashboardScreenState {
                       ),
                       selected: isBold,
                       onTap: () {
+                        recordHistory();
                         if (activeLayer != null) {
                           _updateLayerField(
                             activeLayer.id,
@@ -510,6 +515,7 @@ extension TextExtensions on DashboardScreenState {
                       ),
                       selected: isItalic,
                       onTap: () {
+                        recordHistory();
                         if (activeLayer != null) {
                           _updateLayerField(
                             activeLayer.id,
@@ -536,6 +542,7 @@ extension TextExtensions on DashboardScreenState {
                       ),
                       selected: isUnderline,
                       onTap: () {
+                        recordHistory();
                         if (activeLayer != null) {
                           _updateLayerField(
                             activeLayer.id,
@@ -559,6 +566,7 @@ extension TextExtensions on DashboardScreenState {
                       ),
                       selected: true,
                       onTap: () {
+                        recordHistory();
                         final nextAlign = _cycleAlign(textAlign);
                         if (activeLayer != null) {
                           _updateLayerField(
@@ -846,6 +854,7 @@ extension TextExtensions on DashboardScreenState {
                 max: 3.0,
                 divisions: 25,
                 activeColor: accentPink,
+                onChangeStart: (_) => recordHistory(immediate: true),
                 onChanged: (v) {
                   safeSetState(() {
                     _slides[selectedSlideIndex] = _slides[selectedSlideIndex]
@@ -1018,6 +1027,7 @@ extension TextExtensions on DashboardScreenState {
                       min: 0,
                       max: 100,
                       activeColor: accentPink,
+                      onChangeStart: (_) => recordHistory(immediate: true),
                       onChanged: (v) {
                         if (activeLayer != null) {
                           _updateLayerField(
@@ -1056,6 +1066,7 @@ extension TextExtensions on DashboardScreenState {
                       min: 0.0,
                       max: 1.0,
                       activeColor: accentPink,
+                      onChangeStart: (_) => recordHistory(immediate: true),
                       onChanged: (v) {
                         if (activeLayer != null) {
                           final baseColor =
@@ -1098,6 +1109,7 @@ extension TextExtensions on DashboardScreenState {
                       max: 360,
                       activeColor: accentPink,
                       inactiveColor: Colors.white24,
+                      onChangeStart: (_) => recordHistory(immediate: true),
                       onChanged: (v) {
                         if (activeLayer != null) {
                           _updateLayerField(

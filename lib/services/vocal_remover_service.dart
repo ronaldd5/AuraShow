@@ -104,6 +104,9 @@ class VocalRemoverService {
           preArgs = ['-3.11'];
         }
       } catch (_) {}
+    } else if (Platform.isMacOS) {
+      // macOS uses python3 by default
+      pythonExe = 'python3';
     }
 
     // Command: pip install "audio-separator[gpu]"
@@ -291,6 +294,11 @@ class VocalRemoverService {
           final ffmpegBin = r'E:\ffmpeg-8.0-full_build-shared\bin';
           final currentPath = Platform.environment['Path'] ?? '';
           env = {'Path': '$ffmpegBin;$currentPath'};
+        } else if (Platform.isMacOS) {
+          // Homebrew paths for macOS
+          const brewPaths = '/opt/homebrew/bin:/usr/local/bin';
+          final currentPath = Platform.environment['PATH'] ?? '';
+          env = {'PATH': '$brewPaths:$currentPath'};
         }
 
         process = await Process.start(exe, args, environment: env);

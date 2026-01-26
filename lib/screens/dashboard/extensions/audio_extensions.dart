@@ -189,6 +189,7 @@ extension AudioExtensions on DashboardScreenState {
                 width: 60,
                 child: Slider(
                   value: _audioVolume,
+                  onChangeStart: (_) => recordHistory(immediate: true),
                   onChanged: _setAudioVolume,
                   min: 0,
                   max: 1,
@@ -314,14 +315,14 @@ extension AudioExtensions on DashboardScreenState {
     }
   }
 
-  void _stopAudio() {
+  void _stopAudio({Duration? fadeDuration}) {
     final now = DateTime.now();
     final isPanicStop =
         _lastStopClickTime != null &&
         now.difference(_lastStopClickTime!) < const Duration(milliseconds: 500);
     _lastStopClickTime = now;
 
-    if (isPanicStop || audioStopFadeDuration <= 0) {
+    if (isPanicStop || (fadeDuration == null && audioStopFadeDuration <= 0)) {
       _stopAudioImmediately();
       return;
     }
@@ -331,7 +332,13 @@ extension AudioExtensions on DashboardScreenState {
     // Soft Stop: Fade out
     double currentVolume = _audioVolume;
     const intervalMs = 50;
-    final steps = (audioStopFadeDuration * 1000) / intervalMs;
+
+    // Determine target duration: use override if provided, else user setting
+    double targetDurationSeconds = fadeDuration != null
+        ? fadeDuration.inMilliseconds / 1000.0
+        : audioStopFadeDuration;
+
+    final steps = (targetDurationSeconds * 1000) / intervalMs;
     final volStep = _audioVolume / steps;
 
     _audioFadeTimer = Timer.periodic(const Duration(milliseconds: intervalMs), (

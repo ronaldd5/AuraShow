@@ -203,13 +203,18 @@ class DeviceService {
           ..clear()
           ..addAll(newScreens);
         return;
+      } else if (Platform.isMacOS) {
+        // macOS uses screen_retriever fallback below
       }
 
       // Non-Windows Fallback below
-      throw UnsupportedError('Not running on Windows');
+      if (!Platform.isMacOS)
+        throw UnsupportedError('Not running on Windows or macOS');
     } catch (e) {
       if (Platform.isWindows) {
         debugPrint('DeviceService: Error scanning screens (Win32): $e');
+      } else if (Platform.isMacOS) {
+        debugPrint('DeviceService: Info scanning screens (macOS): $e');
       }
       // Fallback to screen_retriever on Mac or if Win32 fails
       try {
@@ -495,6 +500,7 @@ class DeviceService {
 
   /// Capture a thumbnail for a screen using native Win32 APIs
   Future<bool> _captureScreenThumbnail(LiveDevice screen) async {
+    if (Platform.isMacOS) return false; // macOS uses standard capture
     if (!Platform.isWindows) return false;
 
     try {
@@ -504,7 +510,6 @@ class DeviceService {
 
       if (displayIndex == null) return false;
 
-      // Get displays from Win32 capture service
       // Get displays from Win32 capture service
       final displays = DesktopCapture.instance.getDisplays();
       if (displayIndex >= displays.length) return false;
@@ -556,18 +561,21 @@ class DeviceService {
 
   /// Get list of available windows for capture
   List<WindowInfo> getWindows() {
+    if (Platform.isMacOS) return [];
     if (!Platform.isWindows) return [];
     return DesktopCapture.instance.getWindows();
   }
 
   /// Get list of available displays for capture
   List<DisplayInfo> getDisplays() {
+    if (Platform.isMacOS) return [];
     if (!Platform.isWindows) return [];
     return DesktopCapture.instance.getDisplays();
   }
 
   /// Capture a window thumbnail
   Uint8List? captureWindowThumbnail(int hwnd, {int? width, int? height}) {
+    if (Platform.isMacOS) return null;
     if (!Platform.isWindows) return null;
     return DesktopCapture.instance.captureWindow(
       hwnd,
@@ -582,6 +590,7 @@ class DeviceService {
     int? width,
     int? height,
   }) {
+    if (Platform.isMacOS) return null;
     if (!Platform.isWindows) return null;
     return DesktopCapture.instance.captureDisplay(
       displayIndex,
@@ -592,6 +601,7 @@ class DeviceService {
 
   /// Capture entire screen (primary monitor)
   Uint8List? captureScreenThumbnail({int? width, int? height}) {
+    if (Platform.isMacOS) return null;
     if (!Platform.isWindows) return null;
     return DesktopCapture.instance.captureScreen(
       thumbnailWidth: width ?? 320,

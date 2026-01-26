@@ -65,6 +65,7 @@ extension LayerExtensions on DashboardScreenState {
   }
 
   void _setLayerRole(String layerId, LayerRole role) {
+    recordHistory();
     _updateLayerField(layerId, (l) => l.copyWith(role: role));
   }
 
@@ -353,6 +354,7 @@ extension LayerExtensions on DashboardScreenState {
                       max: 1,
                       divisions: 20,
                       activeColor: accentPink,
+                      onChangeStart: (_) => recordHistory(immediate: true),
                       onChanged: (v) {
                         _updateLayerField(
                           selectedLayer.id,
@@ -410,6 +412,7 @@ extension LayerExtensions on DashboardScreenState {
                           DropdownMenuItem(value: 'none', child: Text('None')),
                         ],
                         onChanged: (v) {
+                          recordHistory();
                           if (v == null) return;
                           _updateLayerField(
                             selectedLayer.id,
@@ -521,6 +524,8 @@ extension LayerExtensions on DashboardScreenState {
                               max: 200,
                               activeColor: accentPink,
                               inactiveColor: Colors.white24,
+                              onChangeStart: (_) =>
+                                  recordHistory(immediate: true),
                               onChanged: (value) {
                                 _updateLayerField(
                                   selectedLayer.id,
@@ -1038,6 +1043,7 @@ extension LayerExtensions on DashboardScreenState {
                       max: 128,
                       divisions: 15,
                       activeColor: accentPink,
+                      onChangeStart: (_) => recordHistory(immediate: true),
                       onChanged: (val) {
                         _updateLayerField(
                           selectedLayer.id,
@@ -1058,6 +1064,7 @@ extension LayerExtensions on DashboardScreenState {
                       min: 0.1,
                       max: 3.0,
                       activeColor: accentPink,
+                      onChangeStart: (_) => recordHistory(immediate: true),
                       onChanged: (val) {
                         _updateLayerField(
                           selectedLayer.id,
@@ -1078,6 +1085,7 @@ extension LayerExtensions on DashboardScreenState {
                       min: 0.0,
                       max: 1.0,
                       activeColor: accentPink,
+                      onChangeStart: (_) => recordHistory(immediate: true),
                       onChanged: (val) {
                         _updateLayerField(
                           selectedLayer.id,
@@ -1237,6 +1245,7 @@ extension LayerExtensions on DashboardScreenState {
                         min: 0.1,
                         max: 2.0,
                         activeColor: accentPink,
+                        onChangeStart: (_) => recordHistory(immediate: true),
                         onChanged: (val) {
                           _updateLayerField(
                             selectedLayer.id,
@@ -1275,6 +1284,7 @@ extension LayerExtensions on DashboardScreenState {
                       min: 1.0,
                       max: 20.0,
                       activeColor: accentPink,
+                      onChangeStart: (_) => recordHistory(immediate: true),
                       onChanged: (val) {
                         _updateLayerField(
                           selectedLayer.id,
@@ -1295,6 +1305,7 @@ extension LayerExtensions on DashboardScreenState {
                       min: 0.0,
                       max: 10.0,
                       activeColor: accentPink,
+                      onChangeStart: (_) => recordHistory(immediate: true),
                       onChanged: (val) {
                         _updateLayerField(
                           selectedLayer.id,
@@ -1317,6 +1328,7 @@ extension LayerExtensions on DashboardScreenState {
                         min: 0.1,
                         max: 0.8,
                         activeColor: accentPink,
+                        onChangeStart: (_) => recordHistory(immediate: true),
                         onChanged: (val) {
                           _updateLayerField(
                             selectedLayer.id,
@@ -1336,6 +1348,7 @@ extension LayerExtensions on DashboardScreenState {
                         min: 0.0,
                         max: 3.0,
                         activeColor: accentPink,
+                        onChangeStart: (_) => recordHistory(immediate: true),
                         onChanged: (val) {
                           _updateLayerField(
                             selectedLayer.id,
@@ -1409,6 +1422,7 @@ extension LayerExtensions on DashboardScreenState {
                     min: 0.1,
                     max: 5.0,
                     activeColor: accentPink,
+                    onChangeStart: (_) => recordHistory(immediate: true),
                     onChanged: (val) {
                       _updateLayerField(selectedLayer!.id, (l) {
                         final params = Map<String, double>.from(
@@ -1429,6 +1443,7 @@ extension LayerExtensions on DashboardScreenState {
                     min: 0.0,
                     max: 5.0,
                     activeColor: accentPink,
+                    onChangeStart: (_) => recordHistory(immediate: true),
                     onChanged: (val) {
                       _updateLayerField(selectedLayer!.id, (l) {
                         final params = Map<String, double>.from(
@@ -2674,8 +2689,8 @@ extension LayerExtensions on DashboardScreenState {
     showMenu(
       context: context,
       position: position,
-      color: bgMedium,
-      items: [
+      color: AppPalette.surface,
+      items: <PopupMenuEntry<String>>[
         if (!isMulti) ...[
           PopupMenuItem(
             value: 'front',
@@ -2699,7 +2714,44 @@ extension LayerExtensions on DashboardScreenState {
               }
             },
           ),
+          const PopupMenuDivider(),
         ],
+        PopupMenuItem(
+          value: 'copy',
+          child: _popMenuItem(Icons.copy, 'Copy'),
+          onTap: () => copySelection(),
+        ),
+        PopupMenuItem(
+          value: 'duplicate',
+          child: _popMenuItem(Icons.copy_all, 'Duplicate (Ctrl+D)'),
+          onTap: () => duplicateSelection(),
+        ),
+        const PopupMenuDivider(),
+        PopupMenuItem(
+          value: 'copy_style',
+          child: _popMenuItem(Icons.palette, 'Copy Style (Ctrl+Shift+C)'),
+          onTap: () => copyStyle(),
+        ),
+        PopupMenuItem(
+          value: 'paste_style',
+          child: _popMenuItem(Icons.brush, 'Paste Style (Ctrl+Shift+V)'),
+          onTap: () => pasteStyle(),
+        ),
+        PopupMenuItem(
+          value: 'paste_replace',
+          child: _popMenuItem(Icons.swap_horiz, 'Paste Replace (Ctrl+Shift+R)'),
+          onTap: () => pasteReplace(),
+        ),
+        const PopupMenuDivider(),
+        PopupMenuItem(
+          value: 'paste_all',
+          child: _popMenuItem(Icons.library_add_check, 'Paste to All Slides'),
+          onTap: () {
+            copySelection();
+            pasteToAllSlides();
+          },
+        ),
+        const PopupMenuDivider(),
         PopupMenuItem(
           value: 'delete',
           child: _popMenuItem(

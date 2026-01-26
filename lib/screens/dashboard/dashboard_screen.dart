@@ -73,6 +73,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'widgets/new_show_dialog.dart';
 import 'widgets/quick_lyrics_dialog.dart';
+import 'widgets/lines_options_popup.dart';
 import 'widgets/group_color_dialog.dart';
 import '../../services/label_color_service.dart';
 import '../../services/label_color_service.dart';
@@ -96,6 +97,8 @@ part 'extensions/media_extensions.dart'; // Video/Image logic
 part 'extensions/output_extensions.dart'; // Projection window logic
 part 'extensions/stage_extensions.dart'; // Stage display logic
 part 'extensions/filter_extensions.dart'; // Image filters
+part 'extensions/undo_redo_extensions.dart'; // Undo/Redo logic
+part 'extensions/show_processing_extensions.dart'; // Show re-pagination
 part 'modules/top_bar.dart';
 
 class ShowItem {
@@ -591,6 +594,7 @@ class DashboardScreenState extends State<DashboardScreen> {
   Timer? _metronomeTimer;
   List<FileSystemEntity> _audioFiles = [];
   List<SlideContent> _clipboardSlides = [];
+  List<SlideLayer> _clipboardLayers = [];
   static const String _stateFileExtension = '.json';
 
   void _toggleArmOutput(String id) {
@@ -647,6 +651,11 @@ class DashboardScreenState extends State<DashboardScreen> {
   bool disableLabels = false;
   bool showProjectsOnStartup = true;
   bool autoLaunchOutput = false;
+
+  // --- UNDO HISTORY ---
+  final List<HistorySnapshot> _undoStack = [];
+  final List<HistorySnapshot> _redoStack = [];
+  Timer? _debounceTimer;
   bool hideCursorInOutput = false;
   bool enableNdiOutput = false;
   bool enableRemoteShow = false;
@@ -1091,6 +1100,9 @@ class DashboardScreenState extends State<DashboardScreen> {
   Offset _layerDragAccum = Offset.zero;
   Offset _boxDragAccum = Offset.zero;
   bool _isLayerResizing = false;
+
+  final LayerLink _linesOptionsLayerLink = LayerLink();
+  OverlayEntry? _linesOptionsOverlay;
   Offset _layerResizeAccum = Offset.zero;
   Offset _boxResizeAccum = Offset.zero;
   bool _isBoxSelecting = false;
@@ -1127,6 +1139,16 @@ class DashboardScreenState extends State<DashboardScreen> {
   // Returns the PRIMARY selected layer (usually the last recently selected) or first
   SlideLayer? _currentSelectedLayer(SlideContent slide) {
     if (_selectedLayerIds.isEmpty) return null;
+
+    // Resolve pseudo-id for background
+    if (_selectedLayerIds.contains('__BACKGROUND__')) {
+      try {
+        return slide.layers.firstWhere((l) => l.role == LayerRole.background);
+      } catch (_) {
+        return null;
+      }
+    }
+
     // Prefer the one being edited if any
     if (_editingLayerId != null &&
         _selectedLayerIds.contains(_editingLayerId)) {
@@ -7665,33 +7687,37 @@ class DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ],
                 )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              : Stack(
                   children: [
-                    ...topCommon,
-                    _buildAutoAdvanceRow(),
-                    SizedBox(height: gap),
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: AppPalette.carbonBlack,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.white12),
-                      ),
-                      padding: const EdgeInsets.all(8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _sectionHeader('Groups'),
-                          const SizedBox(height: 8),
-                          const GroupTabPanel(),
-                        ],
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ...topCommon,
+                        _buildAutoAdvanceRow(),
+                        SizedBox(height: gap),
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: AppPalette.carbonBlack,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.white12),
+                          ),
+                          padding: const EdgeInsets.all(8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _sectionHeader('Groups'),
+                              const SizedBox(height: 8),
+                              const GroupTabPanel(),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: gap),
+                        _buildDropToSyncPanel(),
+                        SizedBox(height: gap + 2),
+                        _buildShowsMetaPanel(),
+                      ],
                     ),
-                    SizedBox(height: gap),
-                    _buildDropToSyncPanel(),
-                    SizedBox(height: gap + 2),
-                    _buildShowsMetaPanel(),
                   ],
                 );
 
@@ -7712,21 +7738,22 @@ class DashboardScreenState extends State<DashboardScreen> {
       height: height,
       child: Row(
         children: [
-          IconButton(
-            constraints: constraints,
-            padding: EdgeInsets.zero,
-            onPressed: _prevSlide,
-            icon: Icon(
-              Icons.chevron_left,
-              size: iconSize,
-              color: Colors.white70,
-            ),
-            tooltip: 'Previous slide',
-          ),
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                IconButton(
+                  constraints: constraints,
+                  padding: EdgeInsets.zero,
+                  onPressed: _prevSlide,
+                  icon: Icon(
+                    Icons.chevron_left,
+                    size: iconSize,
+                    color: Colors.white70,
+                  ),
+                  tooltip: 'Previous slide',
+                ),
+                const SizedBox(width: 10),
                 IconButton(
                   constraints: constraints,
                   padding: EdgeInsets.zero,
@@ -7752,13 +7779,6 @@ class DashboardScreenState extends State<DashboardScreen> {
                 ),
               ],
             ),
-          ),
-          IconButton(
-            constraints: constraints,
-            padding: EdgeInsets.zero,
-            onPressed: _clearAllOutputs,
-            icon: Icon(Icons.clear_all, size: iconSize, color: Colors.white70),
-            tooltip: 'Clear outputs',
           ),
         ],
       ),
@@ -13269,6 +13289,47 @@ class _LiveScreenCaptureState extends State<_LiveScreenCapture> {
         ],
       ),
     );
+  }
+}
+
+/// A platform-agnostic YouTube player that selects the best implementation
+/// for the current operating system.
+class AuraYouTubePlayer extends StatelessWidget {
+  const AuraYouTubePlayer({
+    super.key,
+    required this.videoId,
+    this.autoPlay = false,
+    this.muted = false,
+    this.showControls = true,
+  });
+
+  final String videoId;
+  final bool autoPlay;
+  final bool muted;
+  final bool showControls;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!kIsWeb && Platform.isWindows) {
+      return _WindowsYouTubePlayer(
+        videoId: videoId,
+        autoPlay: autoPlay,
+        muted: muted,
+        showControls: showControls,
+      );
+    } else {
+      // Use standard iframe player for macOS and Web
+      return YoutubePlayer(
+        controller: YoutubePlayerController.fromVideoId(
+          videoId: videoId,
+          params: YoutubePlayerParams(
+            showControls: showControls,
+            mute: muted,
+            showFullscreenButton: true,
+          ),
+        ),
+      );
+    }
   }
 }
 

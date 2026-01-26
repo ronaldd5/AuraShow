@@ -103,12 +103,14 @@ class ShowNode extends FileSystemNode {
   // A specific show (set of slides) inside a Project
   final String? originalSongId; // If created from a song import
   List<SlideContent> slides;
+  int? maxLinesPerSlide; // New property for global line management
 
   ShowNode({
     required String id,
     required String name,
     required String parentId, // Shows MUST have a parent Project
     this.originalSongId,
+    this.maxLinesPerSlide,
     List<SlideContent>? slides,
   }) : slides = slides ?? [],
        super(id: id, name: name, parentId: parentId, type: NodeType.show);
@@ -120,6 +122,7 @@ class ShowNode extends FileSystemNode {
     'parentId': parentId,
     'type': type.toString(),
     'originalSongId': originalSongId,
+    'maxLinesPerSlide': maxLinesPerSlide,
     'slides': slides.map((s) => s.toJson()).toList(),
   };
 
@@ -129,6 +132,7 @@ class ShowNode extends FileSystemNode {
       name: json['name'],
       parentId: json['parentId']!,
       originalSongId: json['originalSongId'],
+      maxLinesPerSlide: json['maxLinesPerSlide'] as int?,
       slides: (json['slides'] as List<dynamic>?)
           ?.map((e) => SlideContent.fromJson(e))
           .toList(),

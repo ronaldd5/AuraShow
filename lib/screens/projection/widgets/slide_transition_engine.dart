@@ -95,63 +95,83 @@ class _SlideTransitionEngineState extends State<SlideTransitionEngine>
     }
 
     // If stack has 2 items: 0 is OLD, 1 is NEW.
-    // We only animate the NEW one (or both depending on effect).
 
     final oldSlide = _stack[0];
     final newSlide = _stack[1];
 
     return [
-      oldSlide,
-      // Animate new slide entering
+      // AnimatedBuilder redesign to allow animating BOTH slides (for Push)
       AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
-          return _applyTransition(
-            child: child!,
-            progress: _controller.value,
-            type: widget.transitionType,
-          );
+          final progress = _controller.value;
+          final curvedProgress = Curves.easeInOut.transform(progress);
+
+          switch (widget.transitionType) {
+            case 'push':
+              // True Push: Old slide moves Left (-100%), New slide moves in from Right (100% -> 0%)
+              final width = MediaQuery.of(context).size.width;
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Transform.translate(
+                    offset: Offset(-width * curvedProgress, 0),
+                    child: oldSlide,
+                  ),
+                  Transform.translate(
+                    offset: Offset(width * (1.0 - curvedProgress), 0),
+                    child: newSlide,
+                  ),
+                ],
+              );
+
+            case 'wipe':
+              // Wipe: New slide covers old from Left
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  oldSlide,
+                  ClipRect(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      widthFactor: curvedProgress,
+                      child: newSlide,
+                    ),
+                  ),
+                ],
+              );
+
+            case 'iris':
+              // Iris: New slide reveals via circle
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  oldSlide,
+                  ClipPath(
+                    clipper: IrisClipper(curvedProgress),
+                    child: newSlide,
+                  ),
+                ],
+              );
+
+            case 'fade':
+            default:
+              // Cross Dissolve: Fade in new slide over old
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  oldSlide,
+                  Opacity(opacity: curvedProgress, child: newSlide),
+                ],
+              );
+          }
         },
-        child: newSlide,
       ),
     ];
   }
 
-  Widget _applyTransition({
-    required Widget child,
-    required double progress,
-    required String type,
-  }) {
-    // Use Curves
-    final curvedProgress = Curves.easeInOut.transform(progress);
-
-    switch (type) {
-      case 'push':
-        // Push Left: Old slide stays (covered), New slide comes from Right to Left?
-        // Standard "Push" usually implies both move.
-        // Let's implement "Cover Left" for now (New slide moves in from right)
-        // as requested in prompt "Push Left: Transform.translate(offset: Offset(screen_width * (1 - value), 0))"
-        final width = MediaQuery.of(context).size.width;
-        final offset = width * (1.0 - curvedProgress);
-        return Transform.translate(offset: Offset(offset, 0), child: child);
-
-      case 'wipe':
-        return ClipRect(
-          child: Align(
-            alignment: Alignment.centerLeft,
-            widthFactor: curvedProgress,
-            child: child,
-          ),
-        );
-
-      case 'iris':
-        return ClipPath(clipper: IrisClipper(curvedProgress), child: child);
-
-      case 'fade':
-      default:
-        return Opacity(opacity: curvedProgress, child: child);
-    }
-  }
+  // Helper _applyTransition removed as logic moved to builder above
+  // to support multi-slide animation.
 }
 
 class IrisClipper extends CustomClipper<Path> {

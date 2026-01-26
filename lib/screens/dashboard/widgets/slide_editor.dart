@@ -5,6 +5,61 @@ part of '../dashboard_screen.dart';
 // ignore_for_file: invalid_use_of_protected_member
 
 extension SlideEditor on DashboardScreenState {
+  Widget _buildEditorToolbar() {
+    final hasLayerInClipboard = _clipboardLayers.isNotEmpty;
+    final hasSelection = _selectedLayerIds.isNotEmpty;
+
+    return Container(
+      height: 40,
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.black26,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // COPY BUTTON
+          IconButton(
+            icon: const Icon(Icons.copy, size: 18),
+            tooltip: 'Copy Selected (Ctrl+C)',
+            onPressed: hasSelection ? copySelection : null,
+            color: hasSelection ? Colors.white : Colors.white24,
+          ),
+
+          // PASTE BUTTON
+          IconButton(
+            icon: const Icon(Icons.paste, size: 18),
+            tooltip: 'Paste (Ctrl+V)',
+            onPressed: hasLayerInClipboard ? pasteSelection : null,
+            color: hasLayerInClipboard ? Colors.white : Colors.white24,
+          ),
+
+          const VerticalDivider(color: Colors.white24, indent: 8, endIndent: 8),
+
+          // PASTE TO ALL BUTTON (The "Magic" Button)
+          TextButton.icon(
+            icon: const Icon(
+              Icons.copy_all,
+              size: 18,
+              color: AppPalette.accent,
+            ),
+            label: const Text(
+              'Apply to All',
+              style: TextStyle(fontSize: 12, color: AppPalette.accent),
+            ),
+            onPressed: hasLayerInClipboard ? pasteToAllSlides : null,
+            style: TextButton.styleFrom(
+              disabledForegroundColor: Colors.white10,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSingleSlideEditSurface() {
     final hasSlide =
         _slides.isNotEmpty &&
@@ -29,9 +84,56 @@ extension SlideEditor on DashboardScreenState {
             if (hasSlide &&
                 _selectedLayerIds.isNotEmpty &&
                 _editingLayerId == null) {
+              recordHistory();
               _deleteSelectedLayers();
               return KeyEventResult.handled;
             }
+          }
+
+          // UNDO (Ctrl + Z)
+          if (isCtrl && event.logicalKey == LogicalKeyboardKey.keyZ) {
+            if (event.isShiftPressed) {
+              redo();
+            } else {
+              undo();
+            }
+            return KeyEventResult.handled;
+          }
+
+          // REDO (Ctrl + Y)
+          if (isCtrl && event.logicalKey == LogicalKeyboardKey.keyY) {
+            redo();
+            return KeyEventResult.handled;
+          }
+
+          // 1. DUPLICATE (Ctrl + D)
+          if (isCtrl && event.logicalKey == LogicalKeyboardKey.keyD) {
+            duplicateSelection();
+            return KeyEventResult.handled;
+          }
+
+          // 2. COPY STYLE (Ctrl + Shift + C)
+          if (isCtrl &&
+              event.isShiftPressed &&
+              event.logicalKey == LogicalKeyboardKey.keyC) {
+            copyStyle();
+            return KeyEventResult.handled;
+          }
+
+          // 3. PASTE STYLE (Ctrl + Shift + V)
+          if (isCtrl &&
+              event.isShiftPressed &&
+              event.logicalKey == LogicalKeyboardKey.keyV) {
+            pasteStyle();
+            return KeyEventResult.handled;
+          }
+
+          // 4. PASTE REPLACE (Ctrl + Shift + R)
+          if (isCtrl &&
+              event.isShiftPressed &&
+              event.logicalKey == LogicalKeyboardKey.keyR) {
+            pasteReplace();
+            return KeyEventResult.handled;
           }
         }
         return KeyEventResult.ignored;
@@ -44,6 +146,8 @@ extension SlideEditor on DashboardScreenState {
             Row(
               children: [
                 _sectionHeader('Canvas'),
+                const SizedBox(width: 16),
+                _buildEditorToolbar(),
                 const Spacer(),
                 Text(
                   hasSlide
@@ -163,11 +267,178 @@ extension SlideEditor on DashboardScreenState {
                       behavior: HitTestBehavior.opaque,
                       onTap: () {
                         setState(() {
-                          _selectedLayerIds.clear();
-                          _editingLayerId = null;
+                          final bgLayer = _backgroundLayerFor(slide);
+                          if (bgLayer != null) {
+                            if (_selectedLayerIds.contains('__BACKGROUND__')) {
+                              _selectedLayerIds.clear();
+                            } else {
+                              _selectedLayerIds = {'__BACKGROUND__'};
+                              _editingLayerId = null;
+                              _slideEditorTabIndex = 2; // "Item" tab
+                            }
+                          } else {
+                            _selectedLayerIds.clear();
+                            _editingLayerId = null;
+                            _slideEditorTabIndex = 3; // "Slide" tab
+                          }
                         });
                       },
+                      onSecondaryTapDown: (details) {
+                        setState(() {
+                          final bgLayer = _backgroundLayerFor(slide);
+                          if (bgLayer != null) {
+                            _selectedLayerIds = {'__BACKGROUND__'};
+                            _slideEditorTabIndex = 2;
+                          } else {
+                            _selectedLayerIds.clear();
+                            _slideEditorTabIndex = 3;
+                          }
+                          _editingLayerId = null;
+                        });
+
+                        final RenderBox overlay =
+                            Overlay.of(context).context.findRenderObject()
+                                as RenderBox;
+                        final RelativeRect position = RelativeRect.fromRect(
+                          Rect.fromPoints(
+                            details.globalPosition,
+                            details.globalPosition,
+                          ),
+                          Offset.zero & overlay.size,
+                        );
+
+                        showMenu(
+                          context: context,
+                          position: position,
+                          color: AppPalette.surface,
+                          items: <PopupMenuEntry<String>>[
+                            if (_backgroundLayerFor(slide) != null)
+                              PopupMenuItem(
+                                value: 'copy',
+                                child: Row(
+                                  children: const [
+                                    Icon(
+                                      Icons.copy,
+                                      size: 18,
+                                      color: Colors.white70,
+                                    ),
+                                    SizedBox(width: 12),
+                                    Text(
+                                      'Copy Background',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                                onTap: () => copySelection(),
+                              ),
+                            if (_backgroundLayerFor(slide) != null)
+                              PopupMenuItem(
+                                value: 'to_fg',
+                                child: Row(
+                                  children: const [
+                                    Icon(
+                                      Icons.layers,
+                                      size: 18,
+                                      color: Colors.white70,
+                                    ),
+                                    SizedBox(width: 12),
+                                    Text(
+                                      'Bring to Foreground',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                                onTap: () {
+                                  final bgLayer = _backgroundLayerFor(slide);
+                                  if (bgLayer != null) {
+                                    _setLayerRole(
+                                      bgLayer.id,
+                                      LayerRole.foreground,
+                                    );
+                                  }
+                                },
+                              ),
+                            if (_backgroundLayerFor(slide) != null)
+                              PopupMenuItem(
+                                value: 'copy_style',
+                                child: Row(
+                                  children: const [
+                                    Icon(
+                                      Icons.palette,
+                                      size: 18,
+                                      color: Colors.white70,
+                                    ),
+                                    SizedBox(width: 12),
+                                    Text(
+                                      'Copy Style (Ctrl+Shift+C)',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                                onTap: () => copyStyle(),
+                              ),
+                            PopupMenuItem(
+                              value: 'paste_style',
+                              child: Row(
+                                children: const [
+                                  Icon(
+                                    Icons.brush,
+                                    size: 18,
+                                    color: Colors.white70,
+                                  ),
+                                  SizedBox(width: 12),
+                                  Text(
+                                    'Paste Style (Ctrl+Shift+V)',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                              onTap: () => pasteStyle(),
+                            ),
+                            PopupMenuItem(
+                              value: 'paste_replace',
+                              child: Row(
+                                children: const [
+                                  Icon(
+                                    Icons.swap_horiz,
+                                    size: 18,
+                                    color: Colors.white70,
+                                  ),
+                                  SizedBox(width: 12),
+                                  Text(
+                                    'Paste Replace (Ctrl+Shift+R)',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                              onTap: () => pasteReplace(),
+                            ),
+                            if (_clipboardLayers.isNotEmpty)
+                              PopupMenuItem(
+                                value: 'paste_all',
+                                child: Row(
+                                  children: const [
+                                    Icon(
+                                      Icons.copy_all,
+                                      size: 18,
+                                      color: Colors.white70,
+                                    ),
+                                    SizedBox(width: 12),
+                                    Text(
+                                      'Paste to All Slides',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                                onTap: () => pasteToAllSlides(),
+                              ),
+                          ],
+                        );
+                      },
                       onPanStart: (details) {
+                        recordHistory(
+                          immediate: true,
+                        ); // Save state before box selection/move begins
                         setState(() {
                           _isBoxSelecting = true;
                           _selectionRect = Rect.fromPoints(
@@ -228,9 +499,21 @@ extension SlideEditor on DashboardScreenState {
                           _selectionRect = null;
                         });
                       },
-                      child: _applyFilters(
-                        _buildSlideBackground(slide, template),
-                        slide,
+                      child: Container(
+                        foregroundDecoration:
+                            (_selectedLayerIds.contains('__BACKGROUND__') &&
+                                _backgroundLayerFor(slide) != null)
+                            ? BoxDecoration(
+                                border: Border.all(
+                                  color: AppPalette.accent,
+                                  width: 2,
+                                ),
+                              )
+                            : null,
+                        child: _applyFilters(
+                          _buildSlideBackground(slide, template),
+                          slide,
+                        ),
                       ),
                     ),
                   ),
@@ -303,6 +586,8 @@ extension SlideEditor on DashboardScreenState {
                             },
                             onPanStart: (details) {
                               if (_isLayerResizing || editingLayer) return;
+
+                              recordHistory(immediate: true);
 
                               setState(() {
                                 // Ensure dragged item is selected if not already
@@ -955,4 +1240,3 @@ class SnapGuidePainter extends CustomPainter {
     return oldDelegate.vGuides != vGuides || oldDelegate.hGuides != hGuides;
   }
 }
-

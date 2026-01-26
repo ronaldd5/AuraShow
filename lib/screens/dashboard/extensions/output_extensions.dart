@@ -500,6 +500,14 @@ extension OutputExtensions on DashboardScreenState {
 
   Future<void> _clearAllOutputs() async {
     debugPrint('out: clearing all outputs count=${_outputWindowIds.length}');
+    // Fast fade out (500ms) instead of instant stop, per user request
+    _stopAudio(fadeDuration: const Duration(milliseconds: 500));
+    _cancelAutoAdvanceTimer(); // Ensure timer is stopped
+
+    // Explicitly update Play/Pause button state immediately
+    if (isPlaying) {
+      isPlaying = false;
+    }
 
     setState(() {
       outputBackgroundActive = false;
@@ -658,6 +666,35 @@ extension OutputExtensions on DashboardScreenState {
           'Auto-advance',
           style: TextStyle(color: Colors.white70, fontSize: 12),
         ),
+        if (autoAdvanceEnabled &&
+            _isAudioPlaying &&
+            !_isAudioPaused &&
+            _currentlyPlayingAudioPath != null) ...[
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: accentPink.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: accentPink.withOpacity(0.5)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.sync_alt, size: 10, color: accentPink),
+                const SizedBox(width: 4),
+                Text(
+                  'SYNCED',
+                  style: TextStyle(
+                    color: accentPink,
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
         const Spacer(),
         Text(
           '${autoAdvanceInterval.inSeconds}s',

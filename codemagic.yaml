@@ -1,0 +1,59 @@
+workflows:
+  macos-release:
+    name: AuraShow Mac Installer
+    instance_type: mac_mini_m1
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: 🛠️ Fix Platform Conflicts
+        script: |
+          # 1. Delete the Windows-specific file that crashes Mac builds
+          # (We do this on the CI server so your local code stays safe)
+          rm -f lib/services/win32_audio_capture_service.dart
+
+          # 2. Ensure macOS folders exist (in case they weren't pushed)
+          flutter config --enable-macos
+          flutter create .
+
+      - name: 📦 Install Dependencies
+        script: |
+          flutter pub get
+          # Install Mac system plugins
+          cd macos
+          pod install
+          
+      - name: 🚀 Build macOS App
+        script: |
+          # Build the release version (this takes about 5 mins)
+          flutter build macos --release
+          
+      - name: 💿 Create DMG Installer
+        script: |
+          # Install the packaging tool
+          brew install create-dmg
+          
+          # Define paths
+          APP_NAME="AuraShow"
+          APP_PATH="build/macos/Build/Products/Release/$APP_NAME.app"
+          DMG_PATH="$APP_NAME.dmg"
+          
+          # Run the packager
+          create-dmg \
+            --volname "$APP_NAME Installer" \
+            --window-pos 200 120 \
+            --window-size 800 400 \
+            --icon-size 100 \
+            --hide-extension "$APP_NAME.app" \
+            --app-drop-link 600 185 \
+            "$DMG_PATH" \
+            "$APP_PATH"
+            
+    artifacts:
+      - "*.dmg"           # Save the DMG file so you can download it
+    publishing:
+      email:
+        recipients:
+          - your_email@example.com  # <--- REPLACE THIS WITH YOUR EMAIL

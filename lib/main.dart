@@ -32,6 +32,8 @@ Future<void> main(List<String> args) async {
         // WebViewPlatform.instance = WebWebViewPlatform();
       } else if (Platform.isWindows) {
         WebViewPlatform.instance = WindowsWebViewPlatform();
+      } else if (Platform.isMacOS) {
+        // macOS uses standard webview_flutter_wkwebview via default instance
       }
 
       // Optimize image cache to reduce memory usage (was 500MB)

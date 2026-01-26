@@ -682,6 +682,42 @@ extension SlideNavigationExtensions on DashboardScreenState {
           ),
 
           Positioned(
+            right: 135,
+            bottom: 24,
+            child: CompositedTransformTarget(
+              link: _linesOptionsLayerLink,
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: _toggleLinesOptions,
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: const Color(
+                        0xFF3EB4F0,
+                      ), // Aura blue from screenshot
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF3EB4F0).withOpacity(0.4),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.format_line_spacing,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          Positioned(
             right: 24,
             bottom: 24,
             child: ElevatedButton.icon(
