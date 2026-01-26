@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../models/slide_model.dart';
-import '../services/win32_audio_capture_service.dart';
+import '../platforms/desktop_capture.dart'; // <--- NEW: Uses the smart platform switcher
+import '../platforms/interface/capture_platform_interface.dart'; // <--- NEW: For AudioCaptureMode
 
 /// Audio analyzer that provides frequency data.
 /// Supports preview mode (simulated), real audio capture, and app audio.
@@ -45,23 +46,23 @@ class AudioAnalyzer {
     _currentDeviceId = deviceId;
 
     if (audioSource == 'system_audio') {
-      // Start system audio loopback capture
-      _isCapturingRealAudio = await Win32AudioCaptureService.instance
+      // Start system audio loopback capture using DesktopCapture facade
+      _isCapturingRealAudio = await DesktopCapture.instance
           .startCapture(mode: AudioCaptureMode.loopback, deviceId: deviceId);
 
       if (_isCapturingRealAudio) {
-        _captureSubscription = Win32AudioCaptureService.instance.audioDataStream
+        _captureSubscription = DesktopCapture.instance.audioDataStream
             .listen((data) {
               _updateFromCapturedAudio(data.frequencies);
             });
       }
     } else if (audioSource == 'microphone') {
-      // Start microphone capture
-      _isCapturingRealAudio = await Win32AudioCaptureService.instance
+      // Start microphone capture using DesktopCapture facade
+      _isCapturingRealAudio = await DesktopCapture.instance
           .startCapture(mode: AudioCaptureMode.microphone, deviceId: deviceId);
 
       if (_isCapturingRealAudio) {
-        _captureSubscription = Win32AudioCaptureService.instance.audioDataStream
+        _captureSubscription = DesktopCapture.instance.audioDataStream
             .listen((data) {
               _updateFromCapturedAudio(data.frequencies);
             });
@@ -83,7 +84,7 @@ class AudioAnalyzer {
     _captureSubscription = null;
 
     if (_isCapturingRealAudio) {
-      await Win32AudioCaptureService.instance.stopCapture();
+      await DesktopCapture.instance.stopCapture();
       _isCapturingRealAudio = false;
     }
 
