@@ -206,7 +206,9 @@ class DeviceService {
       );
       // Fallback to screen_retriever on Mac or if Win32 fails
       try {
-        final displays = await ScreenRetriever.instance.getAllDisplays();
+        final displays = await ScreenRetriever.instance
+            .getAllDisplays()
+            .timeout(const Duration(seconds: 3), onTimeout: () => []);
         final newScreens = <LiveDevice>[];
 
         for (int i = 0; i < displays.length; i++) {
@@ -305,7 +307,8 @@ class DeviceService {
       // Use the camera platform interface to get available cameras
       final List<CameraDescription> availableCameras = await CameraPlatform
           .instance
-          .availableCameras();
+          .availableCameras()
+          .timeout(const Duration(seconds: 3), onTimeout: () => []);
 
       for (int i = 0; i < availableCameras.length; i++) {
         final camera = availableCameras[i];
