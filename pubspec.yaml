@@ -66,7 +66,9 @@ dependencies:
   # Win32 APIs for native screen/window capture
   win32: ^5.5.0
   ffi: ^2.1.0
+  camera: ^0.11.0
   webview_flutter: ^4.7.0
+  webview_flutter_wkwebview: ^3.13.0
   webview_win_floating: ^3.0.2
   #webview_flutter_web: ^0.2.3
 
