@@ -331,6 +331,8 @@ extension OutputExtensions on DashboardScreenState {
             return false;
           }
           window.setTitle(output.name);
+          // Safety delay for macOS: ensure window is ready before setFrame/show
+          await Future.delayed(const Duration(milliseconds: 200));
           await window.setFrame(
             targetFrame ?? const Rect.fromLTWH(0, 0, 1920, 1080),
           );
@@ -387,6 +389,8 @@ extension OutputExtensions on DashboardScreenState {
               return false;
             }
             window.setTitle(output.name);
+            // Safety delay for macOS: ensure window is ready before setFrame/show
+            await Future.delayed(const Duration(milliseconds: 200));
             await window.setFrame(
               targetFrame ?? const Rect.fromLTWH(0, 0, 1920, 1080),
             );

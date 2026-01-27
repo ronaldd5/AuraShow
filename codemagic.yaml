@@ -8,13 +8,16 @@ workflows:
       xcode: latest
       cocoapods: default
     scripts:
-      - name: 🛠️ Fix Platform Conflicts
+      - name: 🛠️ Fix Platform Conflicts & Create Env
         script: |
-          # 1. Delete the Windows-specific file that crashes Mac builds
-          # (We do this on the CI server so your local code stays safe)
-          rm -f lib/services/win32_audio_capture_service.dart
+          # 1. Create the missing .env file so Flutter doesn't crash
+          echo "VAR=value" > .env
 
-          # 2. Ensure macOS folders exist (in case they weren't pushed)
+          # 2. Delete the Windows-specific files that crash Mac builds
+          # (We do this on the CI server so your local code stays safe)
+          rm -rf lib/platforms/windows
+
+          # 3. Ensure macOS folders exist
           flutter config --enable-macos
           flutter create .
 

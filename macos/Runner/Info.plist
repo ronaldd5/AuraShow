@@ -34,5 +34,7 @@
 	<string>AuraShow needs microphone access for audio visualization.</string>
 	<key>NSScreenCaptureUsageDescription</key>
 	<string>AuraShow needs screen capture access for display thumbnails and live screen layers.</string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>AuraShow needs to control screens for projection.</string>
 </dict>
 </plist>
