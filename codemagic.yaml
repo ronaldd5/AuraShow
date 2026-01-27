@@ -1,34 +1,62 @@
 workflows:
   macos-release:
-    name: AuraShow Mac Installer
-    instance_type: mac_mini_m1
+    name: 🍎 AuraShow Mac Release (M2)
+    instance_type: mac_mini_m2
     max_build_duration: 60
+    triggering:
+      events:
+        - push
+        - tag
+      branch_patterns:
+        - pattern: main
+          include: true
     environment:
       flutter: stable
       xcode: latest
       cocoapods: default
+    cache:
+      cache_paths:
+        - $HOME/Library/Caches/CocoaPods
+        - $HOME/.pub-cache
     scripts:
-      - name: 🛠️ Setup Environment
+      - name: 🔢 Set Version & Env
         script: |
-          # 1. Create dummy .env to satisfy Flutter assets
-          echo "VAR=value" > .env
-
-          # 2. Ensure macOS folders are valid
+          # Create .env to prevent crash
+          echo "ENV=production" > .env
+          
+          # Calculate Version: 1.0 + Codemagic Build Number (e.g. 1.0.45)
+          NEW_VERSION="1.0.$BUILD_NUMBER"
+          echo "Building Version: $NEW_VERSION"
+          
+          # Enable macOS
           flutter config --enable-macos
           flutter create .
 
-      - name: 📦 Install Dependencies
+      - name: 🩺 Run Analysis & Tests
         script: |
           flutter pub get
+          # Stop build if there are syntax errors
+          flutter analyze
+          # Stop build if logic tests fail (Optional: uncomment if you have tests)
+          # flutter test
+
+      - name: 📦 Install Pods
+        script: |
           cd macos
           pod install
-          
+          cd ..
+
       - name: 🚀 Build macOS App
         script: |
-          # Build the release version
-          flutter build macos --release
-          
-      - name: 💿 Create Installer (Reliable Method)
+          # Build with the auto-generated version number
+          flutter build macos --release --build-name=1.0.$BUILD_NUMBER --build-number=$BUILD_NUMBER
+
+      - name: 🔐 Ad-Hoc Sign
+        script: |
+          # Signs the app so macOS doesn't think it's "damaged"
+          codesign --force --deep --sign - "build/macos/Build/Products/Release/AuraShow.app"
+
+      - name: 💿 Create DMG Installer
         script: |
           APP_NAME="AuraShow"
           BUILD_DIR="build/macos/Build/Products/Release"
@@ -36,20 +64,24 @@ workflows:
           STAGING_DIR="dmg_staging"
           DMG_NAME="$APP_NAME.dmg"
 
-          # 1. Prepare a folder with the App and a link to /Applications
+          # Clean previous artifacts
+          rm -rf "$STAGING_DIR" "$DMG_NAME"
+
+          # Prepare staging
           mkdir -p "$STAGING_DIR"
           cp -r "$APP_PATH" "$STAGING_DIR/"
           ln -s /Applications "$STAGING_DIR/Applications"
 
-          # 2. Create the DMG using native macOS tools (No AppleScript = No Timeouts)
+          # Build DMG
           hdiutil create -volname "$APP_NAME Installer" \
                          -srcfolder "$STAGING_DIR" \
                          -ov -format UDZO \
                          "$DMG_NAME"
             
     artifacts:
-      - "*.dmg"
+      - "*.dmg"                                    # The Installer
+      - "build/macos/Build/Products/Release/*.app" # The Raw App (Good for debugging)
     publishing:
       email:
         recipients:
-          - ronald.datcher4@gmail.com
+          - your_email@example.com
