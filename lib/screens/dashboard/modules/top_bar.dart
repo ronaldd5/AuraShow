@@ -276,144 +276,151 @@ extension TopBarModule on DashboardScreenState {
           }
         },
         child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                 // On Mac, leave space for traffic lights
-                if (Platform.isMacOS) const SizedBox(width: 70),
-                _AnimatedGradientText(
-                  text: 'AuraShow',
-                  colors: [
-                    AppPalette.dustyMauve,
-                    AppPalette.willowGreen,
-                    AppPalette.dustyMauve,
-                  ],
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                const SizedBox(width: 24),
-                _miniNavItem('File', fileMenu, _fileNavKey),
-                _miniNavItem('Edit', editMenu, _editNavKey),
-                _miniNavItem('View', viewMenu, _viewNavKey),
-                _miniNavItem('Help', helpMenu, _helpNavKey),
-              ],
-            ),
-          ),
-          Center(child: tabSwitcher),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  onPressed: _openSettingsPage,
-                  icon: const Icon(
-                    Icons.extension,
-                    size: 18,
-                    color: AppPalette.textSecondary,
-                  ),
-                ),
-                IconButton(
-                  onPressed: _openSettingsPage,
-                  icon: const Icon(
-                    Icons.settings,
-                    size: 18,
-                    color: AppPalette.textSecondary,
-                  ),
-                ),
-                Tooltip(
-                  message: 'Ghost Mode (Freeze Audience)',
-                  child: InkWell(
-                    onTap: () {
-                      setState(() => isGhostMode = !isGhostMode);
-                      // Force update to freeze or unfreeze the outputs
-                      _sendCurrentSlideToOutputs();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        isGhostMode ? Icons.visibility_off : Icons.visibility,
-                        size: 24,
-                        color: isGhostMode ? Colors.amber : Colors.white54,
-                      ),
+          alignment: Alignment.center,
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // On Mac, leave space for traffic lights
+                  if (Platform.isMacOS) const SizedBox(width: 70),
+                  _AnimatedGradientText(
+                    text: 'AuraShow',
+                    colors: [
+                      AppPalette.dustyMauve,
+                      AppPalette.willowGreen,
+                      AppPalette.dustyMauve,
+                    ],
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.2,
                     ),
                   ),
-                ),
-                Tooltip(
-                  message: _outputWindowIds.isNotEmpty
-                      ? 'Outputs live (double-click to stop)'
-                      : 'Show Output',
-                  child: InkWell(
-                    onTap: _outputWindowIds.isEmpty
-                        ? () {
-                            debugPrint('out: opening output windows');
-                            _togglePresent();
-                          }
-                        : null,
-                    onDoubleTap: _outputWindowIds.isNotEmpty
-                        ? () async {
-                            debugPrint(
-                              'out: double-tap detected, closing outputs',
-                            );
-                            await _disarmPresentation();
-                            if (mounted) setState(() {});
-                          }
-                        : null,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        Icons.present_to_all,
-                        size: 24,
-                        color: _outputWindowIds.isNotEmpty
-                            ? Colors.redAccent
-                            : Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                ),
-
-                // WINDOWS BUTTONS (Minimize, Maximize, Close)
-                if (Platform.isWindows) ...[
-                  const SizedBox(width: 16),
-                  IconButton(
-                    icon: const Icon(Icons.minimize, color: Colors.white, size: 18),
-                    onPressed: () => windowManager.minimize(),
-                    tooltip: 'Minimize',
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.check_box_outline_blank,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                    onPressed: () async {
-                      if (await windowManager.isMaximized()) {
-                        windowManager.unmaximize();
-                      } else {
-                        windowManager.maximize();
-                      }
-                    },
-                    tooltip: 'Maximize/Restore',
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.red, size: 18),
-                    onPressed: () => windowManager.close(),
-                    tooltip: 'Close',
-                  ),
+                  const SizedBox(width: 24),
+                  _miniNavItem('File', fileMenu, _fileNavKey),
+                  _miniNavItem('Edit', editMenu, _editNavKey),
+                  _miniNavItem('View', viewMenu, _viewNavKey),
+                  _miniNavItem('Help', helpMenu, _helpNavKey),
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
-      ),
+            Center(child: tabSwitcher),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    onPressed: _openSettingsPage,
+                    icon: const Icon(
+                      Icons.extension,
+                      size: 18,
+                      color: AppPalette.textSecondary,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _openSettingsPage,
+                    icon: const Icon(
+                      Icons.settings,
+                      size: 18,
+                      color: AppPalette.textSecondary,
+                    ),
+                  ),
+                  Tooltip(
+                    message: 'Ghost Mode (Freeze Audience)',
+                    child: InkWell(
+                      onTap: () {
+                        setState(() => isGhostMode = !isGhostMode);
+                        // Force update to freeze or unfreeze the outputs
+                        _sendCurrentSlideToOutputs();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(
+                          isGhostMode ? Icons.visibility_off : Icons.visibility,
+                          size: 24,
+                          color: isGhostMode ? Colors.amber : Colors.white54,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Tooltip(
+                    message: _outputWindowIds.isNotEmpty
+                        ? 'Outputs live (double-click to stop)'
+                        : 'Show Output',
+                    child: InkWell(
+                      onTap: _outputWindowIds.isEmpty
+                          ? () {
+                              debugPrint('out: opening output windows');
+                              _togglePresent();
+                            }
+                          : null,
+                      onDoubleTap: _outputWindowIds.isNotEmpty
+                          ? () async {
+                              debugPrint(
+                                'out: double-tap detected, closing outputs',
+                              );
+                              await _disarmPresentation();
+                              if (mounted) setState(() {});
+                            }
+                          : null,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(
+                          Icons.present_to_all,
+                          size: 24,
+                          color: _outputWindowIds.isNotEmpty
+                              ? Colors.redAccent
+                              : Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // WINDOWS BUTTONS (Minimize, Maximize, Close)
+                  if (Platform.isWindows) ...[
+                    const SizedBox(width: 16),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.minimize,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                      onPressed: () => windowManager.minimize(),
+                      tooltip: 'Minimize',
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.check_box_outline_blank,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                      onPressed: () async {
+                        if (await windowManager.isMaximized()) {
+                          windowManager.unmaximize();
+                        } else {
+                          windowManager.maximize();
+                        }
+                      },
+                      tooltip: 'Maximize/Restore',
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.close,
+                        color: Colors.red,
+                        size: 18,
+                      ),
+                      onPressed: () => windowManager.close(),
+                      tooltip: 'Close',
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

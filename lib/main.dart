@@ -77,8 +77,8 @@ Future<void> main(List<String> args) async {
         // Use "hidden" style on Mac/Windows for native look, "normal" otherwise
         final bool useHiddenTitle = Platform.isMacOS || Platform.isWindows;
 
-        const WindowOptions windowOptions = WindowOptions(
-          size: Size(1280, 720),
+        final WindowOptions windowOptions = WindowOptions(
+          size: const Size(1280, 720),
           center: true,
           backgroundColor: Colors.transparent,
           skipTaskbar: false,
