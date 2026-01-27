@@ -52,4 +52,4 @@ workflows:
     publishing:
       email:
         recipients:
-          - your_email@example.com  # <--- Make sure this is your email!
+          - ronald.datcher4@gmail.com
