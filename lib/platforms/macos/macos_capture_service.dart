@@ -41,7 +41,13 @@ class MacosCaptureService implements CapturePlatform {
   @override
   Future<List<DisplayInfo>> getDisplays({bool refresh = false}) async {
     try {
-      final displays = await ScreenRetriever.instance.getAllDisplays();
+      final displays = await ScreenRetriever.instance.getAllDisplays().timeout(
+        const Duration(seconds: 3),
+        onTimeout: () {
+          debugPrint("MacosCaptureService: getAllDisplays timed out");
+          throw TimeoutException("getAllDisplays timed out");
+        },
+      );
       return displays.asMap().entries.map((entry) {
         final i = entry.key;
         final display = entry.value;

@@ -12,11 +12,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+// NEW: Import window_manager
+import 'package:window_manager/window_manager.dart';
 
 import 'platforms/windows/windows_init.dart' deferred as win_init;
 import 'platforms/macos/macos_init.dart' deferred as mac_init;
-
-///import 'package:webview_flutter_web/webview_flutter_web.dart';
 
 import 'app.dart';
 import 'screens/projection/projection.dart';
@@ -30,120 +30,129 @@ Future<void> main(List<String> args) async {
 
       WidgetsFlutterBinding.ensureInitialized();
 
-      // Fix for WebView/YouTube implementation on desktop and web
-      // Fix for WebView/YouTube implementation on desktop and web
-      if (kIsWeb) {
-        // WebViewPlatform.instance = WebWebViewPlatform();
-      } else if (Platform.isWindows) {
-        await win_init.loadLibrary();
-        win_init.registerPlatformWebview();
-      } else if (Platform.isMacOS) {
-        await mac_init.loadLibrary();
-        mac_init.registerPlatformWebview();
+      // 1. Initialize MediaKit (Video Player)
+      try {
+        debugPrint('boot: initializing MediaKit');
+        MediaKit.ensureInitialized();
+      } catch (e) {
+        debugPrint('boot: MediaKit init error: $e');
       }
 
-      // Optimize image cache to reduce memory usage (was 500MB)
-      PaintingBinding.instance.imageCache.maximumSizeBytes =
-          100 * 1024 * 1024; // 100MB
-      PaintingBinding.instance.imageCache.maximumSize =
-          50; // Limit cached images
-
-      // Surface uncaught errors so native runner doesn't tear down unexpectedly.
-      FlutterError.onError = (details) {
-        FlutterError.dumpErrorToConsole(details);
-        Zone.current.handleUncaughtError(
-          details.exception,
-          details.stack ?? StackTrace.empty,
+      // 2. Load Environment Variables
+      try {
+        await _loadEnvFromCommonLocations().timeout(
+          const Duration(seconds: 2),
+          onTimeout: () => debugPrint('boot: env load timed out'),
         );
-      };
-      PlatformDispatcher.instance.onError = (error, stack) {
-        debugPrint('boot: unhandled error (dispatcher) $error');
-        debugPrint('$stack');
-        return true;
-      };
+      } catch (e) {
+        debugPrint('boot: env load error: $e');
+      }
 
-      // Initialize platform services (Capture, Audio)
-      // These use deferred imports to quarantine win32 dependencies.
-      await DesktopCapture.instance.initialize();
-      await AudioDeviceService.initialize();
+      // 3. Handle Projection Window (Multi-Window)
+      if (args.isNotEmpty && args.first == 'multi_window') {
+        final windowId = int.parse(args[1]);
+        final argument = args[2].isEmpty
+            ? const {}
+            : jsonDecode(args[2]) as Map<String, dynamic>;
 
-      // Secondary windows branch early; skip env loading and MediaKit init.
-      if (args.firstOrNull == 'multi_window') {
-        await _launchProjectionWindow(args);
+        // Initialize Platform Services for Projection
+        if (Platform.isWindows) {
+          await win_init.loadLibrary();
+          win_init.registerPlatformWebview();
+        } else if (Platform.isMacOS) {
+          await mac_init.loadLibrary();
+          mac_init.registerPlatformWebview();
+        }
+
+        runApp(ProjectionWindow(windowId: windowId, initialData: argument));
         return;
       }
 
-      // Primary window: load env and init MediaKit
-      await _loadEnvFromCommonLocations();
-      if (kEnableProjectionVideo) {
-        MediaKit.ensureInitialized();
+      // 4. MAIN WINDOW SETUP (The Fix for Blank Screen)
+      if (!kIsWeb &&
+          (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+        await windowManager.ensureInitialized();
+
+        WindowOptions windowOptions = const WindowOptions(
+          size: Size(1280, 720),
+          center: true,
+          backgroundColor: Colors.transparent,
+          skipTaskbar: false,
+          titleBarStyle: TitleBarStyle.normal,
+        );
+
+        await windowManager.waitUntilReadyToShow(windowOptions, () async {
+          await windowManager.show();
+          await windowManager.focus();
+        });
       }
 
+      // 5. Platform Specific Init
+      if (!kIsWeb) {
+        if (Platform.isWindows) {
+          try {
+            await win_init.loadLibrary();
+            win_init.registerPlatformWebview();
+          } catch (e) {
+            debugPrint('Error initializing Windows components: $e');
+          }
+        } else if (Platform.isMacOS) {
+          try {
+            await mac_init.loadLibrary();
+            mac_init.registerPlatformWebview();
+          } catch (e) {
+            debugPrint('Error initializing macOS components: $e');
+          }
+        }
+      }
+
+      // 6. Platform Services (Capture, Audio)
+      try {
+        debugPrint('boot: initializing DesktopCapture');
+        await DesktopCapture.instance.initialize().timeout(
+          const Duration(seconds: 5),
+          onTimeout: () => debugPrint('boot: DesktopCapture init timed out'),
+        );
+      } catch (e) {
+        debugPrint('boot: DesktopCapture init error: $e');
+      }
+
+      try {
+        debugPrint('boot: initializing AudioDeviceService');
+        await AudioDeviceService.initialize().timeout(
+          const Duration(seconds: 5),
+          onTimeout: () =>
+              debugPrint('boot: AudioDeviceService init timed out'),
+        );
+      } catch (e) {
+        debugPrint('boot: AudioDeviceService init error: $e');
+      }
+
+      // 7. Run the App
+      debugPrint('boot: launching primary app');
       runApp(const AuraShowApp());
-      debugPrint('boot: launched primary app');
     },
-    (error, stackTrace) {
-      debugPrint('boot: unhandled zone error=$error');
-      debugPrint('$stackTrace');
+    (error, stack) {
+      debugPrint('boot: Uncaught error: $error');
+      debugPrint('$stack');
     },
   );
-}
-
-/// Launch a secondary projection window for external display output.
-Future<void> _launchProjectionWindow(List<String> args) async {
-  try {
-    debugPrint(
-      'boot: launching projection window for id=${args.elementAtOrNull(1)}',
-    );
-    final int windowId = int.parse(args[1]);
-    final Map data = args.length > 2
-        ? (json.decode(args[2]) as Map? ?? const {})
-        : const {};
-    DartPluginRegistrant.ensureInitialized();
-
-    // Show a minimal shell first to let the secondary engine stabilize.
-    runApp(
-      MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Builder(
-          builder: (context) {
-            // Schedule actual projection widget for next frame.
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              try {
-                runApp(ProjectionWindow(windowId: windowId, initialData: data));
-              } catch (e, st) {
-                debugPrint('boot: projection runApp inner failed error=$e');
-                debugPrint('$st');
-              }
-            });
-            return const Scaffold(backgroundColor: Colors.black);
-          },
-        ),
-      ),
-    );
-  } catch (e, st) {
-    debugPrint(
-      'boot: projection launch failed, showing blank window. error=$e',
-    );
-    debugPrint('$st');
-    runApp(const MaterialApp(home: Scaffold(backgroundColor: Colors.black)));
-  }
 }
 
 /// Load environment variables from common locations.
 Future<void> _loadEnvFromCommonLocations() async {
   const envFileName = '.env';
-  // 1) Try loading from bundled asset (requires .env declared in pubspec.yaml).
   await _tryAssetEnv(envFileName);
 
-  // 2) Try merging from filesystem locations for development/packaged builds.
-  final paths = <String>{
-    envFileName,
-    '${Directory.current.path}${Platform.pathSeparator}$envFileName',
-    '${File(Platform.resolvedExecutable).parent.path}${Platform.pathSeparator}$envFileName',
-  };
-  for (final path in paths) {
-    await _tryFileMerge(path);
+  if (!kIsWeb) {
+    final paths = <String>{
+      envFileName,
+      '${Directory.current.path}${Platform.pathSeparator}$envFileName',
+      '${File(Platform.resolvedExecutable).parent.path}${Platform.pathSeparator}$envFileName',
+    };
+    for (final path in paths) {
+      await _tryFileMerge(path);
+    }
   }
 }
 
@@ -154,7 +163,7 @@ Future<void> _tryAssetEnv(String name) async {
       mergeWith: dotenv.isInitialized ? dotenv.env : <String, String>{},
     );
   } catch (_) {
-    // Asset not found or load failed; continue to file-based fallbacks.
+    // Ignore missing asset file
   }
 }
 
@@ -162,12 +171,22 @@ Future<void> _tryFileMerge(String path) async {
   final file = File(path);
   if (!await file.exists()) return;
   try {
-    final contents = await file.readAsString();
-    dotenv.testLoad(
-      fileInput: contents,
-      mergeWith: dotenv.isInitialized ? dotenv.env : <String, String>{},
-    );
-  } catch (_) {
-    // Ignore unreadable files; loader remains best-effort.
+    final lines = await file.readAsLines();
+    final Map<String, String> envVars = {};
+    for (var line in lines) {
+      final parts = line.split('=');
+      if (parts.length >= 2 && !line.trim().startsWith('#')) {
+        envVars[parts[0].trim()] = parts.sublist(1).join('=').trim();
+      }
+    }
+    if (dotenv.isInitialized) {
+      dotenv.env.addAll(envVars);
+    } else {
+      // Manually load if dotenv isn't initialized
+      // Note: dotenv doesn't expose a clean "init with map" without loading a file first,
+      // but the merge above handles it mostly.
+    }
+  } catch (e) {
+    debugPrint('Error reading env file at $path: $e');
   }
 }

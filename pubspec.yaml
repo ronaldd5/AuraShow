@@ -82,6 +82,7 @@ dependencies:
   qr_flutter: ^4.1.0
   desktop_drop: ^0.7.0
   string_similarity: ^2.1.1
+  window_manager: ^0.5.1
 
 dev_dependencies:
   flutter_test:
