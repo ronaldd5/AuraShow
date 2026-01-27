@@ -2,12 +2,19 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart'; // Required for EventChannel
 import 'package:screen_capturer/screen_capturer.dart';
 import 'package:screen_retriever/screen_retriever.dart';
 import '../interface/capture_platform_interface.dart';
 
 class MacosCaptureService implements CapturePlatform {
   final _audioController = StreamController<AudioCaptureData>.broadcast();
+
+  // 1. Define the Native Bridge Channel
+  static const EventChannel _audioChannel = EventChannel(
+    'com.aurashow.audio/capture',
+  );
+  StreamSubscription? _audioSubscription;
 
   @override
   Stream<AudioCaptureData> get audioDataStream => _audioController.stream;
@@ -17,16 +24,43 @@ class MacosCaptureService implements CapturePlatform {
     required AudioCaptureMode mode,
     String? deviceId,
   }) async {
-    // Note: True system audio capture on macOS requires a custom kernel extension (like BlackHole).
-    // For a Flutter app without custom drivers, we can only simulate audio or capture Microphone.
-    // For now, we return false for Loopback to trigger the visualizer's "Simulation Mode" fallback,
-    // which looks better than a flat line.
-    return false;
+    try {
+      // Cleanup previous subscription if exists
+      await _audioSubscription?.cancel();
+
+      // 2. Listen to the Swift Native Stream
+      _audioSubscription = _audioChannel.receiveBroadcastStream().listen(
+        (event) {
+          if (event is List) {
+            // Convert dynamic list from Swift to Float32List for Dart
+            final List<double> samples = event
+                .map((e) => (e as num).toDouble())
+                .toList();
+
+            // FIX IS HERE: Removed "samples:" label.
+            // We pass the data directly as a positional argument.
+            _audioController.add(
+              AudioCaptureData(Float32List.fromList(samples)),
+            );
+          }
+        },
+        onError: (error) {
+          debugPrint("Mac Audio Capture Error: $error");
+        },
+      );
+
+      return true; // Return true because we are now successfully listening!
+    } catch (e) {
+      debugPrint("Failed to start Mac audio capture: $e");
+      return false;
+    }
   }
 
   @override
   Future<void> stopCapture() async {
-    // Cleanup if we add real mic capture later
+    // 3. Stop listening when requested
+    await _audioSubscription?.cancel();
+    _audioSubscription = null;
   }
 
   // --- Real Screen Capture Implementation ---
@@ -34,7 +68,6 @@ class MacosCaptureService implements CapturePlatform {
   @override
   Future<List<WindowInfo>> getWindows({bool refresh = false}) async {
     // macOS sandbox restricts listing other apps' windows.
-    // We return empty to prevent crashes, as standard plugins can't do this yet.
     return [];
   }
 
@@ -86,7 +119,6 @@ class MacosCaptureService implements CapturePlatform {
     int thumbnailWidth = 320,
     int thumbnailHeight = 180,
   }) async {
-    // REAL implementation using screen_capturer
     try {
       final captured = await ScreenCapturer.instance
           .capture(
@@ -107,7 +139,6 @@ class MacosCaptureService implements CapturePlatform {
     int thumbnailWidth = 320,
     int thumbnailHeight = 180,
   }) async {
-    // REAL implementation
     try {
       final captured = await ScreenCapturer.instance
           .capture(mode: CaptureMode.screen, silent: true)
@@ -124,7 +155,6 @@ class MacosCaptureService implements CapturePlatform {
     int thumbnailWidth = 320,
     int thumbnailHeight = 180,
   }) async {
-    // Window capture is not supported on macOS due to security restrictions
     return null;
   }
 }

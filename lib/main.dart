@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -20,8 +19,6 @@ Future<void> main(List<String> args) async {
     () async {
       WidgetsFlutterBinding.ensureInitialized();
       MediaKit.ensureInitialized();
-
-      await _loadEnvFromCommonLocations();
 
       // --- Multi-Window Projection Check ---
       if (args.isNotEmpty && args.first == 'multi_window') {
@@ -89,17 +86,4 @@ Future<void> main(List<String> args) async {
       debugPrint('$stack');
     },
   );
-}
-
-Future<void> _loadEnvFromCommonLocations() async {
-  const envFileName = '.env';
-  await _tryAssetEnv(envFileName);
-}
-
-Future<void> _tryAssetEnv(String name) async {
-  try {
-    await dotenv.load(fileName: name);
-  } catch (_) {
-    // Ignore missing asset file
-  }
 }

@@ -21,7 +21,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:video_player/video_player.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:math' as math;
 import 'package:path/path.dart' as path;
 import 'package:desktop_multi_window/desktop_multi_window.dart';
@@ -1330,12 +1329,8 @@ class DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    final envYoutubeKey = dotenv.isInitialized
-        ? (dotenv.env['YOUTUBE_API_KEY'] ?? '')
-        : '';
-    final envVimeoToken = dotenv.isInitialized
-        ? (dotenv.env['VIMEO_ACCESS_TOKEN'] ?? '')
-        : '';
+    final envYoutubeKey = '';
+    final envVimeoToken = '';
     final osYoutubeKey = Platform.environment['YOUTUBE_API_KEY'] ?? '';
     final osVimeoToken = Platform.environment['VIMEO_ACCESS_TOKEN'] ?? '';
     setState(() {
@@ -1347,13 +1342,13 @@ class DashboardScreenState extends State<DashboardScreen> {
       final prefVimeoToken = prefs.getString('vimeo_access_token');
       youtubeApiKey = _firstNonEmpty([
         prefYoutubeKey ?? '',
-        envYoutubeKey ?? '',
-        osYoutubeKey ?? '',
+        envYoutubeKey,
+        osYoutubeKey,
       ]);
       vimeoAccessToken = _firstNonEmpty([
         prefVimeoToken ?? '',
-        envVimeoToken ?? '',
-        osVimeoToken ?? '',
+        envVimeoToken,
+        osVimeoToken,
       ]);
       savedYouTubeVideos = (prefs.getStringList('youtube_saved') ?? [])
           .map((e) => Map<String, String>.from(json.decode(e)))

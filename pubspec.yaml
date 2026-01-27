@@ -60,7 +60,7 @@ dependencies:
   http: ^1.2.1
   html: ^0.15.4
   intl: ^0.20.2
-  flutter_dotenv: ^5.1.0
+  envied: ^0.5.3
   # Screen capture for live thumbnails
   screen_capturer: ^0.2.3
   # Windows camera access - uses media_kit under the hood
@@ -92,6 +92,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  
+  build_runner: ^2.4.9
+  envied_generator: ^0.5.3
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -110,9 +113,6 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
-  assets:
-    - .env
 
   shaders:
     - shaders/bg_shader.frag

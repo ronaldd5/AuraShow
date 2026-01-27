@@ -148,12 +148,8 @@ extension SettingsExtensions on DashboardScreenState {
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    final envYoutubeKey = dotenv.isInitialized
-        ? (dotenv.env['YOUTUBE_API_KEY'] ?? '')
-        : '';
-    final envVimeoToken = dotenv.isInitialized
-        ? (dotenv.env['VIMEO_ACCESS_TOKEN'] ?? '')
-        : '';
+    final envYoutubeKey = '';
+    final envVimeoToken = '';
     final osYoutubeKey = Platform.environment['YOUTUBE_API_KEY'] ?? '';
     final osVimeoToken = Platform.environment['VIMEO_ACCESS_TOKEN'] ?? '';
     setState(() {
@@ -189,9 +185,7 @@ extension SettingsExtensions on DashboardScreenState {
         _styles
           ..clear()
           ..addAll(
-            list.map(
-              (e) => StylePreset.fromJson(Map<String, dynamic>.from(e)),
-            ),
+            list.map((e) => StylePreset.fromJson(Map<String, dynamic>.from(e))),
           );
       }
       profiles = prefs.getStringList('profiles') ?? profiles;

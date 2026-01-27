@@ -4,7 +4,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../env/env.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -38,7 +38,7 @@ class LyricsService {
   static final LyricsService instance = LyricsService._();
 
   // Genius API token loaded from .env
-  static String get _geniusToken => dotenv.get('GENIUS_API_KEY', fallback: '');
+  static String get _geniusToken => Env.geniusApiKey;
 
   final _songsController = StreamController<List<Song>>.broadcast();
   Stream<List<Song>> get songsStream => _songsController.stream;

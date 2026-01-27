@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../env/env.dart';
 
 class ImageService {
   static final ImageService instance = ImageService._();
   ImageService._();
 
   Future<List<Map<String, dynamic>>> searchPixabay(String query) async {
-    final apiKey = dotenv.env['PIXABAY_API_KEY'];
-    if (apiKey == null || apiKey.isEmpty) {
+    final apiKey = Env.pixabayApiKey;
+    if (apiKey.isEmpty) {
       return [];
     }
 
@@ -46,8 +46,8 @@ class ImageService {
   }
 
   Future<List<Map<String, dynamic>>> searchUnsplash(String query) async {
-    final accessKey = dotenv.env['UNSPLASH_ACCESS_KEY'];
-    if (accessKey == null || accessKey.isEmpty) {
+    final accessKey = Env.unsplashAccessKey;
+    if (accessKey.isEmpty) {
       return [];
     }
 
@@ -73,8 +73,13 @@ class ImageService {
           final user = item['user'] as Map<String, dynamic>?;
           return {
             'id': item['id'].toString(),
-            'title': (item['description'] as String?) ?? (item['alt_description'] as String?) ?? 'Unsplash Image',
-            'thumb': urls['regular'] as String, // Unsplash 'regular' is good for grids/previews
+            'title':
+                (item['description'] as String?) ??
+                (item['alt_description'] as String?) ??
+                'Unsplash Image',
+            'thumb':
+                urls['regular']
+                    as String, // Unsplash 'regular' is good for grids/previews
             'full': urls['full'] as String,
             'source': 'unsplash',
             'author': user?['name'] as String?,

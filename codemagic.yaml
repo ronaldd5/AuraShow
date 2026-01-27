@@ -30,6 +30,7 @@ workflows:
       - name: 🩺 Run Analysis (Non-Blocking)
         script: |
           flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
           # Run analysis but ignore errors so the build continues
           flutter analyze || true 
 
