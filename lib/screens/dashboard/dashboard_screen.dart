@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart';
 import 'dart:ui' show PointerDeviceKind, ImageFilter, FontFeature, Rect, Offset;
 import 'dart:io';
+import 'package:window_manager/window_manager.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:string_similarity/string_similarity.dart';
 import 'dart:convert';

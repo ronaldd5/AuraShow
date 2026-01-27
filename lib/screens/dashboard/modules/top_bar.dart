@@ -1,9 +1,5 @@
 part of '../dashboard_screen.dart';
 
-// Added for window dragging and controls
-import 'dart:io';
-import 'package:window_manager/window_manager.dart';
-
 extension TopBarModule on DashboardScreenState {
   Widget _buildTopNavBar() {
     final ShowItem? selectedShow =
@@ -382,8 +378,8 @@ extension TopBarModule on DashboardScreenState {
                     ),
                   ),
                 ),
-                  ),
                 ),
+
                 // WINDOWS BUTTONS (Minimize, Maximize, Close)
                 if (Platform.isWindows) ...[
                   const SizedBox(width: 16),
