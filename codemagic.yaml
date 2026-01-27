@@ -10,10 +10,10 @@ workflows:
     scripts:
       - name: 🛠️ Setup Environment
         script: |
-          # 1. Create the missing .env file (Prevents "asset not found" crash)
+          # 1. Create dummy .env to satisfy Flutter assets
           echo "VAR=value" > .env
 
-          # 2. Ensure macOS support is active
+          # 2. Ensure macOS folders are valid
           flutter config --enable-macos
           flutter create .
 
@@ -28,30 +28,28 @@ workflows:
           # Build the release version
           flutter build macos --release
           
-      - name: 💿 Create DMG Installer
+      - name: 💿 Create Installer (Reliable Method)
         script: |
-          # Install the packaging tool
-          brew install create-dmg
-          
-          # Define paths
           APP_NAME="AuraShow"
-          APP_PATH="build/macos/Build/Products/Release/$APP_NAME.app"
-          DMG_PATH="$APP_NAME.dmg"
-          
-          # Run the packager
-          create-dmg \
-            --volname "$APP_NAME Installer" \
-            --window-pos 200 120 \
-            --window-size 800 400 \
-            --icon-size 100 \
-            --hide-extension "$APP_NAME.app" \
-            --app-drop-link 600 185 \
-            "$DMG_PATH" \
-            "$APP_PATH"
+          BUILD_DIR="build/macos/Build/Products/Release"
+          APP_PATH="$BUILD_DIR/$APP_NAME.app"
+          STAGING_DIR="dmg_staging"
+          DMG_NAME="$APP_NAME.dmg"
+
+          # 1. Prepare a folder with the App and a link to /Applications
+          mkdir -p "$STAGING_DIR"
+          cp -r "$APP_PATH" "$STAGING_DIR/"
+          ln -s /Applications "$STAGING_DIR/Applications"
+
+          # 2. Create the DMG using native macOS tools (No AppleScript = No Timeouts)
+          hdiutil create -volname "$APP_NAME Installer" \
+                         -srcfolder "$STAGING_DIR" \
+                         -ov -format UDZO \
+                         "$DMG_NAME"
             
     artifacts:
       - "*.dmg"
     publishing:
       email:
         recipients:
-          - your_email@example.com  # <--- Verify this is still correct!
+          - your_email@example.com  # <--- Make sure this is your email!
