@@ -8,29 +8,24 @@ workflows:
       xcode: latest
       cocoapods: default
     scripts:
-      - name: 🛠️ Fix Platform Conflicts & Create Env
+      - name: 🛠️ Setup Environment
         script: |
-          # 1. Create the missing .env file so Flutter doesn't crash
+          # 1. Create the missing .env file (Prevents "asset not found" crash)
           echo "VAR=value" > .env
 
-          # 2. Delete the Windows-specific files that crash Mac builds
-          # (We do this on the CI server so your local code stays safe)
-          rm -rf lib/platforms/windows
-
-          # 3. Ensure macOS folders exist
+          # 2. Ensure macOS support is active
           flutter config --enable-macos
           flutter create .
 
       - name: 📦 Install Dependencies
         script: |
           flutter pub get
-          # Install Mac system plugins
           cd macos
           pod install
           
       - name: 🚀 Build macOS App
         script: |
-          # Build the release version (this takes about 5 mins)
+          # Build the release version
           flutter build macos --release
           
       - name: 💿 Create DMG Installer
@@ -55,8 +50,8 @@ workflows:
             "$APP_PATH"
             
     artifacts:
-      - "*.dmg"           # Save the DMG file so you can download it
+      - "*.dmg"
     publishing:
       email:
         recipients:
-          - your_email@example.com  # <--- REPLACE THIS WITH YOUR EMAIL
+          - your_email@example.com  # <--- Verify this is still correct!
