@@ -28,5 +28,11 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSCameraUsageDescription</key>
+	<string>AuraShow needs camera access for live video layers.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>AuraShow needs microphone access for audio visualization.</string>
+	<key>NSScreenCaptureUsageDescription</key>
+	<string>AuraShow needs screen capture access for display thumbnails and live screen layers.</string>
 </dict>
 </plist>
