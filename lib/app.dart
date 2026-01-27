@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'core/theme/palette.dart';
 import 'screens/dashboard/dashboard_screen.dart';
+import 'widgets/native_menu_wrapper.dart';
 
 /// The main AuraShow application widget.
 ///
@@ -12,28 +13,30 @@ class AuraShowApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'AuraShow',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: AppPalette.carbonBlack,
-        colorScheme: ColorScheme.dark(
-          primary: AppPalette.dustyMauve,
-          secondary: AppPalette.dustyRose,
-          surface: AppPalette.carbonBlack,
-          background: AppPalette.carbonBlack,
-          onPrimary: Colors.white,
-          onSecondary: Colors.white,
-          onSurface: Colors.white,
-          onBackground: Colors.white,
-        ).copyWith(tertiary: AppPalette.willowGreen),
-        textTheme: GoogleFonts.outfitTextTheme(
-          ThemeData(brightness: Brightness.dark).textTheme,
-        ).apply(bodyColor: Colors.white, displayColor: Colors.white),
-        useMaterial3: true,
+    return NativeMenuWrapper(
+      child: MaterialApp(
+        title: 'AuraShow',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: AppPalette.carbonBlack,
+          colorScheme: ColorScheme.dark(
+            primary: AppPalette.dustyMauve,
+            secondary: AppPalette.dustyRose,
+            surface: AppPalette.carbonBlack,
+            background: AppPalette.carbonBlack,
+            onPrimary: Colors.white,
+            onSecondary: Colors.white,
+            onSurface: Colors.white,
+            onBackground: Colors.white,
+          ).copyWith(tertiary: AppPalette.willowGreen),
+          textTheme: GoogleFonts.outfitTextTheme(
+            ThemeData(brightness: Brightness.dark).textTheme,
+          ).apply(bodyColor: Colors.white, displayColor: Colors.white),
+          useMaterial3: true,
+        ),
+        home: const DashboardScreen(),
       ),
-      home: const DashboardScreen(),
     );
   }
 }

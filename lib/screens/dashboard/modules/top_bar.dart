@@ -1,5 +1,9 @@
 part of '../dashboard_screen.dart';
 
+// Added for window dragging and controls
+import 'dart:io';
+import 'package:window_manager/window_manager.dart';
+
 extension TopBarModule on DashboardScreenState {
   Widget _buildTopNavBar() {
     final ShowItem? selectedShow =
@@ -264,7 +268,18 @@ extension TopBarModule on DashboardScreenState {
       height: 54, // Restore sleeker top bar height
       color: AppPalette.background,
       padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Stack(
+      child: GestureDetector(
+        onPanStart: (details) {
+          windowManager.startDragging();
+        },
+        onDoubleTap: () async {
+          if (await windowManager.isMaximized()) {
+            windowManager.unmaximize();
+          } else {
+            windowManager.maximize();
+          }
+        },
+        child: Stack(
         alignment: Alignment.center,
         children: [
           Align(
@@ -272,6 +287,8 @@ extension TopBarModule on DashboardScreenState {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                 // On Mac, leave space for traffic lights
+                if (Platform.isMacOS) const SizedBox(width: 70),
                 _AnimatedGradientText(
                   text: 'AuraShow',
                   colors: [
@@ -365,10 +382,42 @@ extension TopBarModule on DashboardScreenState {
                     ),
                   ),
                 ),
+                  ),
+                ),
+                // WINDOWS BUTTONS (Minimize, Maximize, Close)
+                if (Platform.isWindows) ...[
+                  const SizedBox(width: 16),
+                  IconButton(
+                    icon: const Icon(Icons.minimize, color: Colors.white, size: 18),
+                    onPressed: () => windowManager.minimize(),
+                    tooltip: 'Minimize',
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.check_box_outline_blank,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                    onPressed: () async {
+                      if (await windowManager.isMaximized()) {
+                        windowManager.unmaximize();
+                      } else {
+                        windowManager.maximize();
+                      }
+                    },
+                    tooltip: 'Maximize/Restore',
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.red, size: 18),
+                    onPressed: () => windowManager.close(),
+                    tooltip: 'Close',
+                  ),
+                ],
               ],
             ),
           ),
         ],
+      ),
       ),
     );
   }

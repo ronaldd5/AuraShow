@@ -73,13 +73,28 @@ Future<void> main(List<String> args) async {
           (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
         await windowManager.ensureInitialized();
 
+        // 1. Define Base Options
         WindowOptions windowOptions = const WindowOptions(
           size: Size(1280, 720),
           center: true,
           backgroundColor: Colors.transparent,
           skipTaskbar: false,
-          titleBarStyle: TitleBarStyle.normal,
         );
+
+        // 2. Apply Platform-Specific Styling
+        if (Platform.isMacOS) {
+          // MAC: Use "hidden" style so content flows behind traffic lights (Modern Mac App look)
+          // The system Menu Bar handles the rest.
+          windowOptions = windowOptions.copyWith(
+            titleBarStyle: TitleBarStyle.hidden,
+          );
+        } else if (Platform.isWindows) {
+          // WINDOWS: Hide standard title bar to draw a custom dark one (Pro App look)
+          // or use 'normal' if you want the standard white Windows frame.
+          windowOptions = windowOptions.copyWith(
+            titleBarStyle: TitleBarStyle.hidden,
+          );
+        }
 
         await windowManager.waitUntilReadyToShow(windowOptions, () async {
           await windowManager.show();
