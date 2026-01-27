@@ -88,11 +88,13 @@ class MacosCaptureService implements CapturePlatform {
   }) async {
     // REAL implementation using screen_capturer
     try {
-      final captured = await ScreenCapturer.instance.capture(
-        mode: CaptureMode.screen,
-        imagePath: null, // Return bytes
-        silent: true,
-      );
+      final captured = await ScreenCapturer.instance
+          .capture(
+            mode: CaptureMode.screen,
+            imagePath: null, // Return bytes
+            silent: true,
+          )
+          .timeout(const Duration(seconds: 5));
       return captured?.imageBytes;
     } catch (e) {
       print("Mac Capture Error: $e");
@@ -107,10 +109,9 @@ class MacosCaptureService implements CapturePlatform {
   }) async {
     // REAL implementation
     try {
-      final captured = await ScreenCapturer.instance.capture(
-        mode: CaptureMode.screen,
-        silent: true,
-      );
+      final captured = await ScreenCapturer.instance
+          .capture(mode: CaptureMode.screen, silent: true)
+          .timeout(const Duration(seconds: 5));
       return captured?.imageBytes;
     } catch (e) {
       return null;

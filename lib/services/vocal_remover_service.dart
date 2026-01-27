@@ -5,8 +5,8 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
 import '../platforms/interface/vocal_remover_platform.dart';
-import '../platforms/windows/windows_vocal_remover.dart';
-import '../platforms/macos/macos_vocal_remover.dart';
+import '../platforms/windows/windows_vocal_remover.dart' deferred as win;
+import '../platforms/macos/macos_vocal_remover.dart' deferred as mac;
 
 enum VocalRemoverType {
   uvr, // Audio Separator (UVR MDX-Net) - High Quality
@@ -38,15 +38,17 @@ class VocalRemoverService {
 
   VocalRemoverPlatform? _platformImpl;
 
-  VocalRemoverPlatform get _platform {
+  Future<VocalRemoverPlatform> get _platform async {
     if (_platformImpl != null) return _platformImpl!;
-
     if (Platform.isWindows) {
-      _platformImpl = WindowsVocalRemover();
+      await win.loadLibrary();
+      _platformImpl = win.WindowsVocalRemover();
     } else if (Platform.isMacOS) {
-      _platformImpl = MacosVocalRemover();
+      await mac.loadLibrary();
+      _platformImpl = mac.MacosVocalRemover();
     } else {
-      _platformImpl = MacosVocalRemover(); // Fallback
+      await mac.loadLibrary();
+      _platformImpl = mac.MacosVocalRemover(); // Fallback
     }
     return _platformImpl!;
   }
@@ -62,7 +64,7 @@ class VocalRemoverService {
     } catch (_) {}
 
     if (ffmpegPath == null) {
-      ffmpegPath = await _platform.getFfmpegPath();
+      ffmpegPath = await (await _platform).getFfmpegPath();
     }
 
     if (ffmpegPath == null) {
@@ -73,7 +75,8 @@ class VocalRemoverService {
 
     // 2. UVR (Audio Separator)
     if (type == VocalRemoverType.uvr) {
-      final audioSeparatorPath = await _platform.getAudioSeparatorPath();
+      final audioSeparatorPath = await (await _platform)
+          .getAudioSeparatorPath();
       if (audioSeparatorPath == null) {
         return 'UVR not found. Run: pip install "audio-separator[cpu]"';
       }
@@ -84,8 +87,9 @@ class VocalRemoverService {
 
   // Helper: Install GPU Support
   Future<int> installGpuSupport() async {
-    String pythonExe = _platform.getPythonExecutable();
-    List<String> preArgs = _platform.getPythonPreArgs();
+    final platform = await _platform;
+    String pythonExe = platform.getPythonExecutable();
+    List<String> preArgs = platform.getPythonPreArgs();
 
     // Command: pip install "audio-separator[gpu]"
     final args = [...preArgs, '-m', 'pip', 'install', 'audio-separator[gpu]'];
@@ -143,7 +147,8 @@ class VocalRemoverService {
 
         statusController.add('Initializing FFmpeg...');
 
-        String ffmpegCmd = (await _platform.getFfmpegPath()) ?? 'ffmpeg';
+        String ffmpegCmd =
+            (await (await _platform).getFfmpegPath()) ?? 'ffmpeg';
 
         final args = [
           '-i',
@@ -229,7 +234,8 @@ class VocalRemoverService {
         if (!modelDir.existsSync()) modelDir.createSync(recursive: true);
 
         // Check if we run as 'audio-separator' or 'py -m audio_separator'
-        final audioSeparatorPath = await _platform.getAudioSeparatorPath();
+        final platform = await _platform;
+        final audioSeparatorPath = await platform.getAudioSeparatorPath();
         String exe = audioSeparatorPath ?? 'audio-separator';
         List<String> preArgs = [];
 
@@ -262,7 +268,7 @@ class VocalRemoverService {
         statusController.add('Processing with UVR MDX-Net...');
 
         // Pass FFmpeg path in env
-        final env = _platform.getEnvironmentVariables();
+        final env = platform.getEnvironmentVariables();
         process = await Process.start(exe, args, environment: env);
 
         if (isCancelled) {
