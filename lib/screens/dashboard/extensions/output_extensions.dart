@@ -263,7 +263,10 @@ extension OutputExtensions on DashboardScreenState {
 
   Future<Rect?> _resolveOutputFrame(OutputConfig output) async {
     try {
-      final displays = await ScreenRetriever.instance.getAllDisplays();
+      final displays = await ScreenRetriever.instance.getAllDisplays().timeout(
+        const Duration(seconds: 3),
+        onTimeout: () => [],
+      );
       if (displays.isEmpty) return null;
 
       Display? target;

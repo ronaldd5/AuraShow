@@ -1681,7 +1681,10 @@ class DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _refreshScreensFromPlatform() async {
     try {
-      final displays = await ScreenRetriever.instance.getAllDisplays();
+      final displays = await ScreenRetriever.instance.getAllDisplays().timeout(
+        const Duration(seconds: 3),
+        onTimeout: () => [],
+      );
       if (displays.isEmpty) {
         _seedDemoDevices();
         return;
