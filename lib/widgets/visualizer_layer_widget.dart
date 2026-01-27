@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../models/slide_model.dart';
-import '../platforms/desktop_capture.dart'; // <--- NEW: Uses the smart platform switcher
-import '../platforms/interface/capture_platform_interface.dart'; // <--- NEW: For AudioCaptureMode
+import '../platforms/desktop_capture.dart';
+import '../platforms/interface/capture_platform_interface.dart';
 
 /// Audio analyzer that provides frequency data.
 /// Supports preview mode (simulated), real audio capture, and app audio.
@@ -27,8 +27,6 @@ class AudioAnalyzer {
 
   // Track current capture mode
   bool _isCapturingRealAudio = false;
-  String? _currentAudioSource;
-  String? _currentDeviceId;
 
   Stream<List<double>> get frequencyStream => _controller.stream;
   List<double> get currentFrequencies => _smoothedFrequencies;
@@ -42,39 +40,31 @@ class AudioAnalyzer {
     // Stop any existing capture
     await stopAudioCapture();
 
-    _currentAudioSource = audioSource;
-    _currentDeviceId = deviceId;
-
+    AudioCaptureMode mode;
     if (audioSource == 'system_audio') {
-      // Start system audio loopback capture using DesktopCapture facade
-      _isCapturingRealAudio = await DesktopCapture.instance
-          .startCapture(mode: AudioCaptureMode.loopback, deviceId: deviceId);
-
-      if (_isCapturingRealAudio) {
-        _captureSubscription = DesktopCapture.instance.audioDataStream
-            .listen((data) {
-              _updateFromCapturedAudio(data.frequencies);
-            });
-      }
+      mode = AudioCaptureMode.loopback;
     } else if (audioSource == 'microphone') {
-      // Start microphone capture using DesktopCapture facade
-      _isCapturingRealAudio = await DesktopCapture.instance
-          .startCapture(mode: AudioCaptureMode.microphone, deviceId: deviceId);
-
-      if (_isCapturingRealAudio) {
-        _captureSubscription = DesktopCapture.instance.audioDataStream
-            .listen((data) {
-              _updateFromCapturedAudio(data.frequencies);
-            });
-      }
+      mode = AudioCaptureMode.microphone;
     } else {
-      // App audio - not implemented yet, use simulation
-      _isCapturingRealAudio = false;
+      _startSimulation();
+      return;
     }
 
-    // If real capture failed, fall back to simulation
-    if (!_isCapturingRealAudio && _previewListenerCount <= 0) {
-      _startSimulation();
+    // UPDATED: Use the Platform Agnostic instance
+    _isCapturingRealAudio = await DesktopCapture.instance.startCapture(
+      mode: mode,
+      deviceId: deviceId,
+    );
+
+    if (_isCapturingRealAudio) {
+      _captureSubscription = DesktopCapture.instance.audioDataStream.listen((
+        data,
+      ) {
+        _updateFromCapturedAudio(data.frequencies);
+      });
+    } else {
+      // Fallback if the platform driver fails (e.g. no permission)
+      if (_previewListenerCount > 0) _startSimulation();
     }
   }
 
@@ -87,9 +77,6 @@ class AudioAnalyzer {
       await DesktopCapture.instance.stopCapture();
       _isCapturingRealAudio = false;
     }
-
-    _currentAudioSource = null;
-    _currentDeviceId = null;
 
     // Stop simulation if no preview listeners
     if (_previewListenerCount <= 0) {

@@ -4,6 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
+import '../platforms/interface/vocal_remover_platform.dart';
+import '../platforms/windows/windows_vocal_remover.dart';
+import '../platforms/macos/macos_vocal_remover.dart';
+
 enum VocalRemoverType {
   uvr, // Audio Separator (UVR MDX-Net) - High Quality
   instant, // Flash/Phase Cancel - Fast
@@ -32,6 +36,21 @@ class VocalRemoverService {
   factory VocalRemoverService() => _instance;
   VocalRemoverService._internal();
 
+  VocalRemoverPlatform? _platformImpl;
+
+  VocalRemoverPlatform get _platform {
+    if (_platformImpl != null) return _platformImpl!;
+
+    if (Platform.isWindows) {
+      _platformImpl = WindowsVocalRemover();
+    } else if (Platform.isMacOS) {
+      _platformImpl = MacosVocalRemover();
+    } else {
+      _platformImpl = MacosVocalRemover(); // Fallback
+    }
+    return _platformImpl!;
+  }
+
   /// Check tools. Returns error message or null.
   Future<String?> checkAvailability(VocalRemoverType type) async {
     // 1. Instant Mode only needs FFmpeg
@@ -43,17 +62,7 @@ class VocalRemoverService {
     } catch (_) {}
 
     if (ffmpegPath == null) {
-      if (Platform.isWindows) {
-        final manualFfmpeg = File(
-          r'E:\ffmpeg-8.0-full_build-shared\bin\ffmpeg.exe',
-        );
-        if (manualFfmpeg.existsSync()) ffmpegPath = manualFfmpeg.path;
-      } else if (Platform.isMacOS) {
-        if (File('/opt/homebrew/bin/ffmpeg').existsSync())
-          ffmpegPath = '/opt/homebrew/bin/ffmpeg';
-        else if (File('/usr/local/bin/ffmpeg').existsSync())
-          ffmpegPath = '/usr/local/bin/ffmpeg';
-      }
+      ffmpegPath = await _platform.getFfmpegPath();
     }
 
     if (ffmpegPath == null) {
@@ -64,28 +73,8 @@ class VocalRemoverService {
 
     // 2. UVR (Audio Separator)
     if (type == VocalRemoverType.uvr) {
-      // Check for audio-separator command
-      // On Windows it's likely a script in Python Scripts folder, or widely available if installed via pip
-      bool found = false;
-      try {
-        if ((await Process.run('audio-separator', ['--version'])).exitCode == 0)
-          found = true;
-      } catch (_) {}
-
-      if (!found && Platform.isWindows) {
-        // Fallback check: py -m audio_separator
-        try {
-          final res = await Process.run('py', [
-            '-3.11',
-            '-m',
-            'audio_separator',
-            '--version',
-          ]);
-          if (res.exitCode == 0) found = true;
-        } catch (_) {}
-      }
-
-      if (!found) {
+      final audioSeparatorPath = await _platform.getAudioSeparatorPath();
+      if (audioSeparatorPath == null) {
         return 'UVR not found. Run: pip install "audio-separator[cpu]"';
       }
     }
@@ -95,19 +84,8 @@ class VocalRemoverService {
 
   // Helper: Install GPU Support
   Future<int> installGpuSupport() async {
-    String pythonExe = 'python';
-    List<String> preArgs = [];
-    if (Platform.isWindows) {
-      try {
-        if ((await Process.run('py', ['-3.11', '--version'])).exitCode == 0) {
-          pythonExe = 'py';
-          preArgs = ['-3.11'];
-        }
-      } catch (_) {}
-    } else if (Platform.isMacOS) {
-      // macOS uses python3 by default
-      pythonExe = 'python3';
-    }
+    String pythonExe = _platform.getPythonExecutable();
+    List<String> preArgs = _platform.getPythonPreArgs();
 
     // Command: pip install "audio-separator[gpu]"
     final args = [...preArgs, '-m', 'pip', 'install', 'audio-separator[gpu]'];
@@ -165,13 +143,7 @@ class VocalRemoverService {
 
         statusController.add('Initializing FFmpeg...');
 
-        String ffmpegCmd = 'ffmpeg';
-        if (Platform.isWindows) {
-          final manual = File(
-            r'E:\ffmpeg-8.0-full_build-shared\bin\ffmpeg.exe',
-          );
-          if (manual.existsSync()) ffmpegCmd = manual.path;
-        }
+        String ffmpegCmd = (await _platform.getFfmpegPath()) ?? 'ffmpeg';
 
         final args = [
           '-i',
@@ -257,27 +229,28 @@ class VocalRemoverService {
         if (!modelDir.existsSync()) modelDir.createSync(recursive: true);
 
         // Check if we run as 'audio-separator' or 'py -m audio_separator'
-        String exe = 'audio-separator';
+        final audioSeparatorPath = await _platform.getAudioSeparatorPath();
+        String exe = audioSeparatorPath ?? 'audio-separator';
         List<String> preArgs = [];
 
-        // On Windows, likely 'py -3.11 -m audio_separator' is safer if path isn't set
-        if (Platform.isWindows) {
-          final scriptPath = File(
-            r'C:\Users\Ronald Datcher\AppData\Local\Programs\Python\Python311\Scripts\audio-separator.exe',
-          );
-          if (scriptPath.existsSync()) {
-            exe = scriptPath.path;
-          }
+        if (exe == 'audio-separator-py') {
+          exe = 'py';
+          preArgs = ['-3.11', '-m', 'audio_separator'];
         }
 
         final args = [
           ...preArgs,
           inputFile.path,
-          '--model_filename', modelName,
-          '--model_file_dir', modelDir.path,
-          '--output_dir', outputDir!.path,
-          '--output_format', 'mp3',
-          '--single_stem', 'instrumental', // Only save instrumental
+          '--model_filename',
+          modelName,
+          '--model_file_dir',
+          modelDir.path,
+          '--output_dir',
+          outputDir!.path,
+          '--output_format',
+          'mp3',
+          '--single_stem',
+          'instrumental', // Only save instrumental
         ];
 
         if (useGpu) {
@@ -289,18 +262,7 @@ class VocalRemoverService {
         statusController.add('Processing with UVR MDX-Net...');
 
         // Pass FFmpeg path in env
-        Map<String, String>? env;
-        if (Platform.isWindows) {
-          final ffmpegBin = r'E:\ffmpeg-8.0-full_build-shared\bin';
-          final currentPath = Platform.environment['Path'] ?? '';
-          env = {'Path': '$ffmpegBin;$currentPath'};
-        } else if (Platform.isMacOS) {
-          // Homebrew paths for macOS
-          const brewPaths = '/opt/homebrew/bin:/usr/local/bin';
-          final currentPath = Platform.environment['PATH'] ?? '';
-          env = {'PATH': '$brewPaths:$currentPath'};
-        }
-
+        final env = _platform.getEnvironmentVariables();
         process = await Process.start(exe, args, environment: env);
 
         if (isCancelled) {

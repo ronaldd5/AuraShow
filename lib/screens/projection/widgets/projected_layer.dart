@@ -263,7 +263,7 @@ class _ScreenCaptureLayerState extends State<ScreenCaptureLayer>
     _captureOnce();
   }
 
-  void _captureOnce() {
+  Future<void> _captureOnce() async {
     if (_isCapturing || !mounted) return;
     _isCapturing = true;
 
@@ -292,7 +292,7 @@ class _ScreenCaptureLayerState extends State<ScreenCaptureLayer>
       switch (captureType) {
         case 'window':
           if (hwnd != null && hwnd > 0) {
-            bytes = DesktopCapture.instance.captureWindow(
+            bytes = await DesktopCapture.instance.captureWindow(
               hwnd,
               thumbnailWidth: thumbWidth,
               thumbnailHeight: thumbHeight,
@@ -301,7 +301,7 @@ class _ScreenCaptureLayerState extends State<ScreenCaptureLayer>
           break;
         case 'display':
           final idx = displayIndex ?? 0;
-          bytes = DesktopCapture.instance.captureDisplay(
+          bytes = await DesktopCapture.instance.captureDisplay(
             idx,
             thumbnailWidth: thumbWidth,
             thumbnailHeight: thumbHeight,
@@ -309,7 +309,7 @@ class _ScreenCaptureLayerState extends State<ScreenCaptureLayer>
           break;
         case 'desktop':
         default:
-          bytes = DesktopCapture.instance.captureScreen(
+          bytes = await DesktopCapture.instance.captureScreen(
             thumbnailWidth: thumbWidth,
             thumbnailHeight: thumbHeight,
           );

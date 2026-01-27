@@ -12,12 +12,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:webview_win_floating/webview_win_floating.dart';
+
+import 'platforms/windows/windows_init.dart' deferred as win_init;
+import 'platforms/macos/macos_init.dart' deferred as mac_init;
 
 ///import 'package:webview_flutter_web/webview_flutter_web.dart';
 
 import 'app.dart';
 import 'screens/projection/projection.dart';
+import 'platforms/desktop_capture.dart';
+import 'services/audio_device_service.dart';
 
 Future<void> main(List<String> args) async {
   await runZonedGuarded(
@@ -31,9 +35,11 @@ Future<void> main(List<String> args) async {
       if (kIsWeb) {
         // WebViewPlatform.instance = WebWebViewPlatform();
       } else if (Platform.isWindows) {
-        WebViewPlatform.instance = WindowsWebViewPlatform();
+        await win_init.loadLibrary();
+        win_init.registerPlatformWebview();
       } else if (Platform.isMacOS) {
-        // macOS uses standard webview_flutter_wkwebview via default instance
+        await mac_init.loadLibrary();
+        mac_init.registerPlatformWebview();
       }
 
       // Optimize image cache to reduce memory usage (was 500MB)
@@ -55,6 +61,11 @@ Future<void> main(List<String> args) async {
         debugPrint('$stack');
         return true;
       };
+
+      // Initialize platform services (Capture, Audio)
+      // These use deferred imports to quarantine win32 dependencies.
+      await DesktopCapture.instance.initialize();
+      await AudioDeviceService.initialize();
 
       // Secondary windows branch early; skip env loading and MediaKit init.
       if (args.firstOrNull == 'multi_window') {

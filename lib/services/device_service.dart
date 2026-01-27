@@ -172,50 +172,38 @@ class DeviceService {
   /// Scan for connected screens/displays using Win32 APIs
   Future<void> _scanScreens() async {
     try {
-      // Use Win32 capture service for reliable display detection (Windows only)
-      if (Platform.isWindows) {
-        final displays = DesktopCapture.instance.getDisplays();
-        final newScreens = <LiveDevice>[];
+      // Use platform-agnostic DesktopCapture service
+      final displays = await DesktopCapture.instance.getDisplays();
+      final newScreens = <LiveDevice>[];
 
-        for (int i = 0; i < displays.length; i++) {
-          final display = displays[i];
-          final resolution = '${display.width}x${display.height}';
+      for (int i = 0; i < displays.length; i++) {
+        final display = displays[i];
+        final resolution = '${display.width}x${display.height}';
 
-          // Check if we already have this screen to preserve thumbnail
-          final existing = _screens.firstWhereOrNull(
-            (s) => s.id == 'screen-$i',
-          );
+        // Check if we already have this screen to preserve thumbnail
+        final existing = _screens.firstWhereOrNull((s) => s.id == 'screen-$i');
 
-          newScreens.add(
-            LiveDevice(
-              id: 'screen-$i',
-              name: display.name,
-              detail: '$resolution @(${display.left},${display.top})',
-              type: DeviceType.screen,
-              thumbnail: existing?.thumbnail,
-              resolution: resolution,
-              isActive: true,
-            ),
-          );
-        }
-
-        _screens
-          ..clear()
-          ..addAll(newScreens);
-        return;
-      } else if (Platform.isMacOS) {
-        // macOS uses screen_retriever fallback below
+        newScreens.add(
+          LiveDevice(
+            id: 'screen-$i',
+            name: display.name,
+            detail: '$resolution @(${display.left},${display.top})',
+            type: DeviceType.screen,
+            thumbnail: existing?.thumbnail,
+            resolution: resolution,
+            isActive: true,
+          ),
+        );
       }
 
-      // Non-Windows Fallback below
-      if (!Platform.isMacOS)
-        throw UnsupportedError('Not running on Windows or macOS');
+      _screens
+        ..clear()
+        ..addAll(newScreens);
+      return;
     } catch (e) {
-      if (Platform.isWindows) {
-        debugPrint('DeviceService: Error scanning screens (Win32): $e');
-      } else if (Platform.isMacOS) {
-        debugPrint('DeviceService: Info scanning screens (macOS): $e');
-      }
+      debugPrint(
+        'DeviceService: Error scanning screens via DesktopCapture: $e',
+      );
       // Fallback to screen_retriever on Mac or if Win32 fails
       try {
         final displays = await ScreenRetriever.instance.getAllDisplays();
@@ -498,11 +486,8 @@ class DeviceService {
     return false;
   }
 
-  /// Capture a thumbnail for a screen using native Win32 APIs
+  /// Capture a thumbnail for a screen using DesktopCapture (BitBlt on Win, plugin on Mac)
   Future<bool> _captureScreenThumbnail(LiveDevice screen) async {
-    if (Platform.isMacOS) return false; // macOS uses standard capture
-    if (!Platform.isWindows) return false;
-
     try {
       // Extract display ID from screen.id
       final displayIdStr = screen.id.replaceFirst('screen-', '');
@@ -510,12 +495,12 @@ class DeviceService {
 
       if (displayIndex == null) return false;
 
-      // Get displays from Win32 capture service
-      final displays = DesktopCapture.instance.getDisplays();
+      // Get displays from DesktopCapture service
+      final displays = await DesktopCapture.instance.getDisplays();
       if (displayIndex >= displays.length) return false;
 
-      // Capture the display using Win32 BitBlt (silent, no Snipping Tool!)
-      final imageBytes = DesktopCapture.instance.captureDisplay(
+      // Capture the display (BitBlt on Win, screen_capturer on Mac)
+      final imageBytes = await DesktopCapture.instance.captureDisplay(
         displayIndex,
         thumbnailWidth: 320,
         thumbnailHeight: 180,
@@ -560,23 +545,21 @@ class DeviceService {
   }
 
   /// Get list of available windows for capture
-  List<WindowInfo> getWindows() {
-    if (Platform.isMacOS) return [];
-    if (!Platform.isWindows) return [];
+  Future<List<WindowInfo>> getWindows() async {
     return DesktopCapture.instance.getWindows();
   }
 
   /// Get list of available displays for capture
-  List<DisplayInfo> getDisplays() {
-    if (Platform.isMacOS) return [];
-    if (!Platform.isWindows) return [];
+  Future<List<DisplayInfo>> getDisplays() async {
     return DesktopCapture.instance.getDisplays();
   }
 
   /// Capture a window thumbnail
-  Uint8List? captureWindowThumbnail(int hwnd, {int? width, int? height}) {
-    if (Platform.isMacOS) return null;
-    if (!Platform.isWindows) return null;
+  Future<Uint8List?> captureWindowThumbnail(
+    int hwnd, {
+    int? width,
+    int? height,
+  }) async {
     return DesktopCapture.instance.captureWindow(
       hwnd,
       thumbnailWidth: width ?? 320,
@@ -585,13 +568,11 @@ class DeviceService {
   }
 
   /// Capture a display thumbnail
-  Uint8List? captureDisplayThumbnail(
+  Future<Uint8List?> captureDisplayThumbnail(
     int displayIndex, {
     int? width,
     int? height,
-  }) {
-    if (Platform.isMacOS) return null;
-    if (!Platform.isWindows) return null;
+  }) async {
     return DesktopCapture.instance.captureDisplay(
       displayIndex,
       thumbnailWidth: width ?? 320,
@@ -600,9 +581,7 @@ class DeviceService {
   }
 
   /// Capture entire screen (primary monitor)
-  Uint8List? captureScreenThumbnail({int? width, int? height}) {
-    if (Platform.isMacOS) return null;
-    if (!Platform.isWindows) return null;
+  Future<Uint8List?> captureScreenThumbnail({int? width, int? height}) async {
     return DesktopCapture.instance.captureScreen(
       thumbnailWidth: width ?? 320,
       thumbnailHeight: height ?? 180,

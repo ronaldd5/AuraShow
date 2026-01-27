@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ffi';
 import 'dart:typed_data';
 
@@ -6,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:win32/win32.dart';
 
 import '../interface/capture_platform_interface.dart';
+import 'win32_audio_capture_service.dart' as audio;
 
 /// Native Win32 Screen Capture Service Implementation
 class WindowsCaptureService implements CapturePlatform {
@@ -17,7 +19,36 @@ class WindowsCaptureService implements CapturePlatform {
   DateTime? _lastDisplayScan;
 
   @override
-  List<WindowInfo> getWindows({bool refresh = false}) {
+  Stream<AudioCaptureData> get audioDataStream => audio
+      .Win32AudioCaptureService
+      .instance
+      .audioDataStream
+      .map((data) => AudioCaptureData(data.frequencies));
+
+  @override
+  Future<bool> startCapture({
+    required AudioCaptureMode mode,
+    String? deviceId,
+  }) async {
+    audio.AudioCaptureMode winMode;
+    if (mode == AudioCaptureMode.loopback) {
+      winMode = audio.AudioCaptureMode.loopback;
+    } else {
+      winMode = audio.AudioCaptureMode.microphone;
+    }
+    return audio.Win32AudioCaptureService.instance.startCapture(
+      mode: winMode,
+      deviceId: deviceId,
+    );
+  }
+
+  @override
+  Future<void> stopCapture() async {
+    await audio.Win32AudioCaptureService.instance.stopCapture();
+  }
+
+  @override
+  Future<List<WindowInfo>> getWindows({bool refresh = false}) async {
     final now = DateTime.now();
     if (!refresh &&
         _lastWindowScan != null &&
@@ -32,7 +63,7 @@ class WindowsCaptureService implements CapturePlatform {
   }
 
   @override
-  List<DisplayInfo> getDisplays({bool refresh = false}) {
+  Future<List<DisplayInfo>> getDisplays({bool refresh = false}) async {
     final now = DateTime.now();
     if (!refresh &&
         _lastDisplayScan != null &&
@@ -49,7 +80,6 @@ class WindowsCaptureService implements CapturePlatform {
   // Temporary static collection for the callback
   static final List<WindowInfo> _collectedWindows = [];
 
-  @override
   void _enumerateWindows() {
     try {
       _collectedWindows.clear();
@@ -109,12 +139,6 @@ class WindowsCaptureService implements CapturePlatform {
         CloseHandle(hProcess);
       }
 
-      // Hack: We can't access the instance directly in static callback
-      // But typically this is a singleton or managed elsewhere.
-      // For this refactor, we'll assume a global lists approach or just strict FFI
-      // In the original code, it accessed `instance._cachedWindows`.
-      // We will need to re-architect this slightly if we want multiple instances,
-      // but for now, let's keep it simple or use a static list for collection temporary.
       _collectedWindows.add(
         WindowInfo(
           hwnd: hwnd,
@@ -128,13 +152,6 @@ class WindowsCaptureService implements CapturePlatform {
     }
 
     return TRUE;
-  }
-
-  // Override to populate collecting list
-  void _enumerateWindowsInternal() {
-    _collectedWindows.clear();
-    // ... call EnumWindows ...
-    _cachedWindows.addAll(_collectedWindows);
   }
 
   static bool _shouldSkipWindow(String className, String title) {
@@ -203,11 +220,11 @@ class WindowsCaptureService implements CapturePlatform {
   }
 
   @override
-  Uint8List? captureWindow(
+  Future<Uint8List?> captureWindow(
     int hwnd, {
     int thumbnailWidth = 320,
     int thumbnailHeight = 180,
-  }) {
+  }) async {
     try {
       final rect = calloc<RECT>();
       if (GetWindowRect(hwnd, rect) == 0) {
@@ -236,10 +253,10 @@ class WindowsCaptureService implements CapturePlatform {
   }
 
   @override
-  Uint8List? captureScreen({
+  Future<Uint8List?> captureScreen({
     int thumbnailWidth = 320,
     int thumbnailHeight = 180,
-  }) {
+  }) async {
     try {
       final width = GetSystemMetrics(SM_CXSCREEN);
       final height = GetSystemMetrics(SM_CYSCREEN);
@@ -260,13 +277,13 @@ class WindowsCaptureService implements CapturePlatform {
   }
 
   @override
-  Uint8List? captureDisplay(
+  Future<Uint8List?> captureDisplay(
     int displayIndex, {
     int thumbnailWidth = 320,
     int thumbnailHeight = 180,
-  }) {
+  }) async {
     try {
-      final displays = getDisplays();
+      final displays = await getDisplays();
       if (displayIndex < 0 || displayIndex >= displays.length) {
         return captureScreen(
           thumbnailWidth: thumbnailWidth,

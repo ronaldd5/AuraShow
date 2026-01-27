@@ -12537,11 +12537,11 @@ class _ScreenPickerDialogState extends State<_ScreenPickerDialog>
 
     try {
       // Use Win32 native API to enumerate actual windows
-      final win32Windows = DesktopCapture.instance.getWindows();
+      final win32Windows = await DesktopCapture.instance.getWindows();
 
       for (final win in win32Windows) {
         // Capture a thumbnail for each window
-        final thumbnail = DesktopCapture.instance.captureWindow(
+        final thumbnail = await DesktopCapture.instance.captureWindow(
           win.hwnd,
           thumbnailWidth: 240,
           thumbnailHeight: 135,
@@ -13080,7 +13080,7 @@ class _ScreenCaptureManager implements TickerProvider {
     }
   }
 
-  void _performCapture(String captureId) {
+  Future<void> _performCapture(String captureId) async {
     try {
       // Parse capture info from ID (format: "type:value")
       final parts = captureId.split(':');
@@ -13099,7 +13099,7 @@ class _ScreenCaptureManager implements TickerProvider {
         case 'window':
           final hwnd = int.tryParse(captureValue);
           if (hwnd != null && hwnd > 0) {
-            bytes = DesktopCapture.instance.captureWindow(
+            bytes = await DesktopCapture.instance.captureWindow(
               hwnd,
               thumbnailWidth: thumbWidth,
               thumbnailHeight: thumbHeight,
@@ -13108,14 +13108,14 @@ class _ScreenCaptureManager implements TickerProvider {
           break;
         case 'display':
           final idx = int.tryParse(captureValue) ?? 0;
-          bytes = DesktopCapture.instance.captureDisplay(
+          bytes = await DesktopCapture.instance.captureDisplay(
             idx,
             thumbnailWidth: thumbWidth,
             thumbnailHeight: thumbHeight,
           );
           break;
         case 'desktop':
-          bytes = DesktopCapture.instance.captureScreen(
+          bytes = await DesktopCapture.instance.captureScreen(
             thumbnailWidth: thumbWidth,
             thumbnailHeight: thumbHeight,
           );
