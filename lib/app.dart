@@ -1,41 +1,92 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'core/theme/palette.dart';
-import 'screens/dashboard/dashboard_screen.dart';
-import 'widgets/native_menu_wrapper.dart';
+import 'package:flutter/services.dart'; // Required for Shortcuts
+import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
-/// The main AuraShow application widget.
-///
-/// This configures the app theme and provides the root MaterialApp
-/// with dark theme styling and the DashboardScreen as the home.
+import 'core/theme/palette.dart';
+import 'screens/dashboard/controller/dashboard_controller.dart';
+import 'screens/dashboard/dashboard_screen.dart';
+
 class AuraShowApp extends StatelessWidget {
   const AuraShowApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return NativeMenuWrapper(
-      child: MaterialApp(
-        title: 'AuraShow',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          brightness: Brightness.dark,
-          scaffoldBackgroundColor: AppPalette.carbonBlack,
-          colorScheme: ColorScheme.dark(
-            primary: AppPalette.dustyMauve,
-            secondary: AppPalette.dustyRose,
-            surface: AppPalette.carbonBlack,
-            background: AppPalette.carbonBlack,
-            onPrimary: Colors.white,
-            onSecondary: Colors.white,
-            onSurface: Colors.white,
-            onBackground: Colors.white,
-          ).copyWith(tertiary: AppPalette.willowGreen),
-          textTheme: GoogleFonts.outfitTextTheme(
-            ThemeData(brightness: Brightness.dark).textTheme,
-          ).apply(bodyColor: Colors.white, displayColor: Colors.white),
-          useMaterial3: true,
+    // Native Menu Bar Wrapper
+    return PlatformMenuBar(
+      menus: [
+        PlatformMenu(
+          label: 'AuraShow',
+          menus: [
+            if (Platform.isMacOS)
+              PlatformMenuItemGroup(
+                members: [
+                  PlatformMenuItem(
+                    label: 'About AuraShow',
+                    onSelected: () {
+                      showAboutDialog(
+                        context: context,
+                        applicationName: 'AuraShow',
+                        applicationVersion: '1.0.0',
+                      );
+                    },
+                  ),
+                  PlatformMenuItem(
+                    label: 'Quit',
+                    shortcut: const SingleActivator(
+                      LogicalKeyboardKey.keyQ,
+                      meta: true,
+                    ),
+                    onSelected: () => exit(0),
+                  ),
+                ],
+              ),
+          ],
         ),
-        home: const DashboardScreen(),
+        PlatformMenu(
+          label: 'File',
+          menus: [
+            PlatformMenuItem(
+              label: 'New Show',
+              shortcut: const SingleActivator(
+                LogicalKeyboardKey.keyN,
+                meta: true,
+              ),
+              onSelected: () {
+                // Future: Hook up to DashboardController
+              },
+            ),
+          ],
+        ),
+      ],
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => DashboardController()),
+        ],
+        child: MaterialApp(
+          title: 'AuraShow',
+          debugShowCheckedModeBanner: false,
+          themeMode: ThemeMode.dark,
+          theme: ThemeData(
+            brightness: Brightness.dark,
+            primaryColor: AppPalette.primary,
+            scaffoldBackgroundColor: AppPalette.background,
+            useMaterial3: true,
+            fontFamily: 'Inter',
+          ),
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en', ''),
+            Locale('es', ''),
+            Locale('fr', ''),
+          ],
+          home: const DashboardScreen(),
+        ),
       ),
     );
   }
