@@ -13310,26 +13310,12 @@ class AuraYouTubePlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!kIsWeb && Platform.isWindows) {
-      return _WindowsYouTubePlayer(
-        videoId: videoId,
-        autoPlay: autoPlay,
-        muted: muted,
-        showControls: showControls,
-      );
-    } else {
-      // Use standard iframe player for macOS and Web
-      return YoutubePlayer(
-        controller: YoutubePlayerController.fromVideoId(
-          videoId: videoId,
-          params: YoutubePlayerParams(
-            showControls: showControls,
-            mute: muted,
-            showFullscreenButton: true,
-          ),
-        ),
-      );
-    }
+    return YouTubePlayerFactory(
+      videoId: videoId,
+      autoPlay: autoPlay,
+      muted: muted,
+      showControls: showControls,
+    );
   }
 }
 
