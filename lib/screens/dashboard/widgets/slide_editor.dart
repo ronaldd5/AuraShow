@@ -222,6 +222,7 @@ extension SlideEditor on DashboardScreenState {
                     )
                   : _emptyStageBox('No slide selected'),
             ),
+            SizedBox(height: _drawerHeight + 20),
           ],
         ),
       ),

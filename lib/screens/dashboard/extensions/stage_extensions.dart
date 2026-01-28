@@ -198,7 +198,7 @@ extension StageExtensions on DashboardScreenState {
             Expanded(
               child: hasLayouts
                   ? ReorderableListView.builder(
-                      padding: EdgeInsets.zero,
+                      padding: EdgeInsets.only(bottom: _drawerHeight + 20),
                       itemCount: _stageLayouts.length,
                       onReorder: _reorderStageLayouts,
                       proxyDecorator: (child, index, animation) => Material(
@@ -451,6 +451,7 @@ extension StageExtensions on DashboardScreenState {
                     final itemWidth = (width - totalSpacing) / columns;
 
                     return SingleChildScrollView(
+                      padding: EdgeInsets.only(bottom: _drawerHeight + 20),
                       child: Wrap(
                         spacing: spacing,
                         runSpacing: spacing,

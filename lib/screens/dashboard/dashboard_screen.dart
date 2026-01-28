@@ -1784,21 +1784,30 @@ class DashboardScreenState extends State<DashboardScreen> {
               });
             }
           },
-          child: Column(
+          child: Stack(
             children: [
-              _buildTopNavBar(),
-              Expanded(
-                child: isEditTab
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 12,
-                        ),
-                        child: rowContent,
-                      )
-                    : rowContent,
+              Column(
+                children: [
+                  _buildTopNavBar(),
+                  Expanded(
+                    child: isEditTab
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
+                            child: rowContent,
+                          )
+                        : rowContent,
+                  ),
+                ],
               ),
-              _buildBottomDrawer(),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: _buildBottomDrawer(),
+              ),
             ],
           ),
         ),
@@ -1840,29 +1849,23 @@ class DashboardScreenState extends State<DashboardScreen> {
       height: targetHeight,
       width: double.infinity,
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E), // Slightly lighter than background
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white10),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black54,
-            blurRadius: 15,
-            spreadRadius: 2,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.only(
-          bottom: bottomInset > 16 ? bottomInset - 16 : 0,
+      child: Material(
+        color: AppPalette.surface,
+        elevation: 12,
+        shadowColor: Colors.black54,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Colors.white10),
         ),
-        child: DefaultTabController(
-          length: tabs.length,
-          child: Builder(
-            builder: (context) => ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Column(
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: bottomInset > 16 ? bottomInset - 16 : 0,
+          ),
+          child: DefaultTabController(
+            length: tabs.length,
+            child: Builder(
+              builder: (context) => Column(
                 children: [
                   GestureDetector(
                     behavior: HitTestBehavior.translucent,
@@ -1879,59 +1882,57 @@ class DashboardScreenState extends State<DashboardScreen> {
                     onVerticalDragEnd: (_) => setState(() {
                       drawerExpanded = _drawerHeight > _drawerMinHeight + 4;
                     }),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () => setState(() {
-                          drawerExpanded = !drawerExpanded;
-                          _drawerHeight = drawerExpanded
-                              ? _drawerDefaultHeight
-                              : _drawerMinHeight;
-                        }),
-                        splashColor: Colors.white10,
-                        highlightColor: Colors.white10,
-                        child: Container(
-                          height: _drawerTabHeight,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: InkWell(
+                      onTap: () => setState(() {
+                        drawerExpanded = !drawerExpanded;
+                        _drawerHeight = drawerExpanded
+                            ? _drawerDefaultHeight
+                            : _drawerMinHeight;
+                      }),
+                      splashColor: Colors.white10,
+                      highlightColor: Colors.white10,
+                      child: Container(
+                        height: _drawerTabHeight,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        alignment: Alignment.centerLeft,
+                        child: Align(
                           alignment: Alignment.centerLeft,
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: TabBar(
-                              labelColor: Colors.white,
-                              unselectedLabelColor: Colors.white60,
-                              indicatorColor: accentPink,
-                              labelStyle: const TextStyle(
-                                fontWeight: FontWeight.w900,
-                                fontSize: 16,
-                                letterSpacing: 0.5,
-                              ),
-                              unselectedLabelStyle: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                              isScrollable: true,
-                              indicatorSize: TabBarIndicatorSize.label,
-                              labelPadding: const EdgeInsets.symmetric(
-                                horizontal: 34,
-                              ),
-                              indicatorPadding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                              ),
-                              tabs: tabs,
-                              onTap: (index) {
-                                if (!drawerExpanded) {
-                                  setState(() {
-                                    drawerExpanded = true;
-                                    _drawerHeight = _drawerDefaultHeight;
-                                  });
-                                }
-                              },
+                          child: TabBar(
+                            labelColor: Colors.white,
+                            unselectedLabelColor: Colors.white60,
+                            indicatorColor: accentPink,
+                            labelStyle: const TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16,
+                              letterSpacing: 0.5,
                             ),
+                            unselectedLabelStyle: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                            isScrollable: true,
+                            indicatorSize: TabBarIndicatorSize.label,
+                            labelPadding: const EdgeInsets.symmetric(
+                              horizontal: 34,
+                            ),
+                            indicatorPadding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                            ),
+                            tabs: tabs,
+                            onTap: (index) {
+                              if (!drawerExpanded) {
+                                setState(() {
+                                  drawerExpanded = true;
+                                  _drawerHeight = _drawerDefaultHeight;
+                                });
+                              }
+                            },
                           ),
                         ),
                       ),
                     ),
                   ),
+
                   if (showContent)
                     Expanded(
                       child: Padding(
@@ -7684,6 +7685,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                       SizedBox(height: gap),
                       _buildLayerTimeline(),
                     ],
+                    SizedBox(height: _drawerHeight + 20),
                   ],
                 )
               : Stack(
@@ -7715,6 +7717,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                         _buildDropToSyncPanel(),
                         SizedBox(height: gap + 2),
                         _buildShowsMetaPanel(),
+                        SizedBox(height: _drawerHeight + 20),
                       ],
                     ),
                   ],

@@ -407,7 +407,12 @@ extension SlideNavigationExtensions on DashboardScreenState {
                         )
                       : GridView.builder(
                           controller: _slidesScrollController,
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 44),
+                          padding: EdgeInsets.fromLTRB(
+                            0,
+                            0,
+                            0,
+                            _drawerHeight + 44,
+                          ),
                           gridDelegate:
                               const SliverGridDelegateWithMaxCrossAxisExtent(
                                 maxCrossAxisExtent: 360,
@@ -683,7 +688,7 @@ extension SlideNavigationExtensions on DashboardScreenState {
 
           Positioned(
             right: 135,
-            bottom: 24,
+            bottom: _drawerHeight + 24,
             child: CompositedTransformTarget(
               link: _linesOptionsLayerLink,
               child: MouseRegion(
@@ -719,7 +724,7 @@ extension SlideNavigationExtensions on DashboardScreenState {
 
           Positioned(
             right: 24,
-            bottom: 24,
+            bottom: _drawerHeight + 24,
             child: ElevatedButton.icon(
               onPressed: _addSlide,
               style: ElevatedButton.styleFrom(

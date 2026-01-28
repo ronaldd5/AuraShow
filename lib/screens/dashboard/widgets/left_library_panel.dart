@@ -11,11 +11,13 @@ import '../../../core/theme/palette.dart';
 class LeftLibraryPanel extends StatefulWidget {
   final Function(Song) onSongSelected;
   final Function(BibleVerse) onVerseSelected;
+  final double bottomPadding;
 
   const LeftLibraryPanel({
     super.key,
     required this.onSongSelected,
     required this.onVerseSelected,
+    this.bottomPadding = 0,
   });
 
   @override
@@ -151,6 +153,7 @@ class _LeftLibraryPanelState extends State<LeftLibraryPanel>
 
               final verses = snapshot.data!;
               return ListView.builder(
+                padding: EdgeInsets.only(bottom: widget.bottomPadding + 20),
                 itemCount: verses.length,
                 itemBuilder: (context, index) {
                   final verse = verses[index];
@@ -233,6 +236,7 @@ class _LeftLibraryPanelState extends State<LeftLibraryPanel>
               }
 
               return ListView.builder(
+                padding: EdgeInsets.only(bottom: widget.bottomPadding + 20),
                 itemCount: filtered.length,
                 itemBuilder: (context, index) {
                   final song = filtered[index];

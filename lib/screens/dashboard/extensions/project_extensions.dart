@@ -249,7 +249,7 @@ extension ProjectExtensions on DashboardScreenState {
 
     return Container(
       color: AppPalette.carbonBlack,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + _drawerHeight),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -341,7 +341,12 @@ extension ProjectExtensions on DashboardScreenState {
                               "No shows in this project yet. Click '+ New Show' to add one.",
                         )
                       : ListView.builder(
-                          padding: const EdgeInsets.all(8),
+                          padding: EdgeInsets.fromLTRB(
+                            8,
+                            8,
+                            8,
+                            8 + _drawerHeight + 80,
+                          ),
                           itemCount: showsInProject.length,
                           itemBuilder: (context, index) {
                             final showNode = showsInProject[index];
@@ -379,7 +384,7 @@ extension ProjectExtensions on DashboardScreenState {
             // FLOATING ACTION BUTTON
             Positioned(
               right: 16,
-              bottom: 16,
+              bottom: 16 + _drawerHeight,
               child: FloatingActionButton.extended(
                 backgroundColor: AppPalette.accent,
                 icon: const Icon(Icons.add),
