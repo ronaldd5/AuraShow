@@ -27,6 +27,7 @@ extension AudioExtensions on DashboardScreenState {
               _audioModeButton('Playlists', 'playlists', Icons.queue_music),
               _audioModeButton('Effects', 'effects', Icons.campaign),
               _audioModeButton('Metronome', 'metronome', Icons.timer),
+              _audioModeButton('Mixer', 'mixer', Icons.tune),
             ],
           ),
           const SizedBox(height: 8),
@@ -38,6 +39,8 @@ extension AudioExtensions on DashboardScreenState {
                 ? _buildAudioPlaylistsView()
                 : _audioTabMode == 'effects'
                 ? _buildSoundEffectsView()
+                : _audioTabMode == 'mixer'
+                ? _buildMixerView()
                 : _buildMetronomeView(),
           ),
         ],

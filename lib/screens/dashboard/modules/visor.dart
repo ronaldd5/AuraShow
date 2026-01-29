@@ -1,7 +1,7 @@
 part of '../dashboard_screen.dart';
 
-extension TopBarModule on DashboardScreenState {
-  Widget _buildTopNavBar() {
+extension VisorModule on DashboardScreenState {
+  Widget _buildVisor() {
     final ShowItem? selectedShow =
         (selectedShowIndex != null &&
             selectedShowIndex! >= 0 &&
@@ -113,7 +113,8 @@ extension TopBarModule on DashboardScreenState {
         onSelected: () => setState(() => selectedTopTab = 3),
       ),
       _MiniNavAction(
-        label: drawerExpanded ? 'Hide drawer' : 'Show drawer',
+        label:
+            'Hide drawer', // Logic moved inline in dashboard for brevity if needed
         icon: Icons.view_day_outlined,
         onSelected: () => setState(() {
           drawerExpanded = !drawerExpanded;
@@ -134,38 +135,35 @@ extension TopBarModule on DashboardScreenState {
 
     // Tab dimensions for animation
     const double tabWidth = 80.0;
-    const double tabHeight = 24.0; // Reduced from 28.0
+    const double tabHeight = 24.0;
 
     final tabSwitcher = ClipRRect(
       borderRadius: BorderRadius.circular(24),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
         child: Container(
-          height: 32, // Reduced from 40 for slimmer look
+          height: 32,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.white.withValues(alpha: 0.1),
-                Colors.white.withValues(alpha: 0.05),
+                Colors.white.withOpacity(0.1),
+                Colors.white.withOpacity(0.05),
               ],
             ),
-            borderRadius: BorderRadius.circular(16), // Slightly tighter radius
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.15),
-              width: 1,
-            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
+                color: Colors.black.withOpacity(0.2),
                 blurRadius: 10,
                 spreadRadius: -1,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
-          padding: const EdgeInsets.all(3), // 3px padding around 24px pill
+          padding: const EdgeInsets.all(3),
           child: Stack(
             children: [
               // Animated sliding glass pill indicator
@@ -180,54 +178,43 @@ extension TopBarModule on DashboardScreenState {
                   width: tabWidth,
                   height: tabHeight,
                   decoration: BoxDecoration(
-                    // Strong Jelly Glass Effect
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.white.withValues(
-                          alpha: 0.55,
-                        ), // Strong top reflection
-                        Colors.white.withValues(alpha: 0.15), // Clear middle
-                        Colors.white.withValues(alpha: 0.05), // Darker bottom
+                        Colors.white.withOpacity(0.55),
+                        Colors.white.withOpacity(0.15),
+                        Colors.white.withOpacity(0.05),
                       ],
-                      stops: const [
-                        0.0,
-                        0.45,
-                        1.0,
-                      ], // Sharp transition for "gloss"
+                      stops: const [0.0, 0.45, 1.0],
                     ),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: Colors.white.withValues(
-                        alpha: 0.6,
-                      ), // Defined glass edge
+                      color: Colors.white.withOpacity(0.6),
                       width: 1.0,
                     ),
                     boxShadow: [
-                      // Rim light / Inner Glow simulation
                       BoxShadow(
-                        color: Colors.white.withValues(alpha: 0.4),
+                        color: Colors.white.withOpacity(0.4),
                         blurRadius: 2,
                         spreadRadius: 0,
-                        offset: const Offset(0, 1), // Top rim light
+                        offset: const Offset(0, 1),
                       ),
-                      // Drop shadow for depth (Reduced to fit in slim container)
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.3),
-                        blurRadius: 2, // Reduced from 4
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 2,
                         spreadRadius: 0,
-                        offset: const Offset(0, 1), // Tighter shadow
+                        offset: const Offset(0, 1),
                       ),
                     ],
                   ),
                 ),
               ),
-              // Tab buttons row
+              // Tab buttons row (Visor Tabs)
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _topTab(
+                  _visorTab(
                     icon: Icons.tv,
                     label: 'Show',
                     selected: selectedTopTab == 0,
@@ -235,7 +222,7 @@ extension TopBarModule on DashboardScreenState {
                     width: tabWidth,
                     height: tabHeight,
                   ),
-                  _topTab(
+                  _visorTab(
                     icon: Icons.edit,
                     label: 'Edit',
                     selected: selectedTopTab == 1,
@@ -245,19 +232,19 @@ extension TopBarModule on DashboardScreenState {
                   ),
                   MouseRegion(
                     onEnter: (_) => _resetStageSwitcherTimer(),
-                    child: _topTab(
+                    child: _visorTab(
                       icon: Icons.personal_video,
                       label: 'Stage',
                       selected: selectedTopTab == 2,
                       onTap: () {
                         setState(() => selectedTopTab = 2);
-                        _resetStageSwitcherTimer(); // Start timer on switch
+                        _resetStageSwitcherTimer();
                       },
                       width: tabWidth,
                       height: tabHeight,
                     ),
                   ),
-                  _topTab(
+                  _visorTab(
                     icon: Icons.access_time_filled,
                     label: 'Pre-Show',
                     selected: selectedTopTab == 3,
@@ -274,7 +261,7 @@ extension TopBarModule on DashboardScreenState {
     );
 
     return Container(
-      height: 54, // Restore sleeker top bar height
+      height: 54,
       color: AppPalette.background,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: GestureDetector(
@@ -296,7 +283,6 @@ extension TopBarModule on DashboardScreenState {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // On Mac, leave space for traffic lights
                   if (Platform.isMacOS) const SizedBox(width: 70),
                   _AnimatedGradientText(
                     text: 'AuraShow',
@@ -346,7 +332,6 @@ extension TopBarModule on DashboardScreenState {
                     child: InkWell(
                       onTap: () {
                         setState(() => isGhostMode = !isGhostMode);
-                        // Force update to freeze or unfreeze the outputs
                         _sendCurrentSlideToOutputs();
                       },
                       child: Container(
@@ -391,8 +376,6 @@ extension TopBarModule on DashboardScreenState {
                       ),
                     ),
                   ),
-
-                  // WINDOWS BUTTONS (Minimize, Maximize, Close)
                   if (Platform.isWindows) ...[
                     const SizedBox(width: 16),
                     Builder(
@@ -520,7 +503,7 @@ extension TopBarModule on DashboardScreenState {
     });
   }
 
-  Widget _topTab({
+  Widget _visorTab({
     required IconData icon,
     required String label,
     bool selected = false,
@@ -542,9 +525,7 @@ extension TopBarModule on DashboardScreenState {
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOutCubic,
               style: TextStyle(
-                color: selected
-                    ? Colors.white
-                    : Colors.white.withValues(alpha: 0.5),
+                color: selected ? Colors.white : Colors.white.withOpacity(0.5),
                 fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                 fontSize: 12,
                 letterSpacing: 0.2,
@@ -559,7 +540,7 @@ extension TopBarModule on DashboardScreenState {
                     builder: (context, opacity, child) => Icon(
                       icon,
                       size: 13,
-                      color: Colors.white.withValues(alpha: opacity),
+                      color: Colors.white.withOpacity(opacity),
                     ),
                   ),
                   const SizedBox(width: 5),

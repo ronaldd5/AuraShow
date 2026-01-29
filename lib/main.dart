@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'services/xair_service.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:desktop_multi_window/desktop_multi_window.dart';
 
 // Deferred imports to prevent platform crashes
 import 'platforms/windows/windows_init.dart' deferred as win_init;
@@ -16,6 +18,7 @@ import 'package:win32/win32.dart' as win32;
 
 import 'app.dart';
 import 'screens/projection/projection.dart';
+import 'screens/mixer_window.dart';
 
 Future<void> main(List<String> args) async {
   await runZonedGuarded(
@@ -27,8 +30,8 @@ Future<void> main(List<String> args) async {
       if (args.isNotEmpty && args.first == 'multi_window') {
         final windowId = int.parse(args[1]);
         final argument = args[2].isEmpty
-            ? const {}
-            : jsonDecode(args[2]) as Map<String, dynamic>;
+            ? const <String, dynamic>{}
+            : jsonDecode(args[2]) as Map;
 
         if (Platform.isWindows) {
           await win_init.loadLibrary();
@@ -43,7 +46,16 @@ Future<void> main(List<String> args) async {
         // await windowManager.ensureInitialized(); ...
 
         // Fix: Use 'initialData' instead of 'args'
-        runApp(ProjectionWindow(windowId: windowId, initialData: argument));
+        if (argument['type'] == 'mixer') {
+          runApp(
+            MixerWindow(
+              windowId: windowId,
+              args: Map<String, dynamic>.from(argument),
+            ),
+          );
+        } else {
+          runApp(ProjectionWindow(windowId: windowId, initialData: argument));
+        }
         return;
       }
 
@@ -85,6 +97,48 @@ Future<void> main(List<String> args) async {
           }
         }
       }
+
+      // --- SETUP XAIR SYNC (Main Window) ---
+      // 1. Listen for updates FROM sub-windows
+      DesktopMultiWindow.setMethodHandler((call, fromWindowId) async {
+        if (call.method == 'xair_sync') {
+          Future.microtask(() {
+            try {
+              final data = call.arguments as Map;
+              final type = data['type'] as String;
+              final ch = data['ch'] as int;
+              final val = data['val'];
+
+              if (type == 'fader') {
+                final dVal = (val is num) ? val.toDouble() : 0.0;
+                XAirService.instance.updateLocalFader(ch, dVal);
+              } else if (type == 'mute') {
+                final bVal = (val is bool) ? val : false;
+                XAirService.instance.updateLocalMute(ch, bVal);
+              }
+            } catch (e) {
+              // Sync error
+            }
+          });
+        }
+        return null;
+      });
+
+      // 2. Broadcast updates TO ALL sub-windows
+      XAirService.instance.onSyncAction = (type, ch, val) async {
+        final subWindowIds = await DesktopMultiWindow.getAllSubWindowIds();
+        for (final id in subWindowIds) {
+          try {
+            await DesktopMultiWindow.invokeMethod(id, 'xair_sync', {
+              'type': type,
+              'ch': ch,
+              'val': val,
+            });
+          } catch (e) {
+            // Ignore error if window closed
+          }
+        }
+      };
 
       runApp(const AuraShowApp());
     },

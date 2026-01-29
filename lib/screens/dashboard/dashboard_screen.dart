@@ -48,6 +48,7 @@ import 'widgets/left_library_panel.dart';
 import '../../services/bible_service.dart';
 import '../../models/file_system_node.dart';
 import '../../services/ndi_output_service.dart';
+import '../../services/xair_service.dart';
 
 import '../../models/slide_model.dart';
 import 'widgets/stage_clock_widget.dart';
@@ -83,6 +84,8 @@ import '../../services/label_color_service.dart';
 import '../../services/vocal_remover_service.dart';
 import '../../core/utils/liturgy_renderer.dart';
 import '../../services/scripture_fetcher.dart';
+import 'widgets/mixer_fader.dart';
+import 'widgets/mixer_console.dart';
 
 part 'widgets/view_widgets.dart'; // Handles the view/preview panel
 part 'widgets/slide_editor.dart'; // Handles the center editor canvas
@@ -103,7 +106,8 @@ part 'extensions/filter_extensions.dart'; // Image filters
 part 'extensions/undo_redo_extensions.dart'; // Undo/Redo logic
 part 'extensions/show_processing_extensions.dart'; // Show re-pagination
 part 'extensions/preshow_extensions.dart'; // Pre-Show logic
-part 'modules/top_bar.dart';
+part 'extensions/mixer_extensions.dart'; // Mixer logic
+part 'modules/visor.dart';
 part 'widgets/quick_search_overlay.dart'; // Spotlight-style quick search
 part 'extensions/karaoke_extensions.dart'; // Karaoke sync extensions
 
@@ -601,7 +605,7 @@ class DashboardScreenState extends State<DashboardScreen> {
   int _metronomeCurrentBeat = 0;
   Timer? _metronomeTimer;
   List<FileSystemEntity> _audioFiles = [];
-  List<PreShowPlaylist> _preshowPlaylists = [];
+
   List<SlideContent> _clipboardSlides = [];
   List<SlideLayer> _clipboardLayers = [];
   static const String _stateFileExtension = '.json';
@@ -625,6 +629,14 @@ class DashboardScreenState extends State<DashboardScreen> {
       0; // 0: Dashboard, 1: Playlists, 2: Countdowns, 3: Announcements
   String? _selectedPreShowPlaylistId;
   PlaylistViewType _playlistViewType = PlaylistViewType.list;
+
+  // Pre-Show Playback State
+  List<PreShowPlaylist> _preshowPlaylists = [];
+  String? _activePreShowPlaylistId;
+  int _currentPreShowIndex = -1;
+  bool _isPreShowPlaying = false;
+  Timer? _preShowTimer;
+  VideoPlayerController? _preShowVideoController;
 
   // Output routing
   List<OutputConfig> _outputs = [];
@@ -1974,7 +1986,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   Column(
                     children: [
-                      _buildTopNavBar(),
+                      _buildVisor(),
                       Expanded(
                         child: isEditTab
                             ? Padding(
@@ -8644,6 +8656,23 @@ class DashboardScreenState extends State<DashboardScreen> {
 
   /// Get the current slide's primary video path for sync
   String? _getCurrentSlideVideoPath() {
+    // 1. Check Pre-Show
+    if (_activePreShowPlaylistId != null &&
+        _isPreShowPlaying &&
+        _currentPreShowIndex >= 0) {
+      // Find the playlist and item
+      final playlist = _preshowPlaylists.firstWhereOrNull(
+        (p) => p.id == _activePreShowPlaylistId,
+      );
+      if (playlist != null && _currentPreShowIndex < playlist.items.length) {
+        final item = playlist.items[_currentPreShowIndex];
+        if (item.type == PlaylistItemType.video) {
+          return item.path;
+        }
+      }
+    }
+
+    // 2. Fallback to normal slide video
     final paths = _getCurrentSlideVideoPaths();
     return paths.isNotEmpty ? paths.first : null;
   }

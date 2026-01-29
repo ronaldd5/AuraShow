@@ -62,6 +62,7 @@ extension PreShowExtensions on DashboardScreenState {
                 ),
               ),
             ),
+            const SizedBox(height: 80), // Clear bottom drawer
           ],
         ),
       ),
@@ -618,14 +619,23 @@ extension PreShowExtensions on DashboardScreenState {
               child: Stack(
                 children: [
                   Center(
-                    child: Icon(
-                      playlist.items.any(
-                            (i) => i.type == PlaylistItemType.video,
-                          )
-                          ? Icons.video_collection
-                          : Icons.queue_music,
-                      size: 48,
-                      color: Colors.white12,
+                    child: IconButton(
+                      icon: Icon(
+                        playlist.id == _activePreShowPlaylistId &&
+                                _isPreShowPlaying
+                            ? Icons.pause_circle_filled
+                            : Icons.play_circle_fill,
+                        size: 64,
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                      onPressed: () {
+                        if (playlist.id == _activePreShowPlaylistId &&
+                            _isPreShowPlaying) {
+                          _stopPreShow();
+                        } else {
+                          _playPreShowPlaylist(playlist, 0);
+                        }
+                      },
                     ),
                   ),
                   Positioned(
@@ -716,6 +726,39 @@ extension PreShowExtensions on DashboardScreenState {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (_activePreShowPlaylistId == playlistId &&
+                _currentPreShowIndex == index &&
+                _isPreShowPlaying)
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Icon(Icons.equalizer, color: accentBlue, size: 18),
+              ),
+            IconButton(
+              icon: Icon(
+                _activePreShowPlaylistId == playlistId &&
+                        _currentPreShowIndex == index &&
+                        _isPreShowPlaying
+                    ? Icons.pause
+                    : Icons.play_arrow,
+                size: 20,
+                color: Colors.white70,
+              ),
+              onPressed: () {
+                if (_activePreShowPlaylistId == playlistId &&
+                    _currentPreShowIndex == index &&
+                    _isPreShowPlaying) {
+                  _stopPreShow();
+                } else {
+                  // Find playlist again to be safe
+                  final playlist = _preshowPlaylists.firstWhereOrNull(
+                    (p) => p.id == playlistId,
+                  );
+                  if (playlist != null) {
+                    _playPreShowPlaylist(playlist, index);
+                  }
+                }
+              },
+            ),
             IconButton(
               icon: const Icon(Icons.close, size: 18),
               onPressed: () => _removeItemFromPlaylist(playlistId, item.id),
@@ -991,5 +1034,126 @@ extension PreShowExtensions on DashboardScreenState {
         ),
       ),
     );
+  }
+
+  // --- Playback Logic ---
+
+  Future<void> _playPreShowPlaylist(PreShowPlaylist playlist, int index) async {
+    // Stop current without clearing state fully yet
+    await _stopPreShow(clearState: false);
+
+    if (index < 0 || index >= playlist.items.length) {
+      _stopPreShow();
+      return;
+    }
+
+    setState(() {
+      _activePreShowPlaylistId = playlist.id;
+      _currentPreShowIndex = index;
+      _isPreShowPlaying = true;
+    });
+
+    final item = playlist.items[index];
+
+    try {
+      if (item.type == PlaylistItemType.audio) {
+        if (_audioPlayer == null) {
+          _audioPlayer = ja.AudioPlayer();
+        }
+        await _audioPlayer!.setFilePath(item.path);
+        await _audioPlayer!.play();
+
+        // Listen for completion
+        _audioPlayerStateSubscription?.cancel();
+        _audioPlayerStateSubscription = _audioPlayer!.playerStateStream.listen((
+          state,
+        ) {
+          if (state.processingState == ja.ProcessingState.completed) {
+            _nextPreShowItem();
+          }
+        });
+      } else {
+        // Video
+        // Dispose old controller if exists
+        _preShowVideoController?.dispose();
+
+        _preShowVideoController = VideoPlayerController.file(File(item.path));
+        await _preShowVideoController!.initialize();
+        await _preShowVideoController!.play();
+
+        // Force outputs to update (will pick up new video path via _getCurrentSlideVideoPath)
+        _sendCurrentSlideToOutputs();
+
+        // Listen for completion
+        _preShowVideoController!.addListener(_preShowVideoListener);
+      }
+    } catch (e) {
+      debugPrint('PreShow Playback Error: $e');
+      _showSnack('Failed to play ${item.title}');
+      _nextPreShowItem();
+    }
+
+    // Refresh UI
+    if (mounted) setState(() {});
+  }
+
+  void _preShowVideoListener() {
+    if (_preShowVideoController != null &&
+        _preShowVideoController!.value.isInitialized &&
+        (_preShowVideoController!.value.position >=
+            _preShowVideoController!.value.duration)) {
+      _preShowVideoController!.removeListener(_preShowVideoListener);
+      _nextPreShowItem();
+    }
+  }
+
+  Future<void> _stopPreShow({bool clearState = true}) async {
+    // Stop Audio
+    _audioPlayerStateSubscription?.cancel();
+    if (_audioPlayer != null && _audioPlayer!.playing) {
+      await _audioPlayer!.stop();
+    }
+
+    // Stop Video
+    if (_preShowVideoController != null) {
+      _preShowVideoController!.removeListener(_preShowVideoListener);
+      await _preShowVideoController!.pause();
+    }
+
+    if (clearState) {
+      _preShowVideoController?.dispose();
+      _preShowVideoController = null;
+      setState(() {
+        _activePreShowPlaylistId = null;
+        _currentPreShowIndex = -1;
+        _isPreShowPlaying = false;
+      });
+      // Clear outputs (remove video layer)
+      _sendCurrentSlideToOutputs();
+    }
+  }
+
+  void _nextPreShowItem() {
+    if (_activePreShowPlaylistId == null) return;
+
+    final playlist = _preshowPlaylists.firstWhereOrNull(
+      (p) => p.id == _activePreShowPlaylistId,
+    );
+    if (playlist == null) {
+      _stopPreShow();
+      return;
+    }
+
+    int nextIndex = _currentPreShowIndex + 1;
+    if (nextIndex >= playlist.items.length) {
+      if (playlist.isLooping) {
+        nextIndex = 0;
+      } else {
+        _stopPreShow();
+        return;
+      }
+    }
+
+    _playPreShowPlaylist(playlist, nextIndex);
   }
 }
