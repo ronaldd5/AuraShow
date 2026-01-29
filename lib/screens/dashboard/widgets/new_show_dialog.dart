@@ -23,6 +23,7 @@ class _NewShowDialogState extends State<NewShowDialog> {
   String? _selectedCategory;
   bool _isSearching = false;
   List<Song>? _searchResults;
+  String? _sourceFilter; // All: null, lrclib, genius
 
   @override
   void initState() {
@@ -68,7 +69,11 @@ class _NewShowDialogState extends State<NewShowDialog> {
     });
 
     try {
-      final results = await LyricsService.instance.searchSongs(query);
+      final results = await LyricsService.instance.searchSongs(
+        query,
+        sourceFilter: _sourceFilter,
+        limit: 25,
+      );
 
       if (mounted) {
         setState(() {
@@ -91,9 +96,37 @@ class _NewShowDialogState extends State<NewShowDialog> {
     setState(() => _isSearching = true);
 
     String lyrics = song.content;
+    String? alignmentData = song.alignmentData;
 
-    // If content is empty, fetch from source URL (stored in copyright field)
-    if (lyrics.isEmpty && song.copyright.startsWith('http')) {
+    // If Genius result, try to fetch lyrics AND look for sync bridge on LRCLIB
+    if (song.source == 'genius') {
+      try {
+        // 1. Fetch text lyrics from Genius URL
+        if (lyrics.isEmpty && song.copyright.startsWith('http')) {
+          lyrics = await LyricsService.instance.fetchLyricsFromUrl(
+            song.copyright,
+          );
+        }
+
+        // 2. Sync Bridge: Try to find timing data on LRCLIB
+        if (alignmentData == null || alignmentData.isEmpty) {
+          debugPrint(
+            'Sync Bridge: Attempting to find timing for ${song.title}...',
+          );
+          final lrcSync = await LyricsService.instance.getLrcSync(
+            song.title,
+            song.author,
+          );
+          if (lrcSync != null) {
+            debugPrint('Sync Bridge: Found timing data!');
+            alignmentData = lrcSync;
+          }
+        }
+      } catch (e) {
+        debugPrint('Genius Sync Bridge error: $e');
+      }
+    } else if (lyrics.isEmpty && song.copyright.startsWith('http')) {
+      // Standard fetch for other sources
       try {
         lyrics = await LyricsService.instance.fetchLyricsFromUrl(
           song.copyright,
@@ -105,12 +138,9 @@ class _NewShowDialogState extends State<NewShowDialog> {
 
     setState(() => _isSearching = false);
 
-    // Format lyrics with section tags if not already present
-    final formattedLyrics = _formatLyricsWithTags(
-      lyrics,
-      song.title,
-      song.author,
-    );
+    // Use cleaned lyrics directly from LyricsService.
+    // metadata header (Title/Author) will be added by QuickLyricsDialog if missing.
+    final formattedLyrics = lyrics;
 
     // Close this dialog and return data for quick_lyrics mode
     // The parent will open QuickLyricsDialog with this pre-populated text
@@ -120,59 +150,8 @@ class _NewShowDialogState extends State<NewShowDialog> {
       'category': _selectedCategory,
       'author': song.author,
       'lyrics': formattedLyrics,
+      'alignmentData': alignmentData,
     });
-  }
-
-  /// Format raw lyrics with section tags like [Verse 1], [Chorus], etc.
-  String _formatLyricsWithTags(String rawLyrics, String title, String author) {
-    final buffer = StringBuffer();
-
-    // Add metadata header
-    if (title.isNotEmpty) buffer.writeln('Title: $title');
-    if (author.isNotEmpty) buffer.writeln('Author: $author');
-    if (buffer.isNotEmpty) buffer.writeln();
-
-    // Split into stanzas by blank lines
-    final stanzas = rawLyrics.split(RegExp(r'\n\s*\n'));
-
-    int verseCount = 1;
-    bool hasChorus = false;
-    String? chorusText;
-
-    for (int i = 0; i < stanzas.length; i++) {
-      final stanza = stanzas[i].trim();
-      if (stanza.isEmpty) continue;
-
-      // Detect if this stanza looks like a chorus (repeats)
-      if (!hasChorus && i < stanzas.length - 1) {
-        // Simple heuristic: shorter stanzas that repeat might be choruses
-        final nextStanzas = stanzas.sublist(i + 1);
-        if (nextStanzas.any((s) => s.trim() == stanza)) {
-          hasChorus = true;
-          chorusText = stanza;
-          buffer.writeln('[Chorus]');
-          buffer.writeln(stanza);
-          buffer.writeln();
-          continue;
-        }
-      }
-
-      // Check if this is a repeat of the chorus
-      if (hasChorus && stanza == chorusText) {
-        buffer.writeln('[Chorus]');
-        buffer.writeln(stanza);
-        buffer.writeln();
-        continue;
-      }
-
-      // Otherwise it's a verse
-      buffer.writeln('[Verse $verseCount]');
-      buffer.writeln(stanza);
-      buffer.writeln();
-      verseCount++;
-    }
-
-    return buffer.toString().trim();
   }
 
   Widget _buildOptionCard({
@@ -261,27 +240,159 @@ class _NewShowDialogState extends State<NewShowDialog> {
           ),
         );
       } else {
-        content = SizedBox(
-          height: 300,
-          child: ListView.separated(
-            itemCount: _searchResults!.length,
-            separatorBuilder: (_, __) =>
-                const Divider(height: 1, color: Colors.white12),
-            itemBuilder: (context, index) {
-              final song = _searchResults![index];
-              return ListTile(
-                title: Text(
-                  song.title,
-                  style: const TextStyle(color: Colors.white),
+        content = Expanded(
+          child: Column(
+            children: [
+              // Source Filter Chips
+              Container(
+                height: 48,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    FilterChip(
+                      label: const Text('All'),
+                      selected: _sourceFilter == null,
+                      onSelected: (selected) {
+                        setState(() => _sourceFilter = null);
+                        _performWebSearch();
+                      },
+                      backgroundColor: Colors.white10,
+                      selectedColor: AppPalette.accent.withOpacity(0.3),
+                      labelStyle: TextStyle(
+                        color: _sourceFilter == null
+                            ? Colors.white
+                            : Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    FilterChip(
+                      label: const Text('LRCLIB'),
+                      selected: _sourceFilter == 'lrclib',
+                      onSelected: (selected) {
+                        setState(() => _sourceFilter = 'lrclib');
+                        _performWebSearch();
+                      },
+                      backgroundColor: Colors.white10,
+                      selectedColor: Colors.green.withOpacity(0.3),
+                      labelStyle: TextStyle(
+                        color: _sourceFilter == 'lrclib'
+                            ? Colors.white
+                            : Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    FilterChip(
+                      label: const Text('Genius'),
+                      selected: _sourceFilter == 'genius',
+                      onSelected: (selected) {
+                        setState(() => _sourceFilter = 'genius');
+                        _performWebSearch();
+                      },
+                      backgroundColor: Colors.white10,
+                      selectedColor: Colors.amber.withOpacity(0.3),
+                      labelStyle: TextStyle(
+                        color: _sourceFilter == 'genius'
+                            ? Colors.white
+                            : Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
-                subtitle: Text(
-                  song.author,
-                  style: const TextStyle(color: Colors.white70),
+              ),
+              const Divider(height: 1, color: Colors.white12),
+              Expanded(
+                child: ListView.separated(
+                  itemCount: _searchResults!.length,
+                  separatorBuilder: (_, __) =>
+                      const Divider(height: 1, color: Colors.white12),
+                  itemBuilder: (context, index) {
+                    final song = _searchResults![index];
+
+                    // Determine source color
+                    Color sourceColor = Colors.grey;
+                    if (song.source == 'lrclib') {
+                      sourceColor = Colors.green;
+                    } else if (song.source == 'genius') {
+                      sourceColor = Colors.amber;
+                    }
+
+                    return ListTile(
+                      title: Text(
+                        song.title,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      subtitle: Text(
+                        song.author,
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                      leading: Icon(
+                        song.hasSyncedLyrics
+                            ? Icons.mic_external_on
+                            : Icons.music_note,
+                        color: song.hasSyncedLyrics
+                            ? Colors.greenAccent
+                            : AppPalette.accent,
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (song.hasSyncedLyrics) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.greenAccent.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: Colors.greenAccent.withOpacity(0.5),
+                                ),
+                              ),
+                              child: const Text(
+                                'SYNCED',
+                                style: TextStyle(
+                                  color: Colors.greenAccent,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: sourceColor.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(
+                                color: sourceColor.withOpacity(0.5),
+                              ),
+                            ),
+                            child: Text(
+                              song.source.toUpperCase(),
+                              style: TextStyle(
+                                color: sourceColor,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () => _selectSongAndOpenQuickLyrics(song),
+                    );
+                  },
                 ),
-                leading: const Icon(Icons.music_note, color: AppPalette.accent),
-                onTap: () => _selectSongAndOpenQuickLyrics(song),
-              );
-            },
+              ),
+            ],
           ),
         );
       }
@@ -359,6 +470,7 @@ class _NewShowDialogState extends State<NewShowDialog> {
                           setState(() {
                             _isSearching = false;
                             _searchResults = null;
+                            _sourceFilter = null;
                           });
                         },
                       )
@@ -406,6 +518,7 @@ class _NewShowDialogState extends State<NewShowDialog> {
             ),
             const SizedBox(height: 24),
             content,
+            const SizedBox(height: 12),
           ],
         ),
       ),

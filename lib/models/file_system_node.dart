@@ -40,6 +40,7 @@ class ProjectNode extends FileSystemNode {
   // Metadata specific to a project container
   final String? projectFilePath;
   final String? category; // Retained for backward compatibility/export
+  bool isExpanded; // UI state for showing child shows inline
 
   ProjectNode({
     required String id,
@@ -47,6 +48,7 @@ class ProjectNode extends FileSystemNode {
     String? parentId,
     this.projectFilePath,
     this.category,
+    this.isExpanded = false,
   }) : super(id: id, name: name, parentId: parentId, type: NodeType.project);
 
   @override
@@ -57,6 +59,7 @@ class ProjectNode extends FileSystemNode {
     'type': type.toString(),
     'projectFilePath': projectFilePath,
     'category': category,
+    'isExpanded': isExpanded,
   };
 
   factory ProjectNode.fromJson(Map<String, dynamic> json) {
@@ -66,6 +69,7 @@ class ProjectNode extends FileSystemNode {
       parentId: json['parentId'],
       projectFilePath: json['projectFilePath'],
       category: json['category'],
+      isExpanded: (json['isExpanded'] as bool?) ?? false,
     );
   }
 }

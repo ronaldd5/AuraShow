@@ -8,12 +8,15 @@ class QuickLyricsDialog extends StatefulWidget {
   final String? initialName;
   final String? initialCategory;
   final String? initialLyrics;
+  final bool
+  canGoBack; // If true, show a back button to return to search results
 
   const QuickLyricsDialog({
     Key? key,
     this.initialName,
     this.initialCategory,
     this.initialLyrics,
+    this.canGoBack = false,
   }) : super(key: key);
 
   @override
@@ -257,6 +260,13 @@ class _QuickLyricsDialogState extends State<QuickLyricsDialog> {
             // Header
             Row(
               children: [
+                if (widget.canGoBack)
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.white70),
+                    tooltip: 'Back to search results',
+                    onPressed: () =>
+                        Navigator.of(context).pop({'mode': 'go_back'}),
+                  ),
                 const Text(
                   'Quick Lyrics',
                   style: TextStyle(

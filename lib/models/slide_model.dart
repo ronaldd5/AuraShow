@@ -641,6 +641,8 @@ class SlideContent {
     this.maxLinesPerSlide,
     this.groupColor,
     this.triggerTime,
+    this.audioPath,
+    this.alignmentData,
   }) : layers = layers ?? const [],
        createdAt = createdAt ?? DateTime.now(),
        modifiedAt = modifiedAt ?? DateTime.now();
@@ -700,6 +702,8 @@ class SlideContent {
   int? maxLinesPerSlide;
   Color? groupColor;
   Duration? triggerTime;
+  String? audioPath;
+  String? alignmentData;
 
   static const _unset = Object();
   Map<String, dynamic> toJson() => {
@@ -757,6 +761,8 @@ class SlideContent {
     'sizingMode': sizingMode?.name,
     'maxLinesPerSlide': maxLinesPerSlide,
     'groupColor': groupColor?.value,
+    'audioPath': audioPath,
+    'alignmentData': alignmentData,
   };
 
   SlideContent copyWith({
@@ -815,6 +821,8 @@ class SlideContent {
     int? maxLinesPerSlide,
     Color? groupColor,
     Object? triggerTime = _unset,
+    Object? audioPath = _unset,
+    Object? alignmentData = _unset,
   }) {
     return SlideContent(
       id: id ?? this.id,
@@ -883,6 +891,12 @@ class SlideContent {
       triggerTime: identical(triggerTime, _unset)
           ? this.triggerTime
           : triggerTime as Duration?,
+      audioPath: identical(audioPath, _unset)
+          ? this.audioPath
+          : audioPath as String?,
+      alignmentData: identical(alignmentData, _unset)
+          ? this.alignmentData
+          : alignmentData as String?,
     );
   }
 
@@ -996,6 +1010,8 @@ class SlideContent {
       triggerTime: json['triggerTime'] != null
           ? Duration(milliseconds: json['triggerTime'])
           : null,
+      audioPath: json['audioPath'] as String?,
+      alignmentData: json['alignmentData'] as String?,
     );
   }
 }

@@ -46,6 +46,8 @@ class ProjectionSlide {
     this.contrast,
     this.saturate,
     this.rotation,
+    this.audioPath,
+    this.alignmentData,
     List<ProjectionLayer>? layers,
   }) : layers = layers ?? const [];
 
@@ -89,6 +91,8 @@ class ProjectionSlide {
   final double? contrast;
   final double? saturate;
   final double? rotation;
+  final String? audioPath;
+  final String? alignmentData;
   final List<ProjectionLayer> layers;
 
   factory ProjectionSlide.fromJson(Map<String, dynamic> json) {
@@ -144,6 +148,8 @@ class ProjectionSlide {
       contrast: numToDouble(json['contrast']),
       saturate: numToDouble(json['saturate']),
       rotation: numToDouble(json['rotation']),
+      audioPath: json['audioPath'] as String?,
+      alignmentData: json['alignmentData'] as String?,
       layers: () {
         debugPrint(
           'proj: parsing layers, json[layers]=${json['layers']?.runtimeType} length=${(json['layers'] as List?)?.length ?? 0}',

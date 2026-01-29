@@ -101,13 +101,45 @@ extension OutputExtensions on DashboardScreenState {
           nextSlideJson = nextPayload['slide'];
         }
 
+        // Apply Style Profile Modifications
+        SlideContent effectiveSlide = slide;
+        if (output.styleProfile == OutputStyleProfile.streamLowerThird) {
+          effectiveSlide = slide.copyWith(
+            alignOverride: TextAlign.center,
+            verticalAlign: VerticalAlign.bottom,
+            boxHeight: lowerThirdHeight.toDouble(),
+            boxBackgroundColor: lowerThirdGradient
+                ? Colors.black.withOpacity(0.7)
+                : null,
+          );
+        }
+
+        // Re-calculate payload base with effective slide
+        final effectivePayloadBase = _buildProjectionPayload(
+          effectiveSlide,
+          template,
+        );
+
+        // Apply Layer Logic
+        final overrides = output.layerOverrides ?? {};
+        final effBackground =
+            outputBackgroundActive && (overrides['background'] ?? true);
+        final effForeground =
+            outputForegroundMediaActive &&
+            (overrides['foreground_media'] ?? true);
+        final effSlide = slideLayerActive && (overrides['slide_text'] ?? true);
+        final effOverlay =
+            outputOverlayActive && (overrides['overlay'] ?? true);
+        final effAudio = outputAudioActive && (overrides['audio'] ?? true);
+        final effTimer = outputTimerActive && (overrides['timer'] ?? true);
+
         final payload = {
           'stageLayout': stageLayoutJson,
           'nextSlide': nextSlideJson,
           'stageTimerTarget': stageTimerTarget?.toIso8601String(),
           'stageTimerDuration': stageTimerDuration.inSeconds,
           'stageMessage': stageMessage,
-          ...payloadBase,
+          ...effectivePayloadBase,
           'output': {
             ...output.toJson(),
             'lowerThirdHeight': lowerThirdHeight,
@@ -117,12 +149,12 @@ extension OutputExtensions on DashboardScreenState {
           },
           'state': {
             'layers': {
-              'background': outputBackgroundActive,
-              'foregroundMedia': outputForegroundMediaActive,
-              'slide': slideLayerActive,
-              'overlay': outputOverlayActive,
-              'audio': outputAudioActive,
-              'timer': outputTimerActive,
+              'background': effBackground,
+              'foregroundMedia': effForeground,
+              'slide': effSlide,
+              'overlay': effOverlay,
+              'audio': effAudio,
+              'timer': effTimer,
             },
             'locked': locked,
             'transition': outputTransition,
@@ -138,7 +170,7 @@ extension OutputExtensions on DashboardScreenState {
           runtime.locked = locked;
           runtime.disconnected = false;
           runtime.ndi =
-              output.destination == OutputDestination.ndi || enableNdiOutput;
+              output.destination == OutputDestination.ndi || output.enableNdi;
           runtime.headless = true;
           _outputRuntime[output.id] = runtime;
           _headlessOutputPayloads[output.id] = payload;
@@ -152,7 +184,7 @@ extension OutputExtensions on DashboardScreenState {
         if (delivered) {
           final runtime =
               _outputRuntime[output.id] ??
-              _OutputRuntimeState(ndi: enableNdiOutput);
+              _OutputRuntimeState(ndi: output.enableNdi);
           runtime.active = true;
           runtime.locked = locked;
           runtime.headless = false;
@@ -263,6 +295,46 @@ extension OutputExtensions on DashboardScreenState {
 
   Future<Rect?> _resolveOutputFrame(OutputConfig output) async {
     try {
+      // 1. Try to find the matching LiveDevice from our trusted DeviceService list
+      final allScreens = DeviceService.instance.screens;
+      LiveDevice? match;
+
+      if (output.targetScreenId != null) {
+        match = allScreens.firstWhereOrNull(
+          (s) => s.id == output.targetScreenId,
+        );
+      }
+
+      // If no match found (or not set), use secondary screen if available, else primary
+      if (match == null) {
+        if (allScreens.length > 1) {
+          match = allScreens[1];
+        } else if (allScreens.isNotEmpty) {
+          match = allScreens.first;
+        }
+      }
+
+      // If we found a match with trusted bounds, use them
+      if (match != null && match.bounds != null) {
+        final frame = match.bounds!;
+        final double desiredWidth = _safeClamp(
+          (output.width ?? frame.width.toInt()).toDouble(),
+          320,
+          frame.width,
+        );
+        final double desiredHeight = _safeClamp(
+          (output.height ?? frame.height.toInt()).toDouble(),
+          240,
+          frame.height,
+        );
+        // Center in the display bounds
+        final double left = frame.left + (frame.width - desiredWidth) / 2;
+        final double top = frame.top + (frame.height - desiredHeight) / 2;
+
+        return Rect.fromLTWH(left, top, desiredWidth, desiredHeight);
+      }
+
+      // 2. Fallback to ScreenRetriever (OLD LOGIC)
       final displays = await ScreenRetriever.instance.getAllDisplays().timeout(
         const Duration(seconds: 3),
         onTimeout: () => [],
@@ -281,10 +353,21 @@ extension OutputExtensions on DashboardScreenState {
           }
         }
       }
-      target ??= displays.first;
+
+      // If no specific target set, prefer the second monitor (projector) if available
+      if (target == null) {
+        if (displays.length > 1) {
+          // Use the second monitor by default (index 1)
+          target = displays[1];
+        } else {
+          // Fallback to primary if only one monitor
+          target = displays.first;
+        }
+      }
 
       final pos = target.visiblePosition ?? Offset.zero;
-      final size = target.visibleSize ?? target.size ?? const Size(0, 0);
+      // Force Fullscreen: Use physical size, ignoring safe area (taskbar)
+      final size = target.size ?? target.visibleSize ?? const Size(0, 0);
       final frame = Rect.fromLTWH(
         pos.dx,
         pos.dy,
@@ -334,6 +417,11 @@ extension OutputExtensions on DashboardScreenState {
             return false;
           }
           window.setTitle(output.name);
+
+          // Make window "headless" - no controls
+          // window.setTitleBarVisibility(false); // Invalid on WindowController
+          // window.setHasShadow(false); // Invalid on WindowController
+
           // Safety delay for macOS: ensure window is ready before setFrame/show
           await Future.delayed(const Duration(milliseconds: 200));
           await window.setFrame(
@@ -392,6 +480,11 @@ extension OutputExtensions on DashboardScreenState {
               return false;
             }
             window.setTitle(output.name);
+
+            // Make window "headless" - no controls
+            // window.setTitleBarVisibility(false); // Invalid on WindowController
+            // window.setHasShadow(false); // Invalid on WindowController
+
             // Safety delay for macOS: ensure window is ready before setFrame/show
             await Future.delayed(const Duration(milliseconds: 200));
             await window.setFrame(
@@ -464,17 +557,138 @@ extension OutputExtensions on DashboardScreenState {
   }
 
   void _addOutput() {
-    setState(() {
-      _outputs = [
-        ..._outputs,
-        OutputConfig.defaultAudience().copyWith(
-          id: 'output-${DateTime.now().microsecondsSinceEpoch}',
-          name: 'Output ${_outputs.length + 1}',
+    _showOutputTypeDialog();
+  }
+
+  /// Shows a dialog to choose between Normal and Stage output types
+  void _showOutputTypeDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: bgDark,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Container(
+          width: 340,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                children: [
+                  const Expanded(
+                    child: Text(
+                      'Choose output type',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white54,
+                      size: 20,
+                    ),
+                    onPressed: () => Navigator.pop(ctx),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // Output type options
+              Row(
+                children: [
+                  // Normal output
+                  Expanded(
+                    child: _outputTypeCard(
+                      ctx: ctx,
+                      icon: Icons.tv,
+                      label: 'Normal',
+                      isStage: false,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // Stage output
+                  Expanded(
+                    child: _outputTypeCard(
+                      ctx: ctx,
+                      icon: Icons.cast,
+                      label: 'Stage',
+                      isStage: true,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ];
+      ),
+    );
+  }
+
+  /// Card widget for output type selection
+  Widget _outputTypeCard({
+    required BuildContext ctx,
+    required IconData icon,
+    required String label,
+    required bool isStage,
+  }) {
+    return InkWell(
+      onTap: () {
+        Navigator.pop(ctx);
+        _createOutputOfType(isStage: isStage);
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white24),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: Colors.white, size: 48),
+            const SizedBox(height: 12),
+            Text(
+              label,
+              style: TextStyle(
+                color: isStage ? Colors.white : accentBlue,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Creates a new output of the specified type
+  void _createOutputOfType({required bool isStage}) {
+    final newId = 'output-${DateTime.now().microsecondsSinceEpoch}';
+    final outputNumber = _outputs.length + 1;
+
+    final newOutput = OutputConfig(
+      id: newId,
+      name: isStage ? 'Stage $outputNumber' : 'Output $outputNumber',
+      destination: OutputDestination.screen,
+      styleProfile: isStage
+          ? OutputStyleProfile.stageNotes
+          : OutputStyleProfile.audienceFull,
+      stageNotes: isStage,
+      visible: true,
+    );
+
+    setState(() {
+      _outputs = [..._outputs, newOutput];
       _ensureOutputVisibilityDefaults();
     });
-    // _saveOutputs();
   }
 
   void _updateOutput(OutputConfig updated) {
@@ -561,10 +775,14 @@ extension OutputExtensions on DashboardScreenState {
     }
 
     for (final id in _outputWindowIds.keys) {
+      final output = _outputs.firstWhere(
+        (o) => o.id == id,
+        orElse: () => OutputConfig.defaultAudience(),
+      );
       _outputRuntime[id] = _OutputRuntimeState(
         active: false,
         locked: false,
-        ndi: enableNdiOutput,
+        ndi: output.enableNdi,
         disconnected: false,
       );
     }
@@ -1397,5 +1615,50 @@ extension OutputExtensions on DashboardScreenState {
     } catch (_) {}
 
     return null;
+  }
+
+  Future<dynamic> handleOutputWindowMessage(
+    MethodCall call,
+    int fromWindowId,
+  ) async {
+    if (call.method == 'outputClosed') {
+      debugPrint(
+        'out: received outputClosed message from windowId=$fromWindowId',
+      );
+      final windowId = call.arguments['windowId'] as int?;
+      if (windowId != null) {
+        _handleOutputClosed(windowId);
+      }
+    }
+    return null;
+  }
+
+  void _handleOutputClosed(int windowId) {
+    // Find output ID by window ID
+    String? outputId;
+    _outputWindowIds.forEach((key, value) {
+      if (value == windowId) {
+        outputId = key;
+      }
+    });
+
+    if (outputId != null) {
+      debugPrint('out: syncing closed state for outputId=$outputId');
+      setState(() {
+        _outputWindowIds.remove(outputId);
+        final runtime = _outputRuntime[outputId] ?? _OutputRuntimeState();
+        runtime.active = false;
+        _outputRuntime[outputId!] = runtime;
+
+        // Also ensure presentation state is updated if no outputs remain
+        if (_outputWindowIds.isEmpty) {
+          _isPresenting = false;
+        }
+      });
+    } else {
+      debugPrint(
+        'out: warning - received close from unknown windowId=$windowId',
+      );
+    }
   }
 }

@@ -1,13 +1,5 @@
-Analyzing vocal_remover_service.dart...                         
+Analyzing lyrics_service.dart...                                
 
-   info - The imported package 'path' isn't a dependency of the importing package - lib\services\vocal_remover_service.dart:3:8 - depend_on_referenced_packages
-warning - Unused import: 'package:path_provider/path_provider.dart' - lib\services\vocal_remover_service.dart:4:8 - unused_import
-warning - The value of the local variable 'manualPath' isn't used - lib\services\vocal_remover_service.dart:75:13 - unused_local_variable
-  error - The method '_removeVocalsDemucs' isn't defined for the type 'VocalRemoverService' - lib\services\vocal_remover_service.dart:90:14 - undefined_method
-   info - Uses 'await' on an instance of 'Wav', which is not a subtype of 'Future' - lib\services\vocal_remover_service.dart:177:19 - await_only_futures
-  error - The argument type 'String' can't be assigned to the parameter type 'Uint8List'.  - lib\services\vocal_remover_service.dart:177:34 - argument_type_not_assignable
-  error - 2 positional arguments expected by 'Wav.new', but 1 found - lib\services\vocal_remover_service.dart:290:8 - not_enough_positional_arguments
-  error - The named parameter 'samplesPerSecond' isn't defined - lib\services\vocal_remover_service.dart:290:10 - undefined_named_parameter
-   info - Uses 'await' on an instance of 'Uint8List', which is not a subtype of 'Future' - lib\services\vocal_remover_service.dart:296:7 - await_only_futures
-  error - Too many positional arguments: 0 expected, but 1 found - lib\services\vocal_remover_service.dart:296:35 - extra_positional_arguments
+   info - The imported package 'path' isn't a dependency of the importing package - lib\services\lyrics_service.dart:11:8 - depend_on_referenced_packages
 
+1 issue found. (ran in 1.7s)

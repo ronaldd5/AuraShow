@@ -9,6 +9,7 @@ import 'background_media.dart';
 import 'projected_layer.dart';
 import '../../projection/widgets/scripture_display.dart';
 import '../../../core/utils/liturgy_renderer.dart';
+import '../../../widgets/karaoke_renderer.dart';
 
 /// Widget for rendering a fully-styled slide with all layers.
 ///
@@ -84,6 +85,7 @@ class StyledSlide extends StatefulWidget {
 
 class _StyledSlideState extends State<StyledSlide> {
   vp.VideoPlayerController? _vpController;
+  vp.VideoPlayerController? _audioController;
   bool _videoReady = false;
   int _currentHydrationId = 0;
 
@@ -93,7 +95,7 @@ class _StyledSlideState extends State<StyledSlide> {
     debugPrint(
       'proj: _StyledSlideState initState called, mediaPath=${widget.slide.mediaPath} mediaType=${widget.slide.mediaType}',
     );
-    _hydrateVideo();
+    _hydrateMedia();
   }
 
   @override
@@ -103,6 +105,10 @@ class _StyledSlideState extends State<StyledSlide> {
     final newPath = widget.slide.mediaPath;
     final oldType = oldWidget.slide.mediaType;
     final newType = widget.slide.mediaType;
+
+    final oldAudio = oldWidget.slide.audioPath;
+    final newAudio = widget.slide.audioPath;
+
     final oldPlaying = oldWidget.isPlaying;
     final newPlaying = widget.isPlaying;
     final oldPositionMs = oldWidget.videoPositionMs;
@@ -110,189 +116,152 @@ class _StyledSlideState extends State<StyledSlide> {
     final oldVolume = oldWidget.volume;
     final newVolume = widget.volume;
 
-    if (oldPath != newPath || oldType != newType) {
-      debugPrint('proj: media changed, re-hydrating video');
-      _disposeVideo();
-      _hydrateVideo();
+    if (oldPath != newPath || oldType != newType || oldAudio != newAudio) {
+      debugPrint('proj: media changed, re-hydrating');
+      _disposeMedia();
+      _hydrateMedia();
     } else if (oldPlaying != newPlaying) {
-      // Playing state changed - play or pause video
       _updatePlayState();
     } else if (newPlaying && (newPositionMs - oldPositionMs).abs() > 500) {
-      // Position changed significantly while playing - re-sync
       _updatePlayState();
     } else if (oldVolume != newVolume) {
       _vpController?.setVolume(newVolume);
+      _audioController?.setVolume(newVolume);
     }
   }
 
   @override
   void dispose() {
-    _disposeVideo();
+    _disposeMedia();
     super.dispose();
   }
 
-  void _disposeVideo() {
-    _currentHydrationId++; // Invalidate pending hydrations
+  void _disposeMedia() {
+    _currentHydrationId++;
     _videoReady = false;
     _vpController?.dispose();
     _vpController = null;
+    _audioController?.dispose();
+    _audioController = null;
   }
 
   void _updatePlayState() async {
-    final controller = _vpController;
-    if (controller == null || !controller.value.isInitialized) return;
+    final vCtl = _vpController;
+    final aCtl = _audioController;
+    if ((vCtl == null || !vCtl.value.isInitialized) &&
+        (aCtl == null || !aCtl.value.isInitialized))
+      return;
 
     if (widget.isPlaying) {
-      // Seek to synced position before playing for frame-accurate sync
       if (widget.videoPositionMs > 0) {
         final syncPosition = Duration(milliseconds: widget.videoPositionMs);
-        final currentPos = controller.value.position;
-        final drift = (syncPosition - currentPos).abs();
-        // Only seek if drift is > 500ms to avoid constant seeking
-        if (drift > const Duration(milliseconds: 500)) {
-          debugPrint(
-            'proj: syncing video position to ${widget.videoPositionMs}ms (drift=${drift.inMilliseconds}ms)',
-          );
-          await controller.seekTo(syncPosition);
+
+        // Sync Video
+        if (vCtl != null && vCtl.value.isInitialized) {
+          final drift = (syncPosition - vCtl.value.position).abs();
+          if (drift > const Duration(milliseconds: 500)) {
+            await vCtl.seekTo(syncPosition);
+          }
+        }
+        // Sync Audio
+        if (aCtl != null && aCtl.value.isInitialized) {
+          final drift = (syncPosition - aCtl.value.position).abs();
+          if (drift > const Duration(milliseconds: 500)) {
+            await aCtl.seekTo(syncPosition);
+          }
         }
       }
-      if (!controller.value.isPlaying) {
-        controller.play();
-        debugPrint('proj: background video started playing');
+
+      if (vCtl != null && vCtl.value.isInitialized && !vCtl.value.isPlaying) {
+        vCtl.play();
+      }
+      if (aCtl != null && aCtl.value.isInitialized && !aCtl.value.isPlaying) {
+        aCtl.play();
       }
     } else {
-      if (controller.value.isPlaying) {
-        controller.pause();
-        debugPrint('proj: background video paused');
-      }
+      if (vCtl != null && vCtl.value.isPlaying) vCtl.pause();
+      if (aCtl != null && aCtl.value.isPlaying) aCtl.pause();
     }
   }
 
-  Future<void> _hydrateVideo() async {
+  Future<void> _hydrateMedia() async {
     final hydrationId = ++_currentHydrationId;
-    debugPrint(
-      'proj: _hydrateVideo called id=$hydrationId, kEnableProjectionVideo=$kEnableProjectionVideo',
-    );
-    if (!kEnableProjectionVideo) {
-      debugPrint(
-        'proj: background video disabled (AURASHOW_ENABLE_PROJECTION_VIDEO=false)',
+    if (!kEnableProjectionVideo) return;
+
+    final bgPath = widget.slide.mediaPath;
+    final bgType = widget.slide.mediaType;
+    final audioPath = widget.slide.audioPath;
+
+    // 1. Hydrate Background Video
+    if (bgPath != null && bgPath.isNotEmpty && bgType == 'video') {
+      final hasDuplicateForeground = widget.slide.layers.any(
+        (l) =>
+            l.role == 'foreground' &&
+            l.path == bgPath &&
+            (l.mediaType == 'video' || bgType == 'video'),
       );
-      return;
-    }
-    final path = widget.slide.mediaPath;
-    final type = widget.slide.mediaType;
-    debugPrint('proj: _hydrateVideo checking path=$path type=$type');
-    if (path == null || path.isEmpty || type != 'video') {
-      debugPrint(
-        'proj: _hydrateVideo skipping - path null/empty or type!=video',
-      );
-      return;
-    }
 
-    // Check if the same video exists as a foreground layer
-    // This prevents double-initialization of video players for the same file, which can crash the app
-    final hasDuplicateForeground = widget.slide.layers.any(
-      (l) =>
-          l.role == 'foreground' &&
-          l.path == path &&
-          (l.mediaType == 'video' || type == 'video'),
-    );
+      if (!hasDuplicateForeground) {
+        final file = File(bgPath);
+        if (await file.exists()) {
+          await VideoInitQueue.instance.enqueue(() async {
+            if (!mounted || hydrationId != _currentHydrationId) return;
+            try {
+              // Reuse preloaded or create new
+              vp.VideoPlayerController? controller;
+              if (StyledSlide._preloaded.containsKey(bgPath)) {
+                controller = StyledSlide._preloaded.remove(bgPath);
+              } else {
+                await Future.delayed(const Duration(milliseconds: 300));
+                if (!mounted || hydrationId != _currentHydrationId) return;
+                controller = vp.VideoPlayerController.file(file);
+                await controller.initialize();
+              }
 
-    if (hasDuplicateForeground) {
-      debugPrint(
-        'proj: skipping background video hydration - duplicate found in foreground layers',
-      );
-      return;
-    }
+              if (controller == null) return;
+              _vpController = controller;
 
-    // Verify file exists before attempting to create controller
-    final file = File(path);
-    if (!await file.exists()) {
-      debugPrint('proj: background video file not found path=$path');
-      return;
-    }
+              if (!mounted || hydrationId != _currentHydrationId) {
+                controller.dispose();
+                return;
+              }
 
-    if (hydrationId != _currentHydrationId) return;
+              await controller.setLooping(true);
+              await controller.setVolume(widget.volume);
+              if (widget.isPlaying) await controller.play();
 
-    debugPrint('proj: hydrate background video path=$path id=$hydrationId');
-
-    // Use the queue to serialize video initialization
-    await VideoInitQueue.instance.enqueue(() async {
-      if (!mounted || hydrationId != _currentHydrationId) return;
-
-      try {
-        vp.VideoPlayerController? controller;
-
-        // Check preloaded cache first
-        if (StyledSlide._preloaded.containsKey(path)) {
-          debugPrint('proj: using preloaded controller for path=$path');
-          controller = StyledSlide._preloaded.remove(path);
-          // Skip the 300ms delay for preloaded content
-        } else {
-          // Delay to allow the secondary engine/window to finish its first frame (only for fresh loads)
-          await Future.delayed(const Duration(milliseconds: 300));
-          if (!mounted || hydrationId != _currentHydrationId) return;
-
-          controller = vp.VideoPlayerController.file(file);
-          await controller.initialize().timeout(const Duration(seconds: 8));
+              setState(() => _videoReady = true);
+            } catch (e) {
+              debugPrint('proj: bg video error $e');
+              if (hydrationId == _currentHydrationId) _vpController?.dispose();
+            }
+          });
         }
-
-        if (controller == null) return; // Should not happen
-
-        _vpController = controller;
-
-        if (!mounted || hydrationId != _currentHydrationId) {
-          try {
-            // Only dispose if we created it or took ownership
-            controller.dispose();
-          } catch (_) {}
-          return;
-        }
-
-        if (!controller.value.isInitialized) {
-          // Fallback if preloaded but not init (unlikely) or just created
-          // If we came from preload, it should be init.
-        }
-
-        await controller.setLooping(true);
-        await controller.setVolume(widget.volume);
-
-        // Check again before playing
-        if (hydrationId != _currentHydrationId) {
-          try {
-            controller.dispose();
-          } catch (_) {}
-          return;
-        }
-
-        // Only start playing if isPlaying is true
-        if (widget.isPlaying) {
-          await controller.play();
-          debugPrint('proj: background video ready and playing (video_player)');
-        } else {
-          debugPrint(
-            'proj: background video ready but paused (isPlaying=false)',
-          );
-        }
-
-        if (!mounted || hydrationId != _currentHydrationId) {
-          try {
-            controller.dispose();
-          } catch (_) {}
-          return;
-        }
-        setState(() => _videoReady = true);
-      } on TimeoutException catch (_) {
-        debugPrint(
-          'proj: hydrate background video timed out; skipping playback',
-        );
-        if (hydrationId == _currentHydrationId) _disposeVideo();
-      } catch (e, st) {
-        debugPrint('proj: hydrate background video failed error=$e');
-        debugPrint('$st');
-        if (hydrationId == _currentHydrationId) _disposeVideo();
       }
-    });
+    }
+
+    // 2. Hydrate Audio Track
+    if (audioPath != null && audioPath.isNotEmpty) {
+      final file = File(audioPath);
+      if (await file.exists()) {
+        await VideoInitQueue.instance.enqueue(() async {
+          if (!mounted || hydrationId != _currentHydrationId) return;
+          try {
+            final controller = vp.VideoPlayerController.file(file);
+            await controller.initialize();
+            if (!mounted || hydrationId != _currentHydrationId) {
+              controller.dispose();
+              return;
+            }
+            _audioController = controller;
+            await controller.setVolume(widget.volume); // Backing track volume
+            if (widget.isPlaying) await controller.play();
+          } catch (e) {
+            debugPrint('proj: audio track error $e');
+          }
+        });
+      }
+    }
   }
 
   @override
@@ -500,13 +469,42 @@ class _StyledSlideState extends State<StyledSlide> {
                     (slide.boxBorderRadius ?? 0).toDouble(),
                   ),
                 ),
-                child: LiturgyTextRenderer.build(
-                  _applyTransform(slide.body, slide.textTransform),
-                  align: align,
-                  style: textStyle,
-                  maxLines: maxLines.clamp(1, 24).toInt(),
-                  overflow: TextOverflow.ellipsis,
-                ),
+                child: (slide.alignmentData?.isNotEmpty ?? false)
+                    ? KaraokePlaybackBuilder(
+                        controller: _audioController ?? _vpController,
+                        builder: (context, time) {
+                          // If local playback is active, use the high-freq time
+                          // Otherwise fall back to the prop (for pause/seek updates)
+                          final isPlaying =
+                              (_audioController?.value.isPlaying ?? false) ||
+                              (_vpController?.value.isPlaying ?? false);
+                          final effectiveTime = isPlaying
+                              ? time
+                              : Duration(milliseconds: widget.videoPositionMs);
+
+                          return KaraokeTextRenderer(
+                            text: _applyTransform(
+                              slide.body,
+                              slide.textTransform,
+                            ),
+                            alignmentData: slide.alignmentData,
+                            currentTime: effectiveTime,
+                            style: textStyle.copyWith(
+                              color: textColor?.withOpacity(0.5) ?? Colors.grey,
+                            ),
+                            activeColor: textColor ?? Colors.white,
+                            inactiveColor:
+                                textColor?.withOpacity(0.5) ?? Colors.grey,
+                          );
+                        },
+                      )
+                    : LiturgyTextRenderer.build(
+                        _applyTransform(slide.body, slide.textTransform),
+                        align: align,
+                        style: textStyle,
+                        maxLines: maxLines.clamp(1, 24).toInt(),
+                        overflow: TextOverflow.ellipsis,
+                      ),
               ),
             ),
           ),

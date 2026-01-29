@@ -8,6 +8,10 @@ class Song {
   String copyright;
   String ccli;
   String content; // Raw text content with stanzas separated by double newlines
+  String? audioPath;
+  String? alignmentData; // JSON map of syllable timing
+  bool hasSyncedLyrics; // True if LRC timing data is available
+  String source; // Source provider: 'lrclib', 'genius', 'local', etc.
 
   Song({
     required this.id,
@@ -16,6 +20,10 @@ class Song {
     this.copyright = '',
     this.ccli = '',
     this.content = '',
+    this.audioPath,
+    this.alignmentData,
+    this.hasSyncedLyrics = false,
+    this.source = 'local',
   });
 
   factory Song.create({required String title}) {
@@ -28,6 +36,10 @@ class Song {
     String? copyright,
     String? ccli,
     String? content,
+    String? audioPath,
+    String? alignmentData,
+    bool? hasSyncedLyrics,
+    String? source,
   }) {
     return Song(
       id: id,
@@ -36,6 +48,10 @@ class Song {
       copyright: copyright ?? this.copyright,
       ccli: ccli ?? this.ccli,
       content: content ?? this.content,
+      audioPath: audioPath ?? this.audioPath,
+      alignmentData: alignmentData ?? this.alignmentData,
+      hasSyncedLyrics: hasSyncedLyrics ?? this.hasSyncedLyrics,
+      source: source ?? this.source,
     );
   }
 
@@ -47,6 +63,10 @@ class Song {
       'copyright': copyright,
       'ccli': ccli,
       'content': content,
+      'audioPath': audioPath,
+      'alignmentData': alignmentData,
+      'hasSyncedLyrics': hasSyncedLyrics,
+      'source': source,
     };
   }
 
@@ -58,6 +78,10 @@ class Song {
       copyright: map['copyright'] ?? '',
       ccli: map['ccli'] ?? '',
       content: map['content'] ?? '',
+      audioPath: map['audioPath'],
+      alignmentData: map['alignmentData'],
+      hasSyncedLyrics: map['hasSyncedLyrics'] ?? false,
+      source: map['source'] ?? 'local',
     );
   }
 

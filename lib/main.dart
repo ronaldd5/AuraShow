@@ -11,6 +11,9 @@ import 'package:window_manager/window_manager.dart';
 import 'platforms/windows/windows_init.dart' deferred as win_init;
 import 'platforms/macos/macos_init.dart' deferred as mac_init;
 
+// NATIVE WIN32
+import 'package:win32/win32.dart' as win32;
+
 import 'app.dart';
 import 'screens/projection/projection.dart';
 
@@ -34,6 +37,10 @@ Future<void> main(List<String> args) async {
           await mac_init.loadLibrary();
           mac_init.registerPlatformWebview();
         }
+
+        // Initialize WindowManager for the secondary window
+        // REMOVED (Caused crash)
+        // await windowManager.ensureInitialized(); ...
 
         // Fix: Use 'initialData' instead of 'args'
         runApp(ProjectionWindow(windowId: windowId, initialData: argument));

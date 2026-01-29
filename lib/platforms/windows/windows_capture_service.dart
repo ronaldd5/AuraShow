@@ -178,46 +178,102 @@ class WindowsCaptureService implements CapturePlatform {
     return false;
   }
 
+  // Use EnumDisplayMonitors to get actual multi-monitor info
   void _enumerateDisplaysSimple() {
     try {
-      final width = GetSystemMetrics(SM_CXSCREEN);
-      final height = GetSystemMetrics(SM_CYSCREEN);
+      _cachedDisplays.clear();
+      _collectedDisplays.clear();
 
-      _cachedDisplays.add(
-        DisplayInfo(
-          handle: 0,
-          name: 'Primary Display',
-          left: 0,
-          top: 0,
-          width: width,
-          height: height,
-          isPrimary: true,
-        ),
+      final callback = Pointer.fromFunction<MonitorEnumProc>(
+        _monitorEnumProc,
+        TRUE,
       );
 
-      final vWidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-      final vHeight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-      final vLeft = GetSystemMetrics(SM_XVIRTUALSCREEN);
-      final vTop = GetSystemMetrics(SM_YVIRTUALSCREEN);
+      // Enumerate
+      EnumDisplayMonitors(NULL, nullptr, callback, 0);
 
-      if (vWidth > width || vHeight > height) {
-        _cachedDisplays.insert(
-          0,
+      // If for some reason we found nothing, fallback to primary
+      if (_collectedDisplays.isEmpty) {
+        final width = GetSystemMetrics(SM_CXSCREEN);
+        final height = GetSystemMetrics(SM_CYSCREEN);
+        _cachedDisplays.add(
           DisplayInfo(
-            handle: -1,
-            name: 'All Displays',
-            left: vLeft,
-            top: vTop,
-            width: vWidth,
-            height: vHeight,
-            isPrimary: false,
+            handle: 0,
+            name: 'Primary Display',
+            left: 0,
+            top: 0,
+            width: width,
+            height: height,
+            isPrimary: true,
           ),
         );
+      } else {
+        // Sort by X position
+        _collectedDisplays.sort((a, b) => a.left.compareTo(b.left));
+
+        // Rename them to "Display 1", "Display 2", etc.
+        for (int i = 0; i < _collectedDisplays.length; i++) {
+          final d = _collectedDisplays[i];
+          // Create a new DisplayInfo with friendly name
+          _cachedDisplays.add(
+            DisplayInfo(
+              handle: d.handle,
+              name: 'Display ${i + 1}',
+              left: d.left,
+              top: d.top,
+              width: d.width,
+              height: d.height,
+              isPrimary: d.isPrimary,
+            ),
+          );
+        }
       }
+      _collectedDisplays.clear();
     } catch (e) {
       debugPrint('WindowsCaptureService: Error enumerating displays: $e');
     }
   }
+
+  static int _monitorEnumProc(
+    int hMonitor,
+    int hDC,
+    Pointer lpRect,
+    int lParam,
+  ) {
+    final monitorInfo = calloc<MONITORINFOEX>();
+    // Set size of structure. Note: cbSize is inside the nested monitorInfo struct.
+    monitorInfo.ref.monitorInfo.cbSize = sizeOf<MONITORINFOEX>();
+
+    // Cast to Pointer<MONITORINFO> because EnumDisplayMonitors expects it
+    if (GetMonitorInfo(hMonitor, monitorInfo.cast<MONITORINFO>()) == TRUE) {
+      // Access nested struct for rect and flags
+      final rect = monitorInfo.ref.monitorInfo.rcMonitor;
+      final isPrimary =
+          (monitorInfo.ref.monitorInfo.dwFlags & MONITORINFOF_PRIMARY) != 0;
+
+      final width = rect.right - rect.left;
+      final height = rect.bottom - rect.top;
+
+      // Device Name is directly on MONITORINFOEX
+      final name = monitorInfo.ref.szDevice;
+
+      _collectedDisplays.add(
+        DisplayInfo(
+          handle: hMonitor,
+          name: name,
+          left: rect.left,
+          top: rect.top,
+          width: width,
+          height: height,
+          isPrimary: isPrimary,
+        ),
+      );
+    }
+    free(monitorInfo);
+    return TRUE;
+  }
+
+  static final List<DisplayInfo> _collectedDisplays = [];
 
   @override
   Future<Uint8List?> captureWindow(

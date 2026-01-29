@@ -12,6 +12,7 @@ extension ProjectExtensions on DashboardScreenState {
       'folders': folders,
       'showCategories': showCategories,
       'playlists': playlists,
+      'preShowPlaylists': _preshowPlaylists.map((p) => p.toJson()).toList(),
       'projects': projects,
       'slides': _slides.map((s) => s.toJson()).toList(),
       'styles': _styles.map((s) => s.toJson()).toList(),
@@ -229,6 +230,12 @@ extension ProjectExtensions on DashboardScreenState {
         }
         if (decoded.containsKey('projects')) {
           projects = List<String>.from(decoded['projects']);
+        }
+        if (decoded.containsKey('preShowPlaylists')) {
+          final list = decoded['preShowPlaylists'] as List;
+          _preshowPlaylists = list
+              .map((e) => PreShowPlaylist.fromJson(e))
+              .toList();
         }
       });
 
@@ -474,6 +481,9 @@ extension ProjectExtensions on DashboardScreenState {
   }
 
   Widget _buildProjectNodeTile(ProjectNode project, int depth) {
+    // Get children (shows) of this project
+    final showsInProject = getChildren(project.id);
+
     // Draggable wrapper for moving
     return Draggable<String>(
       data: project.id,
@@ -493,28 +503,81 @@ extension ProjectExtensions on DashboardScreenState {
       ),
       childWhenDragging: Opacity(
         opacity: 0.5,
-        child: _renderProjectRowContent(project, depth),
+        child: _renderProjectRowContent(project, depth, showsInProject.length),
       ),
-      child: _renderProjectRowContent(project, depth),
+      child: Column(
+        children: [
+          _renderProjectRowContent(project, depth, showsInProject.length),
+          // Show child shows inline when expanded
+          if (project.isExpanded)
+            ...showsInProject.map(
+              (showNode) => _buildShowNodeTile(showNode as ShowNode, depth + 1),
+            ),
+        ],
+      ),
     );
   }
 
-  Widget _renderProjectRowContent(ProjectNode project, int depth) {
+  /// Render a single show node (opens in center panel when clicked)
+  Widget _buildShowNodeTile(ShowNode show, int depth) {
+    final isActive = _activeShow?.id == show.id;
+
+    return InkWell(
+      onTap: () => _openShow(show),
+      child: Container(
+        padding: EdgeInsets.only(
+          left: 12.0 + (depth * 16),
+          right: 12,
+          top: 6,
+          bottom: 6,
+        ),
+        decoration: BoxDecoration(
+          color: isActive
+              ? AppPalette.accent.withValues(alpha: 0.3)
+              : Colors.transparent,
+          border: Border(bottom: BorderSide(color: Colors.white10)),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.slideshow,
+              size: 14,
+              color: isActive ? Colors.white : AppPalette.accent,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                show.name,
+                style: TextStyle(
+                  color: isActive ? Colors.white : Colors.white70,
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _renderProjectRowContent(
+    ProjectNode project,
+    int depth,
+    int childCount,
+  ) {
     // Legacy support: finding index in flat list for selection highlight
     final globalIndex = shows.indexWhere((s) => s.name == project.name);
     final selected = selectedShowIndex == globalIndex;
 
     return InkWell(
       onTap: () {
+        // Toggle expansion to show child shows inline
         setState(() {
+          project.isExpanded = !project.isExpanded;
           if (globalIndex != -1) {
             selectedShowIndex = globalIndex;
           }
-          // Trigger drill-down regardless of legacy index
-          _activeProjectView = ShowItem(
-            name: project.name,
-            category: project.category,
-          );
         });
       },
       onSecondaryTapDown: (d) {
@@ -550,8 +613,26 @@ extension ProjectExtensions on DashboardScreenState {
                 ),
               ),
             ),
-            // Drill-down indicator
-            const Icon(Icons.chevron_right, color: Colors.white24, size: 16),
+            // Show count badge if has children
+            if (childCount > 0)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                margin: const EdgeInsets.only(right: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$childCount',
+                  style: const TextStyle(color: Colors.white54, fontSize: 11),
+                ),
+              ),
+            // Expand/collapse indicator
+            Icon(
+              project.isExpanded ? Icons.expand_less : Icons.chevron_right,
+              color: Colors.white24,
+              size: 16,
+            ),
           ],
         ),
       ),
@@ -1001,12 +1082,38 @@ extension ProjectExtensions on DashboardScreenState {
           initialName: name,
           initialCategory: category,
           initialLyrics: prefilledLyrics,
+          canGoBack: true, // Allow user to go back to search results
         ),
       );
+
+      // Handle "go back" to re-show NewShowDialog with same parameters
+      if (quickResult != null && quickResult['mode'] == 'go_back') {
+        // Re-show the New Show dialog so user can pick different search result
+        _showNewShowDialog(
+          context,
+          defaultCategory: category,
+          parentProjectId: parentProjectId,
+        );
+        return; // Exit current flow
+      }
 
       if (quickResult != null) {
         final showName = quickResult['name'] as String? ?? 'Web Search';
         final slides = quickResult['slides'] as List<SlideContent>? ?? [];
+        final alignmentData = quickResult['alignmentData'] as String?;
+
+        // Process slides with sync data if available
+        List<SlideContent> finalSlides = slides;
+        if (alignmentData != null && alignmentData.isNotEmpty) {
+          final timeMap = _parseLrc(alignmentData);
+          if (timeMap.isNotEmpty) {
+            finalSlides = _applySyncToSlides(slides, timeMap);
+            // Ensure all slides have the alignmentData preserved for future editing
+            for (var slide in finalSlides) {
+              slide.alignmentData = alignmentData;
+            }
+          }
+        }
 
         // Create the show with pre-parsed slides
         if (parentProjectId != null) {
@@ -1016,7 +1123,7 @@ extension ProjectExtensions on DashboardScreenState {
               id: const Uuid().v4(),
               name: finalName,
               parentId: parentProjectId,
-              slides: slides,
+              slides: finalSlides,
             );
             _fileSystem.add(newShow);
             _openShow(newShow);
@@ -1047,7 +1154,7 @@ extension ProjectExtensions on DashboardScreenState {
               id: const Uuid().v4(),
               name: showName,
               parentId: projectId,
-              slides: slides,
+              slides: finalSlides,
             );
             _fileSystem.add(newShow);
             _openShow(newShow);

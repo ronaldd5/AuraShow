@@ -5,11 +5,11 @@ class DashboardController extends ChangeNotifier {
   // State variables
   List<SlideContent> slides = [];
   int selectedSlideIndex = 0;
-  int selectedTopTab = 0; // 0=Show, 1=Edit, 2=Stage
+  int selectedTopTab = 0; // 0=Show, 1=Edit, 2=Stage, 3=Pre-Show
   bool isPlaying = false;
 
   // Placeholder for output configuration
-  // List<OutputConfig> outputs = []; 
+  // List<OutputConfig> outputs = [];
 
   void setSlides(List<SlideContent> newSlides) {
     slides = newSlides;

@@ -202,7 +202,7 @@ extension SettingsExtensions on DashboardScreenState {
           prefs.getBool('auto_launch_output') ?? autoLaunchOutput;
       hideCursorInOutput =
           prefs.getBool('hide_cursor_output') ?? hideCursorInOutput;
-      enableNdiOutput = prefs.getBool('enable_ndi_output') ?? enableNdiOutput;
+      // enableNdiOutput removed
       enableRemoteShow =
           prefs.getBool('enable_remote_show') ?? enableRemoteShow;
       enableStageShow = prefs.getBool('enable_stage_show') ?? enableStageShow;
@@ -236,11 +236,27 @@ extension SettingsExtensions on DashboardScreenState {
       selectedThemeName = prefs.getString('theme_name') ?? selectedThemeName;
       final savedOutputs = prefs.getString('outputs_json');
       if (savedOutputs != null && savedOutputs.isNotEmpty) {
-        final list = json.decode(savedOutputs) as List<dynamic>;
-        _outputs = list
-            .map((e) => OutputConfig.fromJson(Map<String, dynamic>.from(e)))
-            .toList();
+        try {
+          final list = json.decode(savedOutputs) as List<dynamic>;
+          _outputs = list
+              .map((e) => OutputConfig.fromJson(Map<String, dynamic>.from(e)))
+              .toList();
+        } catch (e) {
+          debugPrint('Error loading outputs: $e');
+        }
       }
+
+      // Aggressive cleanup: Ensure only Output 1 remains by default
+      final int beforeCount = _outputs.length;
+      _outputs.removeWhere((o) {
+        final name = o.name.trim();
+        return ['Output 2', 'Output 3', 'Output 4'].contains(name);
+      });
+
+      if (_outputs.length != beforeCount) {
+        _saveOutputs();
+      }
+
       if (_outputs.isEmpty) {
         _outputs = [OutputConfig.defaultAudience()];
       }

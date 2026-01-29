@@ -18,6 +18,7 @@ class OutputConfig {
     this.maxLines = 12,
     this.visible = true,
     this.alwaysOnTop = false,
+    this.enableNdi = false, // New field
     this.ndiAudio = true,
     this.ndiFrameRate = 30,
     this.ndiName,
@@ -25,6 +26,7 @@ class OutputConfig {
     this.transparent = false,
     this.invisibleWindow = false,
     this.useStyle,
+    this.layerOverrides,
   });
 
   final String id;
@@ -39,6 +41,7 @@ class OutputConfig {
   final int maxLines;
   final bool visible;
   final bool alwaysOnTop;
+  final bool enableNdi; // New field
   final bool ndiAudio;
   final int ndiFrameRate;
   final String? ndiName;
@@ -46,17 +49,19 @@ class OutputConfig {
   final bool transparent;
   final bool invisibleWindow;
   final String? useStyle;
+  final Map<String, bool>? layerOverrides;
 
   factory OutputConfig.defaultAudience() {
     return OutputConfig(
       id: 'output-default',
-      name: 'Audience',
+      name: 'Output 1',
       destination: OutputDestination.screen,
       styleProfile: OutputStyleProfile.audienceFull,
       stageNotes: false,
       textScale: 1.0,
       maxLines: 12,
       visible: true,
+      enableNdi: false,
     );
   }
 
@@ -73,6 +78,7 @@ class OutputConfig {
     int? maxLines,
     bool? visible,
     bool? alwaysOnTop,
+    bool? enableNdi,
     bool? ndiAudio,
     int? ndiFrameRate,
     String? ndiName,
@@ -80,6 +86,7 @@ class OutputConfig {
     bool? transparent,
     bool? invisibleWindow,
     String? useStyle,
+    Map<String, bool>? layerOverrides,
   }) {
     return OutputConfig(
       id: id ?? this.id,
@@ -94,6 +101,7 @@ class OutputConfig {
       maxLines: maxLines ?? this.maxLines,
       visible: visible ?? this.visible,
       alwaysOnTop: alwaysOnTop ?? this.alwaysOnTop,
+      enableNdi: enableNdi ?? this.enableNdi,
       ndiAudio: ndiAudio ?? this.ndiAudio,
       ndiFrameRate: ndiFrameRate ?? this.ndiFrameRate,
       ndiName: ndiName ?? this.ndiName,
@@ -101,6 +109,7 @@ class OutputConfig {
       transparent: transparent ?? this.transparent,
       invisibleWindow: invisibleWindow ?? this.invisibleWindow,
       useStyle: useStyle ?? this.useStyle,
+      layerOverrides: layerOverrides ?? this.layerOverrides,
     );
   }
 
@@ -117,6 +126,7 @@ class OutputConfig {
     'maxLines': maxLines,
     'visible': visible,
     'alwaysOnTop': alwaysOnTop,
+    'enableNdi': enableNdi,
     'ndiAudio': ndiAudio,
     'ndiFrameRate': ndiFrameRate,
     'ndiName': ndiName,
@@ -124,6 +134,7 @@ class OutputConfig {
     'transparent': transparent,
     'invisibleWindow': invisibleWindow,
     'useStyle': useStyle,
+    'layerOverrides': layerOverrides,
   };
 
   factory OutputConfig.fromJson(Map<String, dynamic> json) {
@@ -156,6 +167,7 @@ class OutputConfig {
           json['visible'] as bool? ??
           parseDest(json['destination'] as String?) == OutputDestination.screen,
       alwaysOnTop: json['alwaysOnTop'] as bool? ?? false,
+      enableNdi: json['enableNdi'] as bool? ?? false,
       ndiAudio: json['ndiAudio'] as bool? ?? true,
       ndiFrameRate: (json['ndiFrameRate'] as num?)?.toInt() ?? 30,
       ndiName: json['ndiName'] as String?,
@@ -163,6 +175,9 @@ class OutputConfig {
       transparent: json['transparent'] as bool? ?? false,
       invisibleWindow: json['invisibleWindow'] as bool? ?? false,
       useStyle: json['useStyle'] as String?,
+      layerOverrides: (json['layerOverrides'] as Map<String, dynamic>?)?.map(
+        (k, v) => MapEntry(k, v as bool),
+      ),
     );
   }
 }

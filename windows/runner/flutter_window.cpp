@@ -25,10 +25,10 @@ flutter::FlutterEngine *g_primary_engine = nullptr;
 // Register plugins needed by secondary windows, excluding DesktopMultiWindow
 // to avoid "main window already exists" errors.
 void RegisterSecondaryPlugins(flutter::FlutterEngine *engine) {
-  MediaKitLibsWindowsVideoPluginCApiRegisterWithRegistrar(
-      engine->GetRegistrarForPlugin("MediaKitLibsWindowsVideoPluginCApi"));
-  MediaKitVideoPluginCApiRegisterWithRegistrar(
-      engine->GetRegistrarForPlugin("MediaKitVideoPluginCApi"));
+  // MediaKitLibsWindowsVideoPluginCApiRegisterWithRegistrar(
+  //     engine->GetRegistrarForPlugin("MediaKitLibsWindowsVideoPluginCApi"));
+  // MediaKitVideoPluginCApiRegisterWithRegistrar(
+  //     engine->GetRegistrarForPlugin("MediaKitVideoPluginCApi"));
   ScreenRetrieverWindowsPluginCApiRegisterWithRegistrar(
       engine->GetRegistrarForPlugin("ScreenRetrieverWindowsPluginCApi"));
   UrlLauncherWindowsRegisterWithRegistrar(
@@ -50,12 +50,50 @@ bool FlutterWindow::OnCreate() {
     auto *flutter_view_controller =
         reinterpret_cast<flutter::FlutterViewController *>(controller);
     auto *engine = flutter_view_controller->engine();
-    VideoPlayerWinPluginCApiRegisterWithRegistrar(
-        engine->GetRegistrarForPlugin("VideoPlayerWinPluginCApi"));
+
+    // Register generic plugins (including window_manager)
+    RegisterSecondaryPlugins(engine);
+
     // Register just_audio for secondary windows (background audio, projection
     // sound)
     JustAudioWindowsPluginRegisterWithRegistrar(
         engine->GetRegistrarForPlugin("JustAudioWindowsPlugin"));
+
+    // --- NATIVE STYLING FIX FOR HEADLESS WINDOW ---
+    // Directly modify the HWND to remove borders/titlebar
+    auto view = flutter_view_controller->view();
+    if (view) {
+      HWND child_hwnd = view->GetNativeWindow();
+      // Ensure we get the actual TOP LEVEL window (the frame)
+      HWND hwnd = GetAncestor(child_hwnd, GA_ROOT);
+
+      // Get current style
+      LONG_PTR style = GetWindowLongPtr(hwnd, GWL_STYLE);
+
+      // Remove OVERLAPPEDWINDOW (Caption, ThickFrame, etc)
+      style &= ~WS_OVERLAPPEDWINDOW;
+      // Add POPUP (no chrome)
+      style |= WS_POPUP;
+
+      SetWindowLongPtr(hwnd, GWL_STYLE, style);
+
+      // Notify change
+      SetWindowPos(hwnd, nullptr, 0, 0, 0, 0,
+                   SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+
+      // TRUE FULLSCREEN: Resize to cover the entire monitor (including taskbar)
+      HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+      MONITORINFO mi = {sizeof(mi)};
+      if (GetMonitorInfo(hMonitor, &mi)) {
+        SetWindowPos(hwnd, HWND_TOP, mi.rcMonitor.left, mi.rcMonitor.top,
+                     mi.rcMonitor.right - mi.rcMonitor.left,
+                     mi.rcMonitor.bottom - mi.rcMonitor.top,
+                     SWP_NOOWNERZORDER | SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+      } else {
+        // Fallback if monitor info fails
+        ShowWindow(hwnd, SW_MAXIMIZE);
+      }
+    }
   });
 
   RECT frame = GetClientArea();

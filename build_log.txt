@@ -18,6 +18,9 @@ CMake Warning (dev) at flutter/ephemeral/.plugin_symlinks/webview_windows/window
   command to set the policy and suppress this warning.
 This warning is for project developers.  Use -Wno-dev to suppress it.
 
-LINK : fatal error LNK1104: cannot open file 'E:\AuraShow\aurashow (original)\AuraShow\build\windows\x64\runner\Debug\aurashow.exe' [E:\AuraShow\aurashow (original)\AuraShow\build\windows\x64\runner\aurashow.vcxproj]
-Building Windows application...                                    24.5s
+lib/screens/dashboard/dashboard_screen.dart(2203,28): error G297C951C: Can't find ')' to match '('. [E:\AuraShow\aurashow (original)\AuraShow\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/dashboard/dashboard_screen.dart(2244,8): error G67247B7E: Expected ';' after this. [E:\AuraShow\aurashow (original)\AuraShow\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/dashboard/dashboard_screen.dart(2401,29): error GE5CFE876: The method 'SongEditorDialog' isn't defined for the type 'DashboardScreenState'. [E:\AuraShow\aurashow (original)\AuraShow\build\windows\x64\flutter\flutter_assemble.vcxproj]
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(254,5): error MSB8066: Custom build for 'E:\AuraShow\aurashow (original)\AuraShow\build\windows\x64\CMakeFiles\2b16cca5a0932f9a320640e3ec09c599\flutter_windows.dll.rule;E:\AuraShow\aurashow (original)\AuraShow\build\windows\x64\CMakeFiles\d45aa216ead8378cf8f55e0416fded6c\flutter_assemble.rule' exited with code 1. [E:\AuraShow\aurashow (original)\AuraShow\build\windows\x64\flutter\flutter_assemble.vcxproj]
+Building Windows application...                                    18.8s
 Build process failed.

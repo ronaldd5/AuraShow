@@ -108,6 +108,11 @@ extension TopBarModule on DashboardScreenState {
         onSelected: () => setState(() => selectedTopTab = 2),
       ),
       _MiniNavAction(
+        label: 'Pre-Show tab',
+        icon: Icons.access_time_filled,
+        onSelected: () => setState(() => selectedTopTab = 3),
+      ),
+      _MiniNavAction(
         label: drawerExpanded ? 'Hide drawer' : 'Show drawer',
         icon: Icons.view_day_outlined,
         onSelected: () => setState(() {
@@ -252,6 +257,14 @@ extension TopBarModule on DashboardScreenState {
                       height: tabHeight,
                     ),
                   ),
+                  _topTab(
+                    icon: Icons.access_time_filled,
+                    label: 'Pre-Show',
+                    selected: selectedTopTab == 3,
+                    onTap: () => setState(() => selectedTopTab = 3),
+                    width: tabWidth,
+                    height: tabHeight,
+                  ),
                 ],
               ),
             ],
@@ -382,14 +395,18 @@ extension TopBarModule on DashboardScreenState {
                   // WINDOWS BUTTONS (Minimize, Maximize, Close)
                   if (Platform.isWindows) ...[
                     const SizedBox(width: 16),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.minimize,
-                        color: Colors.white,
-                        size: 18,
+                    Builder(
+                      builder: (ctx) => IconButton(
+                        icon: const Icon(
+                          Icons.minimize,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                        onPressed: () {
+                          WindowAnimator.of(ctx)?.animateAndMinimize();
+                        },
+                        tooltip: 'Minimize',
                       ),
-                      onPressed: () => windowManager.minimize(),
-                      tooltip: 'Minimize',
                     ),
                     IconButton(
                       icon: const Icon(

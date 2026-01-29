@@ -7,12 +7,10 @@ import 'package:html/parser.dart' show parse;
 import '../env/env.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
 import '../models/song_model.dart';
-import '../screens/projection/models/projection_slide.dart';
 import 'package:uuid/uuid.dart';
 import '../models/slide_model.dart';
 
@@ -207,35 +205,65 @@ class LyricsService {
   }
 
   /// Search and return a list of potential song matches (for user selection)
-  Future<List<Song>> searchSongs(String query) async {
+  /// Combines results from LRCLIB and Genius, sorted by sync availability
+  Future<List<Song>> searchSongs(
+    String query, {
+    int limit = 20,
+    String? sourceFilter,
+  }) async {
     try {
       String cleanQuery = _sanitizeQuery(query);
-      debugPrint('Search songs: "$query" -> "$cleanQuery"');
+      debugPrint(
+        'Search songs: "$query" -> "$cleanQuery" (limit: $limit, filter: $sourceFilter)',
+      );
 
-      // 1. Try LRCLIB search
-      final lrclibResults = await _searchLrclibForSongs(cleanQuery);
-      if (lrclibResults.isNotEmpty) {
-        return lrclibResults;
+      final List<Song> allResults = [];
+
+      // 1. Search LRCLIB (unless filtering to Genius only)
+      if (sourceFilter == null || sourceFilter == 'lrclib') {
+        final lrclibResults = await _searchLrclibForSongs(cleanQuery);
+        allResults.addAll(lrclibResults);
       }
 
-      // 2. Fallback to Genius API
-      final geniusResults = await _searchGeniusAPI(cleanQuery);
-      if (geniusResults.isNotEmpty) {
-        return geniusResults
+      // 2. Search Genius (unless filtering to LRCLIB only)
+      if (sourceFilter == null || sourceFilter == 'genius') {
+        final geniusResults = await _searchGeniusAPI(cleanQuery);
+        final geniusSongs = geniusResults
             .map(
               (r) => Song(
-                id: r.id.toString(),
+                id: 'genius_${r.id}',
                 title: r.title,
                 author: r.artist,
-                // Store Genius URL in copyright field as temporary source
-                copyright: r.url,
-                content: '', // Start empty, fetch on selection
+                copyright: r.url, // Store URL for fetching
+                content: '',
+                hasSyncedLyrics: false, // Genius doesn't have sync data
+                source: 'genius',
               ),
             )
             .toList();
+        allResults.addAll(geniusSongs);
       }
 
-      return [];
+      // 3. Sort: synced first, then by source (LRCLIB first), then by title
+      allResults.sort((a, b) {
+        // Synced lyrics first
+        if (a.hasSyncedLyrics && !b.hasSyncedLyrics) return -1;
+        if (!a.hasSyncedLyrics && b.hasSyncedLyrics) return 1;
+
+        // LRCLIB source next
+        if (a.source == 'lrclib' && b.source != 'lrclib') return -1;
+        if (a.source != 'lrclib' && b.source == 'lrclib') return 1;
+
+        // Then alphabetically
+        return a.title.toLowerCase().compareTo(b.title.toLowerCase());
+      });
+
+      // 4. Limit results
+      if (allResults.length > limit) {
+        return allResults.sublist(0, limit);
+      }
+
+      return allResults;
     } catch (e) {
       debugPrint('Search songs error: $e');
       return [];
@@ -297,14 +325,13 @@ class LyricsService {
       return lyrics;
     }
 
-    // Step 1: Auto-label if no section tags
-    String processed = _autoLabelRawText(lyrics);
-
-    // Step 2: Expand empty [Chorus] sections with previous text
-    processed = _expandStructure(processed);
-
-    // Step 3: Clean and format
-    return processed;
+    // Wrap in try-catch to be safe
+    try {
+      return cleanLyrics(lyrics);
+    } catch (e) {
+      debugPrint('Lyrics processing error: $e');
+      return lyrics;
+    }
   }
 
   /// Handle YouTube URL - extract video title and search for lyrics
@@ -345,33 +372,65 @@ class LyricsService {
 
   /// "The Detective" - Auto-label raw text by detecting repeated blocks as chorus
   String _autoLabelRawText(String rawText) {
-    // Skip if already has labels
-    if (rawText.contains('[') && rawText.contains(']')) {
+    if (rawText.isEmpty) {
       return rawText;
     }
 
-    // Split into blocks by double newlines
-    final blocks = rawText.split(RegExp(r'\n\n+'));
-    if (blocks.length < 2) return rawText;
-
-    // Count frequency of each block (normalized)
-    final Map<String, int> frequency = {};
-    final Map<String, String> originalBlocks = {};
-
-    for (var block in blocks) {
-      final normalized = block.trim().toLowerCase();
-      if (normalized.isEmpty) continue;
-      frequency[normalized] = (frequency[normalized] ?? 0) + 1;
-      originalBlocks[normalized] = block.trim();
+    // Skip if already has labels.
+    final headerPattern = RegExp(
+      r'\[(Verse|Chorus|Bridge|Intro|Outro|Pre-Chorus|Hook|Vamp|Tag|Refrain)',
+      caseSensitive: false,
+    );
+    if (headerPattern.hasMatch(rawText)) {
+      return rawText;
     }
 
-    // Find the chorus (most frequent block appearing > 1 time)
-    String? chorusNormalized;
+    // Normalize: If there are NO double newlines, but many single ones,
+    // let's assume they are blocks of 4 lines for heuristic purposes
+    String normalized = rawText.trim();
+    if (!normalized.contains('\n\n')) {
+      final lines = normalized.split('\n');
+      if (lines.length > 5) {
+        final buffer = StringBuffer();
+        for (int i = 0; i < lines.length; i++) {
+          buffer.write(lines[i]);
+          // Heuristic: break every 4 lines if no other breaks found
+          if ((i + 1) % 4 == 0 && i != lines.length - 1) {
+            buffer.write('\n\n');
+          } else {
+            buffer.write('\n');
+          }
+        }
+        normalized = buffer.toString().trim();
+      }
+    }
+
+    // Split into blocks by double newlines
+    final blocks = normalized.split(RegExp(r'\n\n+'));
+    if (blocks.length < 2) {
+      return rawText;
+    }
+
+    // Count frequency using "Fuzzy Keys" (ignore ad-libs/punctuation)
+    final Map<String, int> frequency = {};
+    final Map<String, String> fuzzyToOriginal =
+        {}; // Map fuzzy key to one exemplar
+
+    for (var block in blocks) {
+      final fuzzyKey = _getFuzzyKey(block);
+      if (fuzzyKey.isEmpty) continue;
+
+      frequency[fuzzyKey] = (frequency[fuzzyKey] ?? 0) + 1;
+      fuzzyToOriginal[fuzzyKey] = block.trim();
+    }
+
+    // Find the chorus (most frequent fuzzy block appearing > 1 time)
+    String? chorusFuzzyKey;
     int maxCount = 1;
-    frequency.forEach((text, count) {
+    frequency.forEach((fuzzyKey, count) {
       if (count > maxCount) {
         maxCount = count;
-        chorusNormalized = text;
+        chorusFuzzyKey = fuzzyKey;
       }
     });
 
@@ -381,10 +440,10 @@ class LyricsService {
     int chorusCount = 0;
 
     for (var block in blocks) {
-      final normalized = block.trim().toLowerCase();
-      if (normalized.isEmpty) continue;
+      final fuzzyKey = _getFuzzyKey(block);
+      if (fuzzyKey.isEmpty) continue;
 
-      if (chorusNormalized != null && normalized == chorusNormalized) {
+      if (chorusFuzzyKey != null && fuzzyKey == chorusFuzzyKey) {
         chorusCount++;
         if (chorusCount == 1) {
           labeledBlocks.add('[CHORUS]\n${block.trim()}');
@@ -400,8 +459,20 @@ class LyricsService {
     return labeledBlocks.join('\n\n');
   }
 
+  /// Generates a "fuzzy" version of a block for comparison.
+  /// Strips ad-libs (parentheses), punctuationholders, and whitespace.
+  String _getFuzzyKey(String text) {
+    // 1. Remove everything in parentheses (ad-libs)
+    String fuzzy = text.replaceAll(RegExp(r'\(.*?\)', dotAll: true), '');
+    // 2. Remove punctuation
+    fuzzy = fuzzy.replaceAll(RegExp(r'[.,!?/\\-]'), '');
+    // 3. Lowercase and normalize whitespace
+    return fuzzy.toLowerCase().replaceAll(RegExp(r'\s+'), ' ').trim();
+  }
+
   /// "The Cloner" - Expand empty section headers with previously defined text
   String _expandStructure(String lyrics) {
+    if (lyrics.isEmpty) return lyrics;
     final lines = lyrics.split('\n');
     final Map<String, String> definedSections = {}; // "CHORUS" -> actual text
     final List<String> finalOutput = [];
@@ -443,35 +514,70 @@ class LyricsService {
     for (String line in lines) {
       final trimmed = line.trim();
 
-      if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+      if (trimmed.startsWith('[') &&
+          trimmed.endsWith(']') &&
+          !trimmed.contains(':')) {
+        if (trimmed == '[_VB]') {
+          if (currentLabel.isNotEmpty) {
+            currentBuffer.writeln('[_VB]');
+          }
+          continue;
+        }
+        if (trimmed.startsWith('[#')) {
+          // Internal reference, ignore for structure expansion
+          continue;
+        }
+
         commitSection();
         currentLabel = trimmed.substring(1, trimmed.length - 1);
-      } else {
-        currentBuffer.writeln(line);
+        continue;
       }
+
+      currentBuffer.writeln(line);
     }
     commitSection();
 
     return finalOutput.join('\n\n');
   }
 
-  /// Search lrclib.net - a free, open lyrics database (no auth needed)
+  /// Fetches raw LRC sync data from LRCLIB for a given artist/title.
+  /// Used to "bridge" sync data to Genius lyrics results.
+  Future<String?> getLrcSync(String track, String artist) async {
+    try {
+      final query = '$artist $track';
+      final searchUrl = Uri.parse(
+        'https://lrclib.net/api/search?q=${Uri.encodeComponent(query)}',
+      );
+
+      final response = await http
+          .get(
+            searchUrl,
+            headers: {'User-Agent': 'AuraShow/1.0.0 (https://github.com)'},
+          )
+          .timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        if (data.isNotEmpty) {
+          // Look for an exact match or close match with synced lyrics
+          final match = data.firstWhere(
+            (item) =>
+                item['syncedLyrics'] != null &&
+                item['syncedLyrics'].toString().isNotEmpty,
+            orElse: () => null,
+          );
+          return match?['syncedLyrics'] as String?;
+        }
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Sync bridge fetch error: $e');
+      return null;
+    }
+  }
+
   Future<String?> _searchLrclib(String query) async {
     try {
-      // Parse query for artist and track
-      String artist = '';
-      String track = query;
-
-      if (query.contains(' - ')) {
-        final parts = query.split(' - ');
-        artist = parts[0].trim();
-        track = parts.sublist(1).join(' - ').trim();
-      } else if (query.toLowerCase().contains(' by ')) {
-        final idx = query.toLowerCase().indexOf(' by ');
-        track = query.substring(0, idx).trim();
-        artist = query.substring(idx + 4).trim();
-      }
-
       // Try search endpoint
       final searchUrl = Uri.parse(
         'https://lrclib.net/api/search?q=${Uri.encodeComponent(query)}',
@@ -488,19 +594,12 @@ class LyricsService {
       if (searchResponse.statusCode == 200) {
         final List<dynamic> data = jsonDecode(searchResponse.body);
         if (data.isNotEmpty) {
-          // Prefer exact matches on track name
-          final exact = data.firstWhere(
-            (item) =>
-                (item['trackName'] as String).toLowerCase() ==
-                track.toLowerCase(),
-            orElse: () => data.first,
-          );
-
-          if (exact['plainLyrics'] != null) {
-            return exact['plainLyrics'];
+          final first = data.first;
+          if (first['plainLyrics'] != null) {
+            return cleanLyrics(first['plainLyrics']);
           }
-          if (exact['syncedLyrics'] != null) {
-            return _stripTimestamps(exact['syncedLyrics']);
+          if (first['syncedLyrics'] != null) {
+            return cleanLyrics(_stripTimestamps(first['syncedLyrics']));
           }
         }
       }
@@ -527,30 +626,95 @@ class LyricsService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        return data.map<Song>((item) {
-          final id = item['id'].toString();
-          final title = item['trackName'] ?? 'Unknown Title';
-          final artist = item['artistName'] ?? 'Unknown Artist';
-          final album = item['albumName'] ?? '';
+        final List<Song> results = [];
 
-          // Determine if we have lyrics immediately available
-          String content = '';
-          if (item['plainLyrics'] != null) {
-            content = item['plainLyrics'];
-          } else if (item['syncedLyrics'] != null) {
-            content = _stripTimestamps(item['syncedLyrics']);
+        for (var item in data) {
+          try {
+            final id = item['id'].toString();
+            final title = item['trackName'] ?? 'Unknown Title';
+            final artist = item['artistName'] ?? 'Unknown Artist';
+            final album = item['albumName'] ?? '';
+
+            String content = '';
+            bool hasSynced = false;
+            String? alignmentData;
+
+            if (item['syncedLyrics'] != null &&
+                item['syncedLyrics'].toString().isNotEmpty) {
+              hasSynced = true;
+              alignmentData = item['syncedLyrics'];
+
+              // --- HYBRID LOGIC START ---
+              String? geniusStructure;
+              try {
+                // Background search to Genius for Structure
+                final geniusHits = await _searchGeniusAPI('$title $artist');
+                if (geniusHits.isNotEmpty) {
+                  geniusStructure = await _scrapeGeniusPage(
+                    geniusHits.first.url,
+                  );
+                  geniusStructure = cleanLyrics(geniusStructure);
+                }
+              } catch (e) {
+                debugPrint('Genius hybrid fallback failed: $e');
+              }
+
+              if (geniusStructure != null && geniusStructure.isNotEmpty) {
+                debugPrint('Merging Genius Structure into LRCLIB Timing...');
+                final merged = _mergeGeniusStructureWithLrc(
+                  geniusStructure,
+                  alignmentData!,
+                );
+
+                if (merged.contains('[VERSE') ||
+                    merged.contains('[CHORUS') ||
+                    merged.contains('[BRIDGE') ||
+                    merged.contains('[INTRO')) {
+                  alignmentData = merged;
+                  content = cleanLyrics(
+                    _stripTimestamps(merged),
+                    autoLabel: false,
+                  );
+                } else {
+                  final structured = _smartStructureFromLrc(alignmentData);
+                  content = cleanLyrics(
+                    _stripTimestamps(structured),
+                    autoLabel: false,
+                  );
+                  alignmentData = structured;
+                }
+              } else {
+                final structured = _smartStructureFromLrc(alignmentData!);
+                content = cleanLyrics(
+                  _stripTimestamps(structured),
+                  autoLabel: false,
+                );
+                alignmentData = structured;
+              }
+              // --- HYBRID LOGIC END ---
+            } else if (item['plainLyrics'] != null) {
+              content = cleanLyrics(_autoLabelRawText(item['plainLyrics']));
+            }
+
+            results.add(
+              Song(
+                id: 'lrclib_$id',
+                title: title,
+                author: artist,
+                ccli: album,
+                copyright: 'lrclib:$id',
+                content: content,
+                hasSyncedLyrics: hasSynced,
+                alignmentData: alignmentData,
+                source: 'lrclib',
+              ),
+            );
+          } catch (itemError) {
+            debugPrint('Error parsing LRCLIB item: $itemError');
+            continue;
           }
-
-          return Song(
-            id: id,
-            title: title,
-            author: artist,
-            ccli: album, // Use CCLI field for Album/Context if needed
-            // Store source (lrclib) in copyright to ensure we know where to fetch if content empty
-            copyright: 'lrclib:$id',
-            content: content,
-          );
-        }).toList();
+        }
+        return results;
       }
       return [];
     } catch (e) {
@@ -559,63 +723,37 @@ class LyricsService {
     }
   }
 
-  // Helper to remove timestamps from synced lyrics
+  /// Helper to remove timestamps from synced lyrics
   String _stripTimestamps(String syncedLyrics) {
+    // Robustly remove all LRC timestamps: [mm:ss], [mm:ss.xx], [mm:ss.xxx]
     return syncedLyrics
-        .split('\n')
-        .map((line) => line.replaceAll(RegExp(r'^\[\d+:\d+\.\d+\]\s*'), ''))
-        .join('\n');
+        .replaceAll(RegExp(r'\[\d{1,3}:\d{1,2}(?:\.\d+)?\]\s*'), '')
+        .trim();
   }
 
   Future<String> _fetchAndCleanLyrics(
     List<GeniusSongResult> results,
     String query,
   ) async {
-    // Smart select best match
     final bestMatch = _findBestMatch(results, query) ?? results.first;
     debugPrint('Best match: ${bestMatch.title} by ${bestMatch.artist}');
 
-    // Scrape & Clean
     String rawLyrics = await _scrapeGeniusPage(bestMatch.url);
     if (rawLyrics.startsWith("Error") || rawLyrics.startsWith("Could not")) {
       return rawLyrics;
     }
 
-    // Apply all cleaning passes
     String cleanedLyrics = cleanLyrics(rawLyrics);
-
-    // Add metadata header
     final header = 'Title: ${bestMatch.title}\nAuthor: ${bestMatch.artist}\n\n';
     return header + cleanedLyrics;
   }
 
   /// Search for songs and return list of results (for UI picker)
   Future<List<Song>> webSearch(String query) async {
-    if (query.trim().isEmpty) return [];
-
-    try {
-      String cleanQuery = _sanitizeQuery(query.trim());
-      final results = await _searchGeniusAPI(cleanQuery);
-
-      // Convert to Song objects for UI
-      return results
-          .map(
-            (r) => Song(
-              id: const Uuid().v4(),
-              title: r.title,
-              author: r.artist,
-              content: '',
-              copyright: r.url, // Store URL for later fetching
-            ),
-          )
-          .toList();
-    } catch (e) {
-      debugPrint('Web search error: $e');
-      return [];
-    }
+    return searchSongs(query);
   }
 
-  /// Fetch lyrics from a URL (called when user selects a song)
+  /// Fetch lyrics from a URL
   Future<String> fetchLyricsFromUrl(String url) async {
     if (!url.startsWith('http')) return '';
     try {
@@ -637,21 +775,18 @@ class LyricsService {
   String _sanitizeQuery(String query) {
     String clean = query;
 
-    // 1. Smart Parse: "Artist - Title" or "Title by Artist"
     if (clean.contains(' - ')) {
       clean = clean.replaceFirst(' - ', ' ');
     } else if (clean.toLowerCase().contains(' by ')) {
       clean = clean.replaceAll(RegExp(r' by ', caseSensitive: false), ' ');
     }
 
-    // 2. Remove "Official Video", "Lyrics", "Live", "HD", "4K"
     final junkPattern = RegExp(
       r'\b(official\s+video|official\s+audio|lyrics|lyric|live|hd|4k|mv|music\s+video|audio)\b',
       caseSensitive: false,
     );
     clean = clean.replaceAll(junkPattern, '');
 
-    // 3. Remove features (ft. Artist)
     clean = clean.replaceAll(
       RegExp(r'\s(ft\.|feat\.|featuring)\s+.*$', caseSensitive: false),
       '',
@@ -660,17 +795,18 @@ class LyricsService {
       RegExp(r'\s\(feat\..*?\)', caseSensitive: false),
       '',
     );
-
-    // 4. Remove parenthetical info (except remix/reprise)
     clean = clean.replaceAll(
       RegExp(r'\s\((?!remix|reprise).+?\)', caseSensitive: false),
       '',
     );
 
-    // 5. Remove brackets with version info
-    clean = clean.replaceAll(RegExp(r'\[.*?\]'), '');
+    // Don't remove brackets if they might contain the song title or version
+    // Only remove if they contain common junk
+    clean = clean.replaceAll(
+      RegExp(r'\[(Official|MV|HD|4K|Lyrics)\]', caseSensitive: false),
+      '',
+    );
 
-    // 6. Clean up extra spaces
     return clean.replaceAll(RegExp(r'\s+'), ' ').trim();
   }
 
@@ -680,15 +816,9 @@ class LyricsService {
 
   Future<List<GeniusSongResult>> _searchGeniusAPI(String query) async {
     try {
-      // Debug: Check if token is loaded
-      debugPrint(
-        'Genius API Token: ${_geniusToken.isEmpty ? "EMPTY!" : "Loaded (${_geniusToken.substring(0, 10)}...)"}',
-      );
-
       final url = Uri.parse(
         'https://api.genius.com/search?q=${Uri.encodeComponent(query)}',
       );
-      debugPrint('Genius API URL: $url');
 
       final response = await http
           .get(
@@ -701,19 +831,10 @@ class LyricsService {
           )
           .timeout(const Duration(seconds: 10));
 
-      debugPrint('Genius API Status: ${response.statusCode}');
-
-      if (response.statusCode != 200) {
-        debugPrint('Genius API error: ${response.statusCode}');
-        debugPrint(
-          'Response body: ${response.body.substring(0, min(500, response.body.length))}',
-        );
-        return [];
-      }
+      if (response.statusCode != 200) return [];
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       final hits = data['response']?['hits'] as List<dynamic>? ?? [];
-      debugPrint('Genius API found ${hits.length} results');
 
       return hits.take(10).map<GeniusSongResult>((hit) {
         final result = hit['result'] as Map<String, dynamic>;
@@ -731,10 +852,6 @@ class LyricsService {
     }
   }
 
-  // ============================================================
-  // BEST MATCH SELECTION (Levenshtein)
-  // ============================================================
-
   GeniusSongResult? _findBestMatch(
     List<GeniusSongResult> results,
     String originalQuery,
@@ -746,17 +863,13 @@ class LyricsService {
     final queryLower = originalQuery.toLowerCase();
 
     for (final result in results) {
-      // Calculate similarity score (lower is better)
       int score = _levenshtein(result.title.toLowerCase(), queryLower);
-
-      // Also check combined "title artist"
       int combinedScore = _levenshtein(
         '${result.title} ${result.artist}'.toLowerCase(),
         queryLower,
       );
       score = min(score, combinedScore);
 
-      // Penalty for "Script", "Tracklist", "Sample" in title (Genius artifacts)
       if (result.title.toLowerCase().contains('tracklist')) score += 50;
       if (result.title.toLowerCase().contains('script')) score += 50;
       if (result.title.toLowerCase().contains('sample')) score += 30;
@@ -766,7 +879,6 @@ class LyricsService {
         bestResult = result;
       }
     }
-
     return bestResult;
   }
 
@@ -778,7 +890,9 @@ class LyricsService {
     List<int> v0 = List<int>.filled(t.length + 1, 0);
     List<int> v1 = List<int>.filled(t.length + 1, 0);
 
-    for (int i = 0; i < t.length + 1; i++) v0[i] = i;
+    for (int i = 0; i < t.length + 1; i++) {
+      v0[i] = i;
+    }
 
     for (int i = 0; i < s.length; i++) {
       v1[0] = i + 1;
@@ -786,14 +900,12 @@ class LyricsService {
         int cost = (s[i] == t[j]) ? 0 : 1;
         v1[j + 1] = min(v1[j] + 1, min(v0[j + 1] + 1, v0[j] + cost));
       }
-      for (int j = 0; j < t.length + 1; j++) v0[j] = v1[j];
+      for (int j = 0; j < t.length + 1; j++) {
+        v0[j] = v1[j];
+      }
     }
     return v1[t.length];
   }
-
-  // ============================================================
-  // LYRICS SCRAPING
-  // ============================================================
 
   Future<String> _scrapeGeniusPage(String url) async {
     try {
@@ -807,13 +919,9 @@ class LyricsService {
           )
           .timeout(const Duration(seconds: 15));
 
-      if (response.statusCode != 200) {
-        return "Error reading lyrics page.";
-      }
+      if (response.statusCode != 200) return "Error reading lyrics page.";
 
       final document = parse(response.body);
-
-      // Genius selectors - try multiple patterns
       var lyricsContainers = document.querySelectorAll(
         '[data-lyrics-container="true"]',
       );
@@ -826,17 +934,12 @@ class LyricsService {
         lyricsContainers = document.querySelectorAll('.lyrics');
       }
 
-      if (lyricsContainers.isEmpty) {
-        return "Could not parse lyrics text.";
-      }
+      if (lyricsContainers.isEmpty) return "Could not parse lyrics text.";
 
-      // Merge containers and convert to text
       final buffer = StringBuffer();
       for (final container in lyricsContainers) {
         String html = container.innerHtml;
-        // Convert <br> to newlines
         html = html.replaceAll(RegExp(r'<br\s*/?>'), '\n');
-        // Strip remaining HTML tags
         html = html.replaceAll(RegExp(r'<[^>]+>'), '');
         buffer.writeln(html);
       }
@@ -848,14 +951,16 @@ class LyricsService {
     }
   }
 
-  // ============================================================
-  // LYRICS CLEANING (De-Junker)
-  // ============================================================
-
-  String cleanLyrics(String text) {
+  String cleanLyrics(String text, {bool autoLabel = true}) {
     String cleaned = text;
 
-    // A. Remove Genius Artifacts
+    // 0. Remove Genius "Contributors" Header Junk
+    cleaned = cleaned.replaceAll(
+      RegExp(r'\(?\d+\s*Contributors.*?Lyrics\)?', caseSensitive: false),
+      '',
+    );
+
+    // A. Remove Genius Artifacts (Body)
     cleaned = cleaned.replaceAll(RegExp(r'\d*Embed$', multiLine: true), '');
     cleaned = cleaned.replaceAll(RegExp(r'\d*Embed\s*$', multiLine: true), '');
     cleaned = cleaned.replaceAll('You might also like', '');
@@ -864,11 +969,21 @@ class LyricsService {
     cleaned = cleaned.replaceAll(RegExp(r'See .+ Live'), '');
     cleaned = cleaned.replaceAll(RegExp(r'Get tickets.*'), '');
 
-    // B. Strip Noise (Chords)
-    cleaned = cleaned.replaceAll(RegExp(r'\[[A-G][b#]?[a-zA-Z0-9/]*\]'), '');
+    // B. Strip Noise (Chords) - Skip if it looks like a section header
+    final headerKeywords =
+        'Intro|Verse|Chorus|Bridge|Pre-Chorus|Pre Chorus|Outro|Hook|Vamp|Tag|Refrain';
+    cleaned = cleaned.replaceAllMapped(
+      RegExp(r'\[([A-G][b#]?[a-zA-Z0-9/]*)\]'),
+      (match) {
+        final inside = match.group(1) ?? '';
+        if (RegExp(headerKeywords, caseSensitive: false).hasMatch(inside)) {
+          return match.group(0)!;
+        }
+        return '';
+      },
+    );
 
     // C. Normalize Headers
-    // Convert "Chorus:", "(Chorus)", etc. to [CHORUS]
     cleaned = cleaned.replaceAllMapped(
       RegExp(
         r'^[\(\[]?(Verse|Chorus|Bridge|Pre-Chorus|Pre Chorus|Intro|Outro|Hook|Vamp|Tag|Refrain)(\s*\d*)[^\)\]\:]*[\)\]\:]?',
@@ -895,8 +1010,13 @@ class LyricsService {
       },
     );
 
-    // E. Fix Spacing
-    cleaned = cleaned.replaceAll(RegExp(r'\n{3,}'), '\n\n');
+    // E. Smart Detective: Auto-Label if missing
+    if (autoLabel) {
+      cleaned = _autoLabelRawText(cleaned);
+    }
+
+    // E2. The Cloner: Expand empty section headers
+    cleaned = _expandStructure(cleaned);
 
     // F. Smart Title Casing
     if (_isAllUpper(cleaned)) {
@@ -906,7 +1026,10 @@ class LyricsService {
     // G. Theological Casing (for church use)
     cleaned = _applyTheologicalCasing(cleaned);
 
-    // H. Clean up HTML entities
+    // H. Fix Spacing (Normalize to max 2 newlines)
+    cleaned = cleaned.replaceAll(RegExp(r'\n{3,}'), '\n\n');
+
+    // I. Clean up HTML entities
     cleaned = _cleanHtmlEntities(cleaned);
 
     return cleaned.trim();
@@ -915,6 +1038,136 @@ class LyricsService {
   bool _isAllUpper(String text) {
     final letters = text.replaceAll(RegExp(r'[^a-zA-Z]'), '');
     return letters.isNotEmpty && letters == letters.toUpperCase();
+  }
+
+  /// Merges Genius Structure (Headers) into LRCLIB Synced Lyrics
+  String _mergeGeniusStructureWithLrc(String geniusText, String lrcText) {
+    // 1. Parse Genius into Sections with Multi-Line Anchors
+    // Map<SectionHeader, List<FuzzyLine>>
+    final Map<String, List<String>> sectionAnchors = {};
+    final geniusLines = geniusText.split('\n');
+    String currentHeader = '';
+
+    for (var line in geniusLines) {
+      final trimmed = line.trim();
+      if (trimmed.isEmpty) continue;
+
+      if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+        currentHeader = trimmed;
+        sectionAnchors[currentHeader] = [];
+        continue;
+      }
+
+      if (currentHeader.isNotEmpty &&
+          sectionAnchors[currentHeader]!.length < 2) {
+        final fuzzy = _getFuzzySignature(trimmed);
+        if (fuzzy.isNotEmpty) {
+          sectionAnchors[currentHeader]!.add(fuzzy);
+        }
+      }
+    }
+
+    // 2. Process LRC Line by Line
+    final lrcLines = lrcText.split('\n');
+    final buffer = StringBuffer();
+    final Set<String> matchedHeaders = {};
+
+    for (var line in lrcLines) {
+      final cleanLrcLine = _getFuzzySignature(
+        line.replaceAll(RegExp(r'\[.*?\]'), ''),
+      );
+
+      if (cleanLrcLine.isNotEmpty) {
+        String? foundHeader;
+        for (var entry in sectionAnchors.entries) {
+          if (matchedHeaders.contains(entry.key)) continue;
+
+          // Match if ANY of the first 2 lines of the section match
+          bool isMatch = entry.value.any(
+            (anchor) =>
+                cleanLrcLine.contains(anchor) || anchor.contains(cleanLrcLine),
+          );
+
+          if (isMatch) {
+            foundHeader = entry.key;
+            break;
+          }
+        }
+
+        if (foundHeader != null) {
+          if (buffer.isNotEmpty) buffer.writeln();
+          buffer.writeln(foundHeader);
+          matchedHeaders.add(foundHeader);
+        }
+      }
+      buffer.writeln(line);
+    }
+
+    return buffer.toString().trim();
+  }
+
+  /// "Time Knife" - Automatically insert structure based on timestamp gaps
+  String _smartStructureFromLrc(String lrcText) {
+    if (lrcText.isEmpty) return lrcText;
+
+    final lines = lrcText.split('\n');
+    final buffer = StringBuffer();
+    double lastTime = -1.0;
+    int sectionCount = 0;
+    bool hasInitialHeader = false;
+
+    for (var line in lines) {
+      final trimmed = line.trim();
+      if (trimmed.isEmpty) continue;
+
+      // Detect existing headers to avoid double insertion
+      if (trimmed.startsWith('[') && !trimmed.contains(':')) {
+        buffer.writeln(line);
+        hasInitialHeader = true;
+        continue;
+      }
+
+      final match = RegExp(
+        r'\[(\d+):(\d{1,2}(?:\.\d+)?)\]',
+      ).firstMatch(trimmed);
+      if (match != null) {
+        final m = int.parse(match.group(1)!);
+        final s = double.parse(match.group(2)!);
+        final currentTime = m * 60.0 + s;
+
+        if (lastTime < 0) {
+          if (!hasInitialHeader) {
+            sectionCount++;
+            buffer.writeln('[VERSE $sectionCount]');
+          }
+        } else {
+          final gap = currentTime - lastTime;
+          // Typical gap between sections is > 5s
+          if (gap > 6.0 &&
+              !trimmed.contains('[VERSE') &&
+              !trimmed.contains('[CHORUS')) {
+            sectionCount++;
+            buffer.writeln();
+            // Try to guess if it's a verse or bridge
+            String label = 'VERSE';
+            if (currentTime > 120 && gap > 10) label = 'BRIDGE/OUTRO';
+            buffer.writeln('[$label $sectionCount]');
+          }
+        }
+        lastTime = currentTime;
+      }
+      buffer.writeln(line);
+    }
+    return buffer.toString().trim();
+  }
+
+  /// Normalize text for comparison (alphanumeric only)
+  String _getFuzzySignature(String text) {
+    // Remove ad-libs and non-alphanumeric chars
+    return text
+        .toLowerCase()
+        .replaceAll(RegExp(r'\(.*?\)', dotAll: true), '')
+        .replaceAll(RegExp(r'[^a-z0-9]'), '');
   }
 
   String _convertToTitleCase(String text) {
@@ -931,8 +1184,6 @@ class LyricsService {
 
   String _applyTheologicalCasing(String text) {
     String fixed = text;
-
-    // Always capitalize deity titles
     final deityTitles = [
       'god',
       'jesus',
@@ -947,7 +1198,6 @@ class LyricsService {
       fixed = fixed.replaceAllMapped(
         RegExp(r'\b' + title + r'\b', caseSensitive: false),
         (match) {
-          // Title case each word
           return match
               .group(0)!
               .split(' ')
@@ -960,7 +1210,6 @@ class LyricsService {
         },
       );
     }
-
     return fixed;
   }
 
@@ -977,33 +1226,6 @@ class LyricsService {
         .replaceAll('&#8220;', '"')
         .replaceAll('&#8221;', '"')
         .replaceAll('&apos;', "'");
-  }
-
-  // ============================================================
-  // SLIDE GENERATION (existing methods)
-  // ============================================================
-
-  List<ProjectionSlide> getSlides(Song song) {
-    final slides = <ProjectionSlide>[];
-    final stanzas = song.stanzas;
-
-    for (int i = 0; i < stanzas.length; i++) {
-      slides.add(
-        ProjectionSlide(
-          body: stanzas[i],
-          templateTextColor: const Color(0xFFFFFFFF),
-          templateBackground: const Color(0xFF000000),
-          templateFontSize: 60,
-          templateAlign: TextAlign.center,
-          boxLeft: 50,
-          boxTop: 50,
-          boxWidth: 1820,
-          boxHeight: 980,
-        ),
-      );
-    }
-
-    return slides;
   }
 
   List<SlideContent> parseSlides(Song song, {int maxLines = 8}) {
@@ -1055,7 +1277,6 @@ class LyricsService {
               ? start + maxLines
               : bodyLines.length;
           final chunkText = bodyLines.sublist(start, end).join('\n');
-
           slides.add(
             SlideContent(
               id: const Uuid().v4(),
@@ -1066,6 +1287,8 @@ class LyricsService {
               alignOverride: TextAlign.center,
               verticalAlign: VerticalAlign.middle,
               layers: i == 0 ? generatedLayers : [],
+              audioPath: song.audioPath,
+              alignmentData: song.alignmentData,
             ),
           );
         }
@@ -1080,10 +1303,11 @@ class LyricsService {
             alignOverride: TextAlign.center,
             verticalAlign: VerticalAlign.middle,
             layers: generatedLayers,
+            audioPath: song.audioPath,
+            alignmentData: song.alignmentData,
           ),
         );
       }
-
       mainBody.clear();
       layerBuffers.clear();
       currentTarget = 'main';
@@ -1091,7 +1315,6 @@ class LyricsService {
 
     for (var line in lines) {
       final trimmed = line.trim();
-
       if (trimmed.startsWith('Title=') ||
           trimmed.startsWith('Author=') ||
           trimmed.startsWith('CCLI=') ||
@@ -1115,17 +1338,14 @@ class LyricsService {
           layerBuffers.putIfAbsent(currentTarget, () => StringBuffer());
           continue;
         }
-
         commitSlide();
         currentLabel = trimmed.substring(1, trimmed.length - 1);
         continue;
       }
-
       if (trimmed.isEmpty) {
         commitSlide();
         continue;
       }
-
       if (currentTarget == 'main') {
         mainBody.writeln(line);
       } else {

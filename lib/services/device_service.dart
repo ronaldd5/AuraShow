@@ -5,7 +5,7 @@ library;
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui' show Offset, Size;
+import 'dart:ui' show Offset, Size, Rect;
 
 import 'package:flutter/foundation.dart';
 import 'package:camera_platform_interface/camera_platform_interface.dart';
@@ -13,6 +13,7 @@ import 'package:screen_retriever/screen_retriever.dart';
 
 import '../platforms/desktop_capture.dart';
 import '../platforms/interface/capture_platform_interface.dart';
+import 'audio_device_service.dart';
 
 /// Device type enumeration
 enum DeviceType { camera, screen, ndi }
@@ -29,6 +30,7 @@ class LiveDevice {
     this.resolution,
     this.refreshRate,
     this.ndiUrl,
+    this.bounds,
   });
 
   final String id;
@@ -40,6 +42,7 @@ class LiveDevice {
   final String? resolution;
   final int? refreshRate;
   final String? ndiUrl;
+  final Rect? bounds;
 
   /// Create a copy with updated thumbnail
   LiveDevice copyWithThumbnail(Uint8List? newThumbnail) {
@@ -53,6 +56,7 @@ class LiveDevice {
       resolution: resolution,
       refreshRate: refreshRate,
       ndiUrl: ndiUrl,
+      bounds: bounds,
     );
   }
 
@@ -67,6 +71,7 @@ class LiveDevice {
     String? resolution,
     int? refreshRate,
     String? ndiUrl,
+    Rect? bounds,
   }) {
     return LiveDevice(
       id: id ?? this.id,
@@ -78,6 +83,7 @@ class LiveDevice {
       resolution: resolution ?? this.resolution,
       refreshRate: refreshRate ?? this.refreshRate,
       ndiUrl: ndiUrl ?? this.ndiUrl,
+      bounds: bounds ?? this.bounds,
     );
   }
 
@@ -137,6 +143,20 @@ class DeviceService {
     if (_isInitialized) return;
     _isInitialized = true;
 
+    // Initialize platform capture service
+    try {
+      await DesktopCapture.instance.initialize();
+    } catch (e) {
+      debugPrint('DeviceService: Failed to initialize DesktopCapture: $e');
+    }
+
+    // Initialize audio service
+    try {
+      await AudioDeviceService.initialize();
+    } catch (e) {
+      debugPrint('DeviceService: Failed to initialize AudioDeviceService: $e');
+    }
+
     // Initial device scan
     await refreshDevices();
 
@@ -192,6 +212,12 @@ class DeviceService {
             thumbnail: existing?.thumbnail,
             resolution: resolution,
             isActive: true,
+            bounds: Rect.fromLTWH(
+              display.left.toDouble(),
+              display.top.toDouble(),
+              display.width.toDouble(),
+              display.height.toDouble(),
+            ),
           ),
         );
       }
@@ -231,6 +257,7 @@ class DeviceService {
               thumbnail: existing?.thumbnail,
               resolution: resolution,
               isActive: true,
+              bounds: Rect.fromLTWH(pos.dx, pos.dy, size.width, size.height),
             ),
           );
         }

@@ -106,3 +106,26 @@ install(DIRECTORY "${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}"
 install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
   CONFIGURATIONS Profile;Release
   COMPONENT Runtime)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NDI SDK Library
+# Copy Processing.NDI.Lib.x64.dll to build output if it exists
+# ─────────────────────────────────────────────────────────────────────────────
+set(NDI_DLL_NAME "Processing.NDI.Lib.x64.dll")
+
+# Check multiple possible locations for the NDI DLL
+set(NDI_DLL_PATHS
+  "${CMAKE_CURRENT_SOURCE_DIR}/runner/${NDI_DLL_NAME}"           # windows/runner/
+  "${CMAKE_CURRENT_SOURCE_DIR}/${NDI_DLL_NAME}"                  # windows/
+  "$ENV{NDI_RUNTIME_DIR_V5}/${NDI_DLL_NAME}"                     # NDI 5 Runtime environment variable
+  "C:/Program Files/NDI/NDI 5 Runtime/v5/${NDI_DLL_NAME}"        # Default NDI 5 install path
+)
+
+foreach(NDI_PATH ${NDI_DLL_PATHS})
+  if(EXISTS "${NDI_PATH}")
+    message(STATUS "Found NDI DLL at: ${NDI_PATH}")
+    install(FILES "${NDI_PATH}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}" COMPONENT Runtime)
+    break()
+  endif()
+endforeach()
+

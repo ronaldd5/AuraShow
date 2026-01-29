@@ -1,6 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:ffi' as ffi;
+import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
+import 'package:win32/win32.dart' as win32;
+
 import '../../core/theme/palette.dart';
 import 'models/projection_slide.dart';
 import 'projection_constants.dart';
@@ -11,9 +17,6 @@ import 'widgets/slide_transition_engine.dart';
 import '../dashboard/models/stage_models.dart';
 
 /// Secondary projection window for displaying slides on external displays.
-///
-/// This widget runs in a separate Flutter engine/window and receives
-/// slide content from the primary dashboard via IPC method calls.
 class ProjectionWindow extends StatefulWidget {
   final int windowId;
   final Map initialData;
@@ -47,7 +50,7 @@ class _ProjectionWindowState extends State<ProjectionWindow> {
   Duration transitionDuration = const Duration(milliseconds: 600);
   int viewVersion = 0;
 
-  // Video sync state - for synchronized playback across windows
+  // Video sync
   int videoPositionMs = 0;
   String? syncedVideoPath;
 
@@ -58,30 +61,23 @@ class _ProjectionWindowState extends State<ProjectionWindow> {
   @override
   void initState() {
     super.initState();
-    debugPrint(
-      'proj: _ProjectionWindowState initState, setting up method handler',
-    );
     _applyProjectionState(Map<String, dynamic>.from(widget.initialData));
+
+    // Initialize headless styling
+    _initWindowStyling();
 
     try {
       DesktopMultiWindow.setMethodHandler((call, fromWindowId) async {
-        debugPrint(
-          'proj: method ${call.method} from=$fromWindowId payloadType=${call.arguments.runtimeType}',
-        );
         if (call.method == "updateContent" || call.method == "updateSlide") {
           final data = _coerceProjectionPayload(call.arguments);
           if (data != null && mounted) {
-            debugPrint('proj: applying projection payload keys=${data.keys}');
             setState(() => _applyProjectionState(data));
           }
         }
-        // Note: Window closing is handled by the main window, not here
         return null;
       });
-      debugPrint('proj: method handler set up successfully');
-    } catch (e, st) {
+    } catch (e) {
       debugPrint('proj: setMethodHandler failed error=$e');
-      debugPrint('$st');
     }
   }
 
@@ -90,24 +86,17 @@ class _ProjectionWindowState extends State<ProjectionWindow> {
     try {
       if (payload is String) {
         if (payload.isEmpty) return null;
-        debugPrint('proj: decode payload string length=${payload.length}');
         return Map<String, dynamic>.from(json.decode(payload) as Map);
       }
       if (payload is Map) {
-        debugPrint('proj: decode payload map keys=${payload.keys}');
         return Map<String, dynamic>.from(payload);
       }
-    } catch (_) {
-      // Ignore malformed payloads; caller will remain unchanged.
-    }
+    } catch (_) {}
     return null;
   }
 
   void _applyProjectionState(Map data) {
-    // Prefer rich slide payload; fallback to legacy text-only payload.
     if (data['clear'] == true) {
-      debugPrint('proj: received clear payload');
-      debugPrint('proj: received clear payload');
       slide = null;
       nextSlide = null;
       stageLayout = null;
@@ -123,7 +112,6 @@ class _ProjectionWindowState extends State<ProjectionWindow> {
       layerTimerActive = false;
       outputLocked = false;
       isPlaying = false;
-      transitionName = 'fade';
       viewVersion++;
       return;
     }
@@ -145,15 +133,8 @@ class _ProjectionWindowState extends State<ProjectionWindow> {
           milliseconds: state['transitionDuration'],
         );
       }
-
-      // Video sync data for timestamp synchronization
       videoPositionMs = state['videoPositionMs'] ?? 0;
       syncedVideoPath = state['videoPath'] as String?;
-      if (videoPositionMs > 0) {
-        debugPrint(
-          'proj: received video sync positionMs=$videoPositionMs path=$syncedVideoPath',
-        );
-      }
     }
 
     if (data['stageTimerTarget'] != null) {
@@ -166,12 +147,8 @@ class _ProjectionWindowState extends State<ProjectionWindow> {
     }
 
     if (data['slide'] is Map) {
-      debugPrint('proj: received slide payload');
       slide = ProjectionSlide.fromJson(
         Map<String, dynamic>.from(data['slide'] as Map),
-      );
-      debugPrint(
-        'proj: parsed slide mediaPath=${slide?.mediaPath} mediaType=${slide?.mediaType}',
       );
     } else {
       slide = null;
@@ -181,7 +158,6 @@ class _ProjectionWindowState extends State<ProjectionWindow> {
       nextSlide = ProjectionSlide.fromJson(
         Map<String, dynamic>.from(data['nextSlide'] as Map),
       );
-      // Preload video for the next slide to ensure smooth transitions
       if (nextSlide!.mediaType == 'video' &&
           (nextSlide!.mediaPath?.isNotEmpty ?? false)) {
         StyledSlide.preload(nextSlide!.mediaPath!);
@@ -218,82 +194,120 @@ class _ProjectionWindowState extends State<ProjectionWindow> {
     viewVersion++;
   }
 
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Request focus aggressively
+    if (!_focusNode.hasFocus) {
+      _focusNode.requestFocus();
+    }
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: (outputConfig?['transparent'] == true)
-            ? Colors.transparent
-            : AppPalette.carbonBlack,
-        body: SlideTransitionEngine(
-          duration: transitionDuration,
-          transitionType: transitionName,
-          child: KeyedSubtree(
-            key: ValueKey<int>(viewVersion),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                // Render a fixed stage surface and scale to fit so proportions match the editor preview.
-                final slideSurface = slide != null
-                    ? StyledSlide(
-                        stageWidth: kStageWidth,
-                        stageHeight: kStageHeight,
-                        slide: slide!,
-                        output: outputConfig,
-                        backgroundActive: layerBackgroundActive,
-                        foregroundMediaActive: layerForegroundMediaActive,
-                        slideActive: layerSlideActive,
-                        overlayActive: layerOverlayActive,
-                        isPlaying: isPlaying,
-                        videoPositionMs: videoPositionMs,
-                        volume:
-                            (layerAudioActive &&
-                                (outputConfig?['ndiAudio'] ?? true))
-                            ? 1.0
-                            : 0.0,
-                      )
-                    : LegacySlideSurface(
-                        stageWidth: kStageWidth,
-                        stageHeight: kStageHeight,
-                        content: content,
-                        alignment: alignment,
-                        imagePath: imagePath,
-                        output: outputConfig,
-                        backgroundActive: layerBackgroundActive,
-                        slideActive: layerSlideActive,
-                      );
+      home: KeyboardListener(
+        focusNode: _focusNode,
+        autofocus: true,
+        onKeyEvent: (event) async {
+          if (event is KeyDownEvent &&
+              event.logicalKey == LogicalKeyboardKey.escape) {
+            debugPrint('proj: ESC pressed (KeyboardListener), closing window');
+            try {
+              // Notify main window before closing
+              await DesktopMultiWindow.invokeMethod(0, 'outputClosed', {
+                'windowId': widget.windowId,
+              });
+              await WindowController.fromWindowId(widget.windowId).close();
+            } catch (e) {
+              debugPrint('proj: error closing window: $e');
+            }
+          }
+        },
+        child: Scaffold(
+          backgroundColor: (outputConfig?['transparent'] == true)
+              ? Colors.transparent
+              : AppPalette.carbonBlack,
+          body: SlideTransitionEngine(
+            duration: transitionDuration,
+            transitionType: transitionName,
+            child: KeyedSubtree(
+              key: ValueKey<int>(viewVersion),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final slideSurface = slide != null
+                      ? StyledSlide(
+                          stageWidth: kStageWidth,
+                          stageHeight: kStageHeight,
+                          slide: slide!,
+                          output: outputConfig,
+                          backgroundActive: layerBackgroundActive,
+                          foregroundMediaActive: layerForegroundMediaActive,
+                          slideActive: layerSlideActive,
+                          overlayActive: layerOverlayActive,
+                          isPlaying: isPlaying,
+                          videoPositionMs: videoPositionMs,
+                          volume:
+                              (layerAudioActive &&
+                                  (outputConfig?['ndiAudio'] ?? true))
+                              ? 1.0
+                              : 0.0,
+                        )
+                      : LegacySlideSurface(
+                          stageWidth: kStageWidth,
+                          stageHeight: kStageHeight,
+                          content: content,
+                          alignment: alignment,
+                          imagePath: imagePath,
+                          output: outputConfig,
+                          backgroundActive: layerBackgroundActive,
+                          slideActive: layerSlideActive,
+                          overlayActive: layerOverlayActive,
+                        );
 
-                // Use StageDisplaySlide if applicable
-                final isStageMode =
-                    outputConfig?['styleProfile'] == 'stageNotes' &&
-                    stageLayout != null;
-                final displayWidget = isStageMode
-                    ? StageDisplaySlide(
-                        layout: stageLayout!,
-                        currentSlide: slide,
-                        nextSlide: nextSlide,
-                        timerTarget: stageTimerTarget,
-                        timerDuration: stageTimerDuration,
-                        stageWidth: kStageWidth,
-                        stageHeight: kStageHeight,
-                      )
-                    : slideSurface;
+                  final isStageMode =
+                      outputConfig?['styleProfile'] == 'stageNotes' &&
+                      stageLayout != null;
+                  final displayWidget = isStageMode
+                      ? StageDisplaySlide(
+                          layout: stageLayout!,
+                          currentSlide: slide,
+                          nextSlide: nextSlide,
+                          timerTarget: stageTimerTarget,
+                          timerDuration: stageTimerDuration,
+                          stageWidth: kStageWidth,
+                          stageHeight: kStageHeight,
+                        )
+                      : slideSurface;
 
-                return Center(
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: SizedBox(
-                      width: kStageWidth,
-                      height: kStageHeight,
-                      child: displayWidget,
+                  return Center(
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: SizedBox(
+                        width: kStageWidth,
+                        height: kStageHeight,
+                        child: displayWidget,
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  // --- Native Window Styling (Headless/Borderless) ---
+
+  Future<void> _initWindowStyling() async {
+    // Native styling is now handled in C++ (flutter_window.cpp)
+    // trying to do it here caused race conditions.
   }
 }
